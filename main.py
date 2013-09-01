@@ -20,15 +20,15 @@ class MoonRabbitGame(Widget):
         self.num_of_blocks_Y = Window.height / self.block_width
         
         # create 2-dimensional array to store blocks
-        self.blocks = [[0 for i in xrange(self.num_of_blocks_X)]
-                            for i in xrange(self.num_of_blocks_Y)]
+        self.blocks = [[0 for j in xrange(self.num_of_blocks_Y)]
+                            for i in xrange(self.num_of_blocks_X)]
 
         with self.canvas:
             allowed_landscapes = (Water, Grass, Sand)
-            for j in xrange(self.num_of_blocks_Y):
-                for i in xrange(self.num_of_blocks_X):
+            for i in xrange(self.num_of_blocks_X):
+                for j in xrange(self.num_of_blocks_Y):
                     rand_landscape = allowed_landscapes[random.randint(0, 2)]
-                    self.blocks[j][i] = rand_landscape(
+                    self.blocks[i][j] = rand_landscape(
                         pos=(i*self.block_width, j*self.block_height),
                         size=(self.block_width, self.block_height)
                     )
