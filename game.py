@@ -3,6 +3,7 @@ import random
 
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+from kivy.clock import Clock
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox
 from gamecontext import GameContext
@@ -11,6 +12,7 @@ from gamecontext import GameContext
 class MoonRabbitGame(Widget):
     block_width = 25
     block_height = 25
+    spf = 1 / 30.
     
     def __init__(self, **kwargs):
         # setup game context
@@ -30,6 +32,8 @@ class MoonRabbitGame(Widget):
         
         # FIXME: rid test function from here
         #self.test()
+        
+        Clock.schedule_interval(self.update, self.spf)
     
     def init_physics(self):
         init_physics()
@@ -41,7 +45,12 @@ class MoonRabbitGame(Widget):
     
     def setup_scene(self):
         """ Create here and add to scene all game objects """ 
-        StaticBox(pos=(50, 100), size=(100, 200))
+        StaticBox(pos=(300, 150), size=(100, 200))
+        
+    def update(self, dt):
+        self.context.space.step(self.spf)
+        for obj in self.context.dynamic_objects:
+            obj.update()
                     
     def test(self):
         with self.canvas:
