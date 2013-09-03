@@ -1,7 +1,10 @@
 
+import math
+
 from kivy.utils import platform
 from kivy.uix.widget import Widget
-from kivy.graphics import Rectangle, Color
+from kivy.uix.scatter import ScatterPlane
+from kivy.graphics import Rectangle, Color, Ellipse
 from gamecontext import GameContext
 
 if platform() in ('ios', 'android'):
@@ -95,8 +98,14 @@ class DynamicObject(PhysicalObject):
     def __init__(self, mass, pos=(0, 0), moment=1e5):
         self.mass = mass
         self.moment = moment # define moment of inertia(inertia for rotation)
-        super(PhysicalObject, self).__init__()
+        self.pos = pos
+        super(DynamicObject, self).__init__()
 
+    def update(self):
+        new_pos = self.body.position.x, self.body.position.y
+        self.widget.center = new_pos
+        if hasattr(self, 'rotation'):
+            self.widget.rotation = math.degrees(self.body.angle)
 
 class StaticBox(StaticObject):
     
@@ -119,4 +128,28 @@ class StaticBox(StaticObject):
         self.size = size
         self.texture = texture
         super(StaticBox, self).__init__(pos=pos)
+
+
+class Circle(DynamicObject):
+
+    def __init__(self, mass, pos=(0, 0), radius=100, texture=None):
+        """ Creates new circle """
+        self.radius = radius
+        self.texture = texture
+        super(Circle, self).__init__(mass, pos=pos)
     
+    def define_shape(self):
+        self.shape = phy.Circle(self.body, self.radius)
+        
+    def widget_factory(self):
+        size = self.radius*2, self.radius*2
+        widget = ScatterPlane(size=size)
+        widget.center = self.pos
+        with widget.canvas:
+            if not self.texture:
+                Color(1, 0, 0, 1)
+                Ellipse(pos=(0, 0), size=size)
+            else:
+                Color(1, 1, 1, 1)
+                Ellipse(pos=(0, 0), texture=self.texture, size=size)
+        return widget

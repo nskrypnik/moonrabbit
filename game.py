@@ -9,16 +9,15 @@ from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from controller import Controller
 from landscape import Water, Grass, Sand
-from physics import phy, init_physics, StaticBox
+from physics import phy, init_physics, StaticBox, Circle
 from gamecontext import GameContext
 
 
 class MoonRabbitGame(Widget):
+    
     block_width = 25
     block_height = 25
     spf = 1 / 30.
-    
-    _objects = DictProperty({})
 
     def __init__(self, **kwargs):
         # setup game context
@@ -67,48 +66,30 @@ class MoonRabbitGame(Widget):
             b.elasticity = 0.5
         self.space.add(borders)
 
-    
     def setup_scene(self):
         """ Create here and add to scene all game objects """ 
         StaticBox(pos=(300, 150), size=(100, 200))
-
-        for i in range(5):
-            body = phy.Body(100, 1e5)
-            body.position = self.x + random.random() * self.width, \
-                            self.y + random.random() * self.height
-
-            radius = 20
-            star = phy.Circle(body, radius)
-            star.elasticity = 1
-            star.friction = 1.0
-            self.space.add(body, star)
-            with self.canvas:
-                Color(3, 0.3, 1, mode='hsv')
-                # Color(3, 0.3, 1, mode='rgb')
-                rect = Ellipse(
-                    texture=Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture,
-                    pos=(300, 400),
-                    size=(40, 40),
-                    segments=100,
-                    angle_start=0,
-                    angle_end=360,
-                )
-                body.apply_force((random.randint(900, 1000), random.randint(900, 1000)), r=(0, 0))
-                self._objects[body] = rect
+        
+        texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
+        texture = texture.get_region(1, 20, 98, 98)
+        
+        c = Circle(1e3, pos=(100, 100), radius=50, texture=texture)
+        c.shape.elasticity = 1.
+        c.body.apply_force((1e4, 1e4), r=(0, 0))
+        #for i in range(5):
+        #    pos = self.x + random.random() * self.width, \
+        #                    self.y + random.random() * self.height
+        #    print pos
+        #    Circle(1e4, pos=pos, radius=50.0, texture=texture)
 
     def update(self, dt):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:
             obj.update()
-
-        for body, obj in self._objects.iteritems():
-            self.controller(body)
-            # Now it's a hack
-            # It must be something like
-            # obj.update()
-            p = body.position
-            obj.pos = p
-
+    
+    def on_touch_down(self, touch):
+        shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
+        print shape
                     
     def test(self):
         with self.canvas:
