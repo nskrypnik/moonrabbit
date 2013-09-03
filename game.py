@@ -4,7 +4,8 @@ import random
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from landscape import Water, Grass, Sand
-from physics import phy, init_physics
+from physics import phy, init_physics, StaticBox
+from gamecontext import GameContext
 
 
 class MoonRabbitGame(Widget):
@@ -12,6 +13,10 @@ class MoonRabbitGame(Widget):
     block_height = 25
     
     def __init__(self, **kwargs):
+        # setup game context
+        self.context = GameContext
+        self.context.game = self
+        
         super(MoonRabbitGame, self).__init__(**kwargs)
         self.num_of_blocks_X = Window.width / self.block_height
         self.num_of_blocks_Y = Window.height / self.block_width
@@ -21,12 +26,22 @@ class MoonRabbitGame(Widget):
                             for i in xrange(self.num_of_blocks_X)]
         
         self.init_physics()
+        self.setup_scene()
         
         # FIXME: rid test function from here
-        self.test()
+        #self.test()
     
     def init_physics(self):
-        self.space = init_physics()
+        init_physics()
+        self.create_bounds()
+        
+    def create_bounds(self):
+        """ Make bounds of the game space """
+        # Bounds should be created for
+    
+    def setup_scene(self):
+        """ Create here and add to scene all game objects """ 
+        StaticBox(pos=(50, 100), size=(100, 200))
                     
     def test(self):
         with self.canvas:
@@ -38,3 +53,8 @@ class MoonRabbitGame(Widget):
                         pos=(i*self.block_width, j*self.block_height),
                         size=(self.block_width, self.block_height)
                     )
+    
+    def on_touch_down(self, touch):
+        # this is for test purposes - returns shape by touch coordinates
+        shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
+        print shape
