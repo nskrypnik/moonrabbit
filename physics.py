@@ -31,10 +31,16 @@ def init_physics(**kw):
 
 class PhysicalObject(object):
     
-    def __init__(self):
+    apply_default_elasticity = True
+    apply_default_friction = True
+    
+    def __init__(self, **kw):
         global space
         self.space = space
         self.shape = None
+        self.texture = kw.pop('texture', None)
+        self.elasticity = kw.pop('elasticity', 0.)
+        self.friction = kw.pop('friction', 1.0)
         self._shapes = []
         self.body = self.body_factory()
         self.widget = self.widget_factory()
@@ -47,6 +53,10 @@ class PhysicalObject(object):
             self.space.add(self.body)
         for shape in self.shapes:
             self.space.add(shape)
+            if self.apply_default_elasticity:
+                shape.elasticity = self.elasticity
+            if self.apply_default_friction:
+                shape.friction = self.friction
         GameContext.add(self)
     
     @property
@@ -84,9 +94,9 @@ class StaticObject(PhysicalObject):
         # create static body
         return phy.Body()
     
-    def __init__(self, pos=(0, 0)):
+    def __init__(self, pos=(0, 0), **kw):
         self.pos = pos
-        super(StaticObject, self).__init__()
+        super(StaticObject, self).__init__(**kw)
 
 
 class DynamicObject(PhysicalObject):
@@ -95,17 +105,18 @@ class DynamicObject(PhysicalObject):
         # create static body
         return phy.Body(self.mass, self.moment)
     
-    def __init__(self, mass, pos=(0, 0), moment=1e5):
+    def __init__(self, mass, pos=(0, 0), moment=1e5, **kw):
         self.mass = mass
         self.moment = moment # define moment of inertia(inertia for rotation)
         self.pos = pos
-        super(DynamicObject, self).__init__()
+        super(DynamicObject, self).__init__(**kw)
 
     def update(self):
         new_pos = self.body.position.x, self.body.position.y
         self.widget.center = new_pos
-        if hasattr(self, 'rotation'):
+        if hasattr(self.widget, 'rotation'):
             self.widget.rotation = math.degrees(self.body.angle)
+
 
 class StaticBox(StaticObject):
     
@@ -123,20 +134,18 @@ class StaticBox(StaticObject):
                 Rectangle(pos=widget.pos, size=self.size)
         return widget
     
-    def __init__(self, pos=(0, 0), size=(100, 100), texture=None):
+    def __init__(self, pos=(0, 0), size=(100, 100), **kw):
         """ Creates new static box with size and pos which is the position of the center """
         self.size = size
-        self.texture = texture
-        super(StaticBox, self).__init__(pos=pos)
+        super(StaticBox, self).__init__(pos=pos, **kw)
 
 
 class Circle(DynamicObject):
 
-    def __init__(self, mass, pos=(0, 0), radius=100, texture=None):
+    def __init__(self, mass, pos=(0, 0), radius=100, **kw):
         """ Creates new circle """
         self.radius = radius
-        self.texture = texture
-        super(Circle, self).__init__(mass, pos=pos)
+        super(Circle, self).__init__(mass, pos=pos, **kw)
     
     def define_shape(self):
         self.shape = phy.Circle(self.body, self.radius)
@@ -153,3 +162,27 @@ class Circle(DynamicObject):
                 Color(1, 1, 1, 1)
                 Ellipse(pos=(0, 0), texture=self.texture, size=size)
         return widget
+    
+
+class Box(DynamicObject):
+    
+    def __init__(self, mass, pos=(0, 0), size=(100., 100.), **kw):
+        """ Creates new circle """
+        self.size = size
+        super(Box, self).__init__(mass, pos=pos, **kw)
+    
+    def define_shape(self):
+        self.shape = phy.Poly.create_box(self.body, self.size)
+  
+    def widget_factory(self):
+        widget = ScatterPlane(size=self.size)
+        widget.center = self.pos
+        with widget.canvas:
+            if self.texture:
+                Rectangle(pos=(0, 0), texture=self.texture, size=self.size)
+            else:
+                Color(0, 0, 1, 1)
+                Rectangle(pos=(0, 0), size=self.size)
+        return widget
+        
+    

@@ -9,7 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from controller import Controller
 from landscape import Water, Grass, Sand
-from physics import phy, init_physics, StaticBox, Circle
+from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
 
 
@@ -68,19 +68,18 @@ class MoonRabbitGame(Widget):
 
     def setup_scene(self):
         """ Create here and add to scene all game objects """ 
-        StaticBox(pos=(300, 150), size=(100, 200))
+        st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
         
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
-        c = Circle(1e3, pos=(100, 100), radius=50, texture=texture)
-        c.shape.elasticity = 1.
-        c.body.apply_force((1e4, 1e4), r=(0, 0))
-        #for i in range(5):
-        #    pos = self.x + random.random() * self.width, \
-        #                    self.y + random.random() * self.height
-        #    print pos
-        #    Circle(1e4, pos=pos, radius=50.0, texture=texture)
+        c = Circle(1e2, pos=(100, 100), radius=50, texture=texture, elasticity=.5)
+        #c.body.apply_force((1e4, 1e4), r=(0, 0))
+        c.body.velocity = (400., 400.)
+        
+        b = Box(1e3, pos=(370, 550), size=(100, 50), elasticity=.5)
+        b.body.angular_velocity = 5.
+        
 
     def update(self, dt):
         self.context.space.step(self.spf)
