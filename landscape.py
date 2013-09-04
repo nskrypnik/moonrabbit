@@ -29,3 +29,13 @@ class Water(Landscape):
 class Sand(Landscape):
     _velocity_coefficient = 0.7
     _color = (255, 255, 0)
+
+    
+class Hole(Landscape):
+    _color = (0, 0, 0)
+    _velocity_coefficient = 0.0
+
+
+class Carrot(Landscape):
+    _color = (255, 165, 0)
+    _velocity_coefficient = 0.0
