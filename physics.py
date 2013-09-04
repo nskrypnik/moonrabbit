@@ -145,23 +145,34 @@ class Circle(DynamicObject):
     def __init__(self, mass, pos=(0, 0), radius=100, **kw):
         """ Creates new circle """
         self.radius = radius
+        self.size = self.radius*2, self.radius*2
         super(Circle, self).__init__(mass, pos=pos, **kw)
     
     def define_shape(self):
         self.shape = phy.Circle(self.body, self.radius)
+        self.shape.parent = self
         
     def widget_factory(self):
-        size = self.radius*2, self.radius*2
-        widget = ScatterPlane(size=size)
+        widget = ScatterPlane(size=self.size)
         widget.center = self.pos
+        self.redraw(widget)
+        return widget
+        
+    def redraw(self, widget=None):
+        if widget is None:
+            widget = self.widget
+        widget.canvas.clear()
         with widget.canvas:
             if not self.texture:
                 Color(1, 0, 0, 1)
-                Ellipse(pos=(0, 0), size=size)
+                Ellipse(pos=(0, 0), size=self.size)
             else:
                 Color(1, 1, 1, 1)
-                Ellipse(pos=(0, 0), texture=self.texture, size=size)
-        return widget
+                Ellipse(pos=(0, 0), texture=self.texture, size=self.size)
+                
+    def change_texture(self, new_texture):
+        self.texture = new_texture
+        self.redraw()
     
 
 class Box(DynamicObject):
