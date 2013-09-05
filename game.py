@@ -11,7 +11,7 @@ from controller import Controller
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-
+from animation import SimpleAnimation
 
 class BodyDragMgr():
     
@@ -69,6 +69,7 @@ class MoonRabbitGame(Widget):
         self.init_physics()
         self.setup_scene()
         self.create_bounds()
+        self.load_resources()
         # FIXME: rid test function from here
         # self.test()
         Clock.schedule_interval(self.update, self.spf)
@@ -109,12 +110,14 @@ class MoonRabbitGame(Widget):
         
         c = Circle(1e2, pos=(100, 100), radius=50, texture=texture, elasticity=.5)
         #c.body.apply_force((1e4, 1e4), r=(0, 0))
-        c.body.velocity = (400., 400.)
+        #c.body.velocity = (400., 400.)
+        c.body.velocity = (0., 0.)
         
         b = Box(1e3, pos=(370, 550), size=(100, 50), elasticity=.5)
         b.body.angular_velocity = 2.
         
-        b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True)
+        b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.2e8)
+        # 0.2e8 is perfect value for dragging and rotation
         
 
     def update(self, dt):
@@ -124,6 +127,10 @@ class MoonRabbitGame(Widget):
     
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
+        # animation test here
+        if hasattr(shape, 'parent') and isinstance(shape.parent, Circle):
+            shape.parent.animate(self.animations['star'])
+        # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)
         else:
@@ -136,6 +143,18 @@ class MoonRabbitGame(Widget):
     def on_touch_up(self, touch):
         if touch.bodydragmgr:
             touch.bodydragmgr.release()
+        
+    def load_resources(self):
+        self.animations = {}
+        
+        frames = []
+        frame_time = 0.04  # sec
+        for i in xrange(6):
+            texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star{}.png'.format(i)), mipmap=True).texture
+            texture = texture.get_region(1, 20, 98, 98)
+            frames.append((texture, frame_time))
+        self.animations['star'] = SimpleAnimation(frames) # shine
+        
                     
     def test(self):
         with self.canvas:
