@@ -3,7 +3,6 @@ class Animation(object):
     Generic interface. Override __init__ in inherited class
     
     each frame in the list '_frames' is tuple (texture, time_to_show)
-    to show animation, main method -- 'launch'
     """
     _frames = []
     
