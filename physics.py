@@ -158,18 +158,10 @@ class Circle(DynamicObject):
     
     def define_shape(self):
         self.shape = phy.Circle(self.body, self.radius)
-        self.shape.parent = self
         
     def widget_factory(self):
         widget = ScatterPlane(size=self.size)
         widget.center = self.pos
-        self.redraw(widget)
-        return widget
-        
-    def redraw(self, widget=None):
-        if widget is None:
-            widget = self.widget
-        widget.canvas.clear()
         with widget.canvas:
             if not self.texture:
                 Color(1, 0, 0, 1)
@@ -177,22 +169,8 @@ class Circle(DynamicObject):
             else:
                 Color(1, 1, 1, 1)
                 Ellipse(pos=(0, 0), texture=self.texture, size=self.size)
-                
-    def animate(self, animation):
-        if animation.is_first_call():
-            # backup texture:
-            self.original_texture = self.texture
-        next_frame = next(animation, None)
-        if next_frame is None: # all frames are shown
-            # restore texture
-            self.texture = self.original_texture
-            self.redraw()
-            return
-        texture, _time = next_frame
-        self.texture = texture
-        self.redraw()
-        Clock.schedule_once(lambda dt: self.animate(animation), _time)
-    
+        return widget
+
 
 class Box(DynamicObject):
     

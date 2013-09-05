@@ -12,6 +12,7 @@ from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
 from animation import SimpleAnimation
+from gameobjects import AnimatedCircle
 
 class BodyDragMgr():
     
@@ -67,9 +68,9 @@ class MoonRabbitGame(Widget):
                             for i in xrange(self.num_of_blocks_X)]
         
         self.init_physics()
+        self.load_resources()
         self.setup_scene()
         self.create_bounds()
-        self.load_resources()
         # FIXME: rid test function from here
         # self.test()
         Clock.schedule_interval(self.update, self.spf)
@@ -108,15 +109,16 @@ class MoonRabbitGame(Widget):
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
-        c = Circle(1e2, pos=(100, 100), radius=50, texture=texture, elasticity=.5)
+        c = AnimatedCircle(1e2, pos=(100, 100), radius=50, texture=texture, elasticity=.5, draggable=True)
         #c.body.apply_force((1e4, 1e4), r=(0, 0))
         #c.body.velocity = (400., 400.)
+        c.set_animation(self.animations['star'])
         c.body.velocity = (0., 0.)
         
         b = Box(1e3, pos=(370, 550), size=(100, 50), elasticity=.5)
         b.body.angular_velocity = 2.
         
-        b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.2e8)
+        b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.15e8)
         # 0.2e8 is perfect value for dragging and rotation
         
 
@@ -128,8 +130,8 @@ class MoonRabbitGame(Widget):
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
         # animation test here
-        if hasattr(shape, 'parent') and isinstance(shape.parent, Circle):
-            shape.parent.animate(self.animations['star'])
+        if shape and isinstance(shape.body.data, AnimatedCircle):
+            shape.body.data.animate()
         # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)
@@ -154,6 +156,8 @@ class MoonRabbitGame(Widget):
             texture = texture.get_region(1, 20, 98, 98)
             frames.append((texture, frame_time))
         self.animations['star'] = SimpleAnimation(frames) # shine
+        
+        return frames
         
                     
     def test(self):
