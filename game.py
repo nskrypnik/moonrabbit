@@ -145,7 +145,7 @@ class MoonRabbitGame(Widget):
     def on_touch_up(self, touch):
         if touch.bodydragmgr:
             touch.bodydragmgr.release()
-        
+
     def load_resources(self):
         self.animations = {}
         
@@ -158,8 +158,14 @@ class MoonRabbitGame(Widget):
         self.animations['star'] = SimpleAnimation(frames) # shine
         
         return frames
-        
-                    
+
+    def get_block(self, x, y):
+        i = int(x) / self.block_width
+        j = int(y) / self.block_height
+        if i >= self.num_of_blocks_X or j >= self.num_of_blocks_Y or x < 0 or y < 0:
+            raise ValueError("Coordinates out of playground")
+        return self.blocks[i][j]
+
     def test(self):
         with self.canvas:
             allowed_landscapes = (Water, Grass, Sand)
