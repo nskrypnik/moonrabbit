@@ -91,7 +91,7 @@ class MoonRabbitGame(Widget):
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
         if hasattr(shape, 'parent') and isinstance(shape.parent, Circle):
-            self.animations['star'].launch(shape.parent.change_texture)
+            shape.parent.animate(self.animations['star'])
         print shape
         
     def load_resources(self):
@@ -103,7 +103,7 @@ class MoonRabbitGame(Widget):
             texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star{}.png'.format(i)), mipmap=True).texture
             texture = texture.get_region(1, 20, 98, 98)
             frames.append((texture, frame_time))
-        self.animations['star'] = SimpleAnimation(3*(frames + frames[::-1])) # shine 3 times
+        self.animations['star'] = SimpleAnimation(frames) # shine
         
                     
     def test(self):

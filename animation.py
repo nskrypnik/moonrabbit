@@ -1,5 +1,3 @@
-from kivy.clock import Clock
-
 class Animation(object):
     """
     Generic interface. Override __init__ in inherited class
@@ -10,17 +8,20 @@ class Animation(object):
     _frames = []
     
     def __init__(self, *args, **kwargs):
+        self.current_frame = 0
         pass
     
-    def launch(self, drawer, frame_no=0):
-        """
-        drawer: function that accepts single argument - texture
-        """
-        if frame_no >= len(self._frames):
-            return
-        texture, _time = self._frames[frame_no]
-        drawer(texture)
-        Clock.schedule_once(lambda dt: self.launch(drawer, frame_no + 1), _time)
+    def next(self):
+        if self.current_frame < len(self._frames):
+            texture, _time = self._frames[self.current_frame]
+            self.current_frame += 1
+            return texture, _time
+        else:
+            self.current_frame = 0
+            raise StopIteration
+        
+    def is_first_call(self):
+        return self.current_frame == 0
 
 
 # implementation

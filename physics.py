@@ -5,6 +5,7 @@ from kivy.utils import platform
 from kivy.uix.widget import Widget
 from kivy.uix.scatter import ScatterPlane
 from kivy.graphics import Rectangle, Color, Ellipse
+from kivy.clock import Clock
 from gamecontext import GameContext
 
 if platform() in ('ios', 'android'):
@@ -170,9 +171,20 @@ class Circle(DynamicObject):
                 Color(1, 1, 1, 1)
                 Ellipse(pos=(0, 0), texture=self.texture, size=self.size)
                 
-    def change_texture(self, new_texture):
-        self.texture = new_texture
+    def animate(self, animation):
+        if animation.is_first_call():
+            # backup texture:
+            self.original_texture = self.texture
+        next_frame = next(animation, None)
+        if next_frame is None: # all frames are shown
+            # restore texture
+            self.texture = self.original_texture
+            self.redraw()
+            return
+        texture, _time = next_frame
+        self.texture = texture
         self.redraw()
+        Clock.schedule_once(lambda dt: self.animate(animation), _time)
     
 
 class Box(DynamicObject):
