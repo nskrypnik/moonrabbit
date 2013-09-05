@@ -43,10 +43,11 @@ class AnimationMixin(object):
         self.animation = animation
     
     def animate(self):
-        if self.animation.is_first_call():
+        animation = self.animation
+        if animation.is_first_call():
             # backup texture:
             self.original_texture = self.texture
-        next_frame = next(self.animation, None)
+        next_frame = next(animation, None)
         if next_frame is None: # all frames are shown
             # restore texture
             self.texture = self.original_texture

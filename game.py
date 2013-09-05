@@ -14,6 +14,7 @@ from gamecontext import GameContext
 from animation import SimpleAnimation
 from gameobjects import AnimatedCircle
 
+
 class BodyDragMgr():
     
     def __init__(self, space, body, touch):
@@ -21,13 +22,10 @@ class BodyDragMgr():
         self.controller = phy.Body(1e1000, 1e1000)
         self.space = space
         self.touch = touch
-        #self.controller.position = self.controlled.position
         self.controller.position = (touch.x, touch.y)
         anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
                 touch.y - self.controlled.position.y)
-        print anchor
         anchor.rotate(-body.angle)
-        print anchor
         args = self.controller, self.controlled, (0, 0), anchor
         joint = phy.constraint.PivotJoint(*args)
         joint.max_bias = 1e5
@@ -44,13 +42,12 @@ class BodyDragMgr():
         self.space.remove(self.joint)
         self.controlled.velocity = 0., 0.
         self.controlled.angular_velocity = 0.
-        print self.controlled.angle
 
 
 class MoonRabbitGame(Widget):
     
-    block_width = 25
-    block_height = 25
+    block_width = 75
+    block_height = 75
     spf = 1 / 30.
 
     def __init__(self, **kwargs):
@@ -60,8 +57,8 @@ class MoonRabbitGame(Widget):
         #self._touches = [] # container for touches
         
         super(MoonRabbitGame, self).__init__(**kwargs)
-        self.num_of_blocks_X = Window.width / self.block_height
-        self.num_of_blocks_Y = Window.height / self.block_width
+        self.num_of_blocks_X = 14
+        self.num_of_blocks_Y = 10
         
         # create 2-dimensional array to store blocks
         self.blocks = [[0 for j in xrange(self.num_of_blocks_Y)]
@@ -103,7 +100,10 @@ class MoonRabbitGame(Widget):
         self.space.add(borders)
 
     def setup_scene(self):
-        """ Create here and add to scene all game objects """ 
+        """ Create here and add to scene all game objects """
+        
+        self.build_landscape()
+         
         st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
         
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
@@ -115,12 +115,24 @@ class MoonRabbitGame(Widget):
         c.set_animation(self.animations['star'])
         c.body.velocity = (0., 0.)
         
-        b = Box(1e3, pos=(370, 550), size=(100, 50), elasticity=.5)
+        b = Box(1e1000, moment=1e500, pos=(370, 550), size=(100, 50), elasticity=.5)
         b.body.angular_velocity = 2.
         
         b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.15e8)
         # 0.2e8 is perfect value for dragging and rotation
-        
+    
+    def build_landscape(self):
+        # while build only with grass
+        with self.canvas:
+            for i in xrange(self.num_of_blocks_X):
+                for j in xrange(self.num_of_blocks_Y):
+                    landscape = Grass(
+                        pos=(i*self.block_width, j*self.block_height),
+                        size=(self.block_width, self.block_height)
+                    )
+                    self.blocks[i][j] = landscape
+                    
+    
 
     def update(self, dt):
         self.context.space.step(self.spf)
@@ -156,8 +168,6 @@ class MoonRabbitGame(Widget):
             texture = texture.get_region(1, 20, 98, 98)
             frames.append((texture, frame_time))
         self.animations['star'] = SimpleAnimation(frames) # shine
-        
-        return frames
         
                     
     def test(self):

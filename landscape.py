@@ -1,41 +1,36 @@
 from kivy.graphics import Color, Rectangle
+from kivy.core.image import Image
+from os.path import join, dirname
 
+RESOURCES = join(dirname(__file__), 'resources')
 
 class Landscape(Rectangle):
-    _velocity_coefficient = 1.0
-    _color = (1, 1, 1)
+    velocity_coefficient = 1.0
+    _texture = None
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kw):
         # set appropriate color for drawing
-        Color(*self._color)
-        super(Landscape, self).__init__(*args, **kwargs)
-    
-    def get_velocity_coefficient(self):
-        """
-        how fast rabbit moves on this type of landscape
-        """
-        return self._velocity_coefficient
+        kw['texture'] = self._texture
+        super(Landscape, self).__init__(*args, **kw)
 
 
 class Grass(Landscape):
-    _color = (0, 255, 0)
-
+    texture_path = join(RESOURCES, 'grass/grass-01.png')
+    _texture = Image(texture_path, mipmap=True).texture \
+        .get_region(0, 0, 72, 72)
+    
 
 class Water(Landscape):
-    _velocity_coefficient = 1.5
-    _color = (0, 0, 255)
+    velocity_coefficient = 1.5
 
 
 class Sand(Landscape):
-    _velocity_coefficient = 0.7
-    _color = (255, 255, 0)
+    velocity_coefficient = 0.7
 
     
 class Hole(Landscape):
-    _color = (0, 0, 0)
-    _velocity_coefficient = 0.0
+    velocity_coefficient = 0.0
 
 
 class Carrot(Landscape):
-    _color = (255, 165, 0)
-    _velocity_coefficient = 0.0
+    velocity_coefficient = 0.0
