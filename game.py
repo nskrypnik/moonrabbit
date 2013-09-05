@@ -13,6 +13,39 @@ from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
 
 
+class BodyDragMgr():
+    
+    def __init__(self, space, body, touch):
+        self.controlled = body
+        self.controller = phy.Body(1e1000, 1e1000)
+        self.space = space
+        self.touch = touch
+        #self.controller.position = self.controlled.position
+        self.controller.position = (touch.x, touch.y)
+        anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
+                touch.y - self.controlled.position.y)
+        print anchor
+        anchor.rotate(-body.angle)
+        print anchor
+        args = self.controller, self.controlled, (0, 0), anchor
+        joint = phy.constraint.PivotJoint(*args)
+        joint.max_bias = 1e5
+        self.joint = joint
+        space.add(joint)
+        
+    def update(self):
+        #print self.touch.dx, self.touch.dy
+        pos = self.controller.position.x + self.touch.dx, \
+                self.controller.position.y + self.touch.dy
+        self.controller.position = pos
+    
+    def release(self):
+        self.space.remove(self.joint)
+        self.controlled.velocity = 0., 0.
+        self.controlled.angular_velocity = 0.
+        print self.controlled.angle
+
+
 class MoonRabbitGame(Widget):
     
     block_width = 25
@@ -23,6 +56,7 @@ class MoonRabbitGame(Widget):
         # setup game context
         self.context = GameContext
         self.context.game = self
+        #self._touches = [] # container for touches
         
         super(MoonRabbitGame, self).__init__(**kwargs)
         self.num_of_blocks_X = Window.width / self.block_height
@@ -78,7 +112,9 @@ class MoonRabbitGame(Widget):
         c.body.velocity = (400., 400.)
         
         b = Box(1e3, pos=(370, 550), size=(100, 50), elasticity=.5)
-        b.body.angular_velocity = 5.
+        b.body.angular_velocity = 2.
+        
+        b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True)
         
 
     def update(self, dt):
@@ -88,7 +124,18 @@ class MoonRabbitGame(Widget):
     
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
-        print shape
+        if shape and shape.body.data.draggable:
+            touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)
+        else:
+            touch.bodydragmgr = None
+        
+    def on_touch_move(self, touch):
+        if touch.bodydragmgr:
+            touch.bodydragmgr.update()
+    
+    def on_touch_up(self, touch):
+        if touch.bodydragmgr:
+            touch.bodydragmgr.release()
                     
     def test(self):
         with self.canvas:

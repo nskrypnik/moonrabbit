@@ -41,6 +41,7 @@ class PhysicalObject(object):
         self.texture = kw.pop('texture', None)
         self.elasticity = kw.pop('elasticity', 0.)
         self.friction = kw.pop('friction', 1.0)
+        self.draggable = kw.pop('draggable', False)
         self._shapes = []
         self.body = self.body_factory()
         self.widget = self.widget_factory()
@@ -57,6 +58,8 @@ class PhysicalObject(object):
                 shape.elasticity = self.elasticity
             if self.apply_default_friction:
                 shape.friction = self.friction
+                
+        self.body.data = self
         GameContext.add(self)
     
     @property
@@ -103,12 +106,16 @@ class DynamicObject(PhysicalObject):
     
     def body_factory(self):
         # create static body
-        return phy.Body(self.mass, self.moment)
+        body = phy.Body(self.mass, self.moment)
+        if self.angular_velocity_limit:
+            body.angular_velocity_limit = self.angular_velocity_limit  
+        return body
     
     def __init__(self, mass, pos=(0, 0), moment=1e5, **kw):
         self.mass = mass
         self.moment = moment # define moment of inertia(inertia for rotation)
         self.pos = pos
+        self.angular_velocity_limit = kw.pop('angular_velocity_limit', None)
         super(DynamicObject, self).__init__(**kw)
 
     def update(self):
