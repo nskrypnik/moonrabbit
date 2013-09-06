@@ -21,7 +21,7 @@ class Rock(Circle):
         radius = BLOCK_SIZE[0] / 2.
         mass = 1e50
         moment = 1e500 # very high moment to prevent rotation
-        elasticity = 0. # not elastic
+        elasticity = 0.1 # not elastic
         texture = GameContext.resources['textures']['rock']
         
         super(Rock, self).__init__(pos=pos, radius=radius,

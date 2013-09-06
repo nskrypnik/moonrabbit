@@ -33,6 +33,9 @@ class BodyDragMgr():
         self.joint = joint
         space.add(joint)
         
+        # add Physical object as dragged to context
+        GameContext.dragged[body.data].append(self)
+        
     def update(self):
         #print self.touch.dx, self.touch.dy
         pos = self.controller.position.x + self.touch.dx, \
@@ -43,6 +46,8 @@ class BodyDragMgr():
         self.space.remove(self.joint)
         self.controlled.velocity = 0., 0.
         self.controlled.angular_velocity = 0.
+        self.touch.bodydragmgr = None
+        GameContext.dragged[self.controlled.data].remove(self)
 
 
 class MoonRabbitGame(Widget):
@@ -69,6 +74,23 @@ class MoonRabbitGame(Widget):
         self.load_resources()
         self.setup_scene()
         self.create_bounds()
+        
+        def _handler(space, arbiter, *args, **kw):
+            for shape in arbiter.shapes:
+                if not hasattr(shape.body, 'data'):
+                    continue
+                phyobj = shape.body.data
+                if not phyobj.draggable:
+                    continue 
+                dragmgrs = GameContext.dragged[phyobj]
+                if dragmgrs:
+                    if arbiter.total_ke > 1e5*shape.body.mass:
+                        for dragmgr in dragmgrs:
+                            dragmgr.release()
+            return True
+        
+        self.space.add_collision_handler(0, 0, post_solve=_handler)
+        
         # FIXME: rid test function from here
         # self.test()
         Clock.schedule_interval(self.update, self.spf)
@@ -121,7 +143,7 @@ class MoonRabbitGame(Widget):
         
         b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.15e8)
         # 0.2e8 is perfect value for dragging and rotation
-        rock = Rock(300, 500)
+        rock = Rock(600, 500)
     
     def build_landscape(self):
         # while build only with grass
@@ -149,6 +171,7 @@ class MoonRabbitGame(Widget):
     
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
+        print shape
         # animation test here
         if shape and isinstance(shape.body.data, AnimatedCircle):
             shape.body.data.animate()

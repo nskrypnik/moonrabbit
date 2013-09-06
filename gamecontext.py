@@ -17,6 +17,7 @@ class _GameContext(object):
         self._objs = []
         self.space = None
         self.resources = {}
+        self.dragged = {}
     
     def add(self, obj):
         
@@ -29,9 +30,11 @@ class _GameContext(object):
         self._objs.append(obj)
         if isinstance(obj, DynamicObject):
             self.dynamic_objects.append(obj)
+            if obj.draggable:
+                self.dragged[obj] = []
+                
         if isinstance(obj, StaticObject):
             self.static_objects.append(obj)
-
     
     def set_game(self, game):
         self.game = game
