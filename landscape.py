@@ -8,9 +8,17 @@ from settings import BLOCK_SIZE
 
 class WaterAnimation(AnimationMixin):
     
+    class DummyWidget(object):
+        pass
+    
     def __init__(self):
-        self.widget = Fbo(size=BLOCK_SIZE, clear_color=(0., 0., 0., 0.))      
-
+        self.widget = self.DummyWidget() 
+        self.widget.canvas = Fbo(size=BLOCK_SIZE, clear_color=(0., 0., 0., 0.))  
+        self.texture = GameContext.resources['textures']['water']
+        self.set_animation(GameContext.resources['animations']['water'])
+        with self.widget.canvas:
+            Color(1, 1, 1, 1)
+            Rectangle(pos=(0, 0), size=BLOCK_SIZE, texture=self.texture)
 
 class Landscape(Rectangle):
     velocity_coefficient = 1.0
@@ -20,7 +28,7 @@ class Landscape(Rectangle):
 
 
 class Grass(Landscape):
-        
+
     def __init__(self, *args, **kw):
         kw['texture'] = GameContext.resources['textures']['grass']
         super(Grass, self).__init__(*args, **kw)
@@ -28,7 +36,16 @@ class Grass(Landscape):
     
 
 class Water(Landscape):
+    _animation = None
     velocity_coefficient = 1.5
+
+    def __init__(self, *args, **kw):
+        if not Water._animation:
+            print "Animation created"
+            Water._animation = WaterAnimation()
+            Water._animation.animate(endless=True)
+        kw['texture'] = self._animation.widget.canvas.texture
+        super(Water, self).__init__(*args, **kw)
 
 
 class Sand(Landscape):

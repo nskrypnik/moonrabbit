@@ -5,7 +5,6 @@ from animation import SimpleAnimation
 from os.path import join, dirname
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 
-
 RESOURCES_DIR = join(dirname(__file__), 'resources')
 
 
@@ -21,6 +20,14 @@ def load_resources():
     
     textures['grass'] = texture
     
+    # load water texture
+
+    texture_path = join(RESOURCES_DIR, 'terrain/water-01.png')
+    texture = Image(texture_path, mipmap=True).texture \
+        .get_region(0, 0, *BLOCK_SIZE)
+        
+    textures['water'] = texture
+    
     # load test star animation
     # TODO: delete it after it's unnecessary 
     frames = []
@@ -30,3 +37,11 @@ def load_resources():
         texture = texture.get_region(1, 20, 98, 98)
         frames.append((texture, frame_time))
     animations['star'] = SimpleAnimation(frames) # shine
+
+    # load water animation
+    frames = []
+    frame_time = 0.2  # sec
+    for i in xrange(1, 6):
+        texture = Image(join(RESOURCES_DIR, 'terrain/water-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['water'] = SimpleAnimation(frames)

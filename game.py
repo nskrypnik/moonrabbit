@@ -127,10 +127,16 @@ class MoonRabbitGame(Widget):
         with self.canvas:
             for i in xrange(self.num_of_blocks_X):
                 for j in xrange(self.num_of_blocks_Y):
-                    landscape = Grass(
-                        pos=(i*self.block_width, j*self.block_height),
-                        size=(self.block_width, self.block_height)
-                    )
+                    if (i, j) in ((0, 0), (0, 1), (1, 0), (1, 1), (1, 3), (5, 2)):
+                        landscape = Water(
+                            pos=(i*self.block_width, j*self.block_height),
+                            size=(self.block_width, self.block_height)
+                        )
+                    else:
+                        landscape = Grass(
+                            pos=(i*self.block_width, j*self.block_height),
+                            size=(self.block_width, self.block_height)
+                        )
                     self.blocks[i][j] = landscape
                     
     
