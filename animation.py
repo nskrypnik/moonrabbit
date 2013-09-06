@@ -30,7 +30,9 @@ class Animation(object):
 
 class AnimationMixin(object):
     
-    animation = None
+    current_animation = None
+    animations = {}
+    stop_flag = False
     
     def redraw(self):
         assert not self.widget is None
@@ -38,25 +40,41 @@ class AnimationMixin(object):
         for obj in self.widget.canvas.children:
             if isinstance(obj, VertexInstruction):
                 obj.texture = self.texture
-                
+                            
     def set_animation(self, animation):
-        self.animation = animation
+        """ Here you can set animation directly or give key of predefined animation """
+        if isinstance(animation, Animation):
+            self.current_animation = animation
+        else:
+            self.current_animation = self.animations[animation]
     
-    def animate(self):
-        animation = self.animation
+    def animate(self, endless=False):
+        
+        if self.stop_flag:
+            self.stop_flag = False
+            return
+        
+        animation = self.current_animation
         if animation.is_first_call():
             # backup texture:
             self.original_texture = self.texture
         next_frame = next(animation, None)
         if next_frame is None: # all frames are shown
-            # restore texture
-            self.texture = self.original_texture
-            self.redraw()
-            return
+            if not endless:
+                # restore texture
+                self.texture = self.original_texture
+                self.redraw()
+                return
+            else:
+                next_frame = next(animation, None)
         texture, _time = next_frame
         self.texture = texture
         self.redraw()
-        Clock.schedule_once(lambda dt: self.animate(), _time)
+        Clock.schedule_once(lambda dt: self.animate(endless=endless), _time)
+    
+    def stop_animation(self):
+        self.stop_flag = True
+        
 
 
 # implementation

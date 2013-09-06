@@ -1,6 +1,6 @@
 from os.path import dirname, join
 import random
-from kivy.graphics import Color, Rectangle, Ellipse
+from kivy.graphics import Color, Rectangle, Mesh
 from kivy.core.image import Image
 from kivy.clock import Clock
 from kivy.properties import DictProperty, ListProperty
@@ -11,9 +11,10 @@ from controller import Controller
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from animation import SimpleAnimation
 from gameobjects import AnimatedCircle
 
+from settings import BLOCK_SIZE, GAME_AREA_SIZE
+from resources import load_resources
 
 class BodyDragMgr():
     
@@ -46,8 +47,8 @@ class BodyDragMgr():
 
 class MoonRabbitGame(Widget):
     
-    block_width = 75
-    block_height = 75
+    block_width = BLOCK_SIZE[0]
+    block_height = BLOCK_SIZE[1]
     spf = 1 / 30.
 
     def __init__(self, **kwargs):
@@ -57,8 +58,8 @@ class MoonRabbitGame(Widget):
         #self._touches = [] # container for touches
         
         super(MoonRabbitGame, self).__init__(**kwargs)
-        self.num_of_blocks_X = 14
-        self.num_of_blocks_Y = 10
+        self.num_of_blocks_X = GAME_AREA_SIZE[0]
+        self.num_of_blocks_Y = GAME_AREA_SIZE[1]
         
         # create 2-dimensional array to store blocks
         self.blocks = [[0 for j in xrange(self.num_of_blocks_Y)]
@@ -112,7 +113,7 @@ class MoonRabbitGame(Widget):
         c = AnimatedCircle(1e2, pos=(100, 100), radius=50, texture=texture, elasticity=.5, draggable=True)
         #c.body.apply_force((1e4, 1e4), r=(0, 0))
         #c.body.velocity = (400., 400.)
-        c.set_animation(self.animations['star'])
+        c.set_animation(self.context.resources['animations']['star'])
         c.body.velocity = (0., 0.)
         
         b = Box(1e1000, moment=1e500, pos=(370, 550), size=(100, 50), elasticity=.5)
@@ -159,16 +160,9 @@ class MoonRabbitGame(Widget):
             touch.bodydragmgr.release()
 
     def load_resources(self):
-        self.animations = {}
-        
-        frames = []
-        frame_time = 0.04  # sec
-        for i in xrange(6):
-            texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star{}.png'.format(i)), mipmap=True).texture
-            texture = texture.get_region(1, 20, 98, 98)
-            frames.append((texture, frame_time))
-        self.animations['star'] = SimpleAnimation(frames) # shine
-        
+        # see resources module
+        load_resources()
+                
     def get_block(self, x, y):
         i = int(x) / self.block_width
         j = int(y) / self.block_height

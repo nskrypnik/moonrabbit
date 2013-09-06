@@ -16,6 +16,7 @@ class _GameContext(object):
         self.static_objects = []
         self._objs = []
         self.space = None
+        self.resources = {}
     
     def add(self, obj):
         

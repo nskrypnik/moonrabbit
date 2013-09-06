@@ -1,23 +1,30 @@
 from kivy.graphics import Color, Rectangle
 from kivy.core.image import Image
-from os.path import join, dirname
+from kivy.graphics.fbo import Fbo
+from gamecontext import GameContext
+from animation import AnimationMixin
+from settings import BLOCK_SIZE
 
-RESOURCES = join(dirname(__file__), 'resources')
+
+class WaterAnimation(AnimationMixin):
+    
+    def __init__(self):
+        self.widget = Fbo(size=BLOCK_SIZE, clear_color=(0., 0., 0., 0.))      
+
 
 class Landscape(Rectangle):
     velocity_coefficient = 1.0
-    _texture = None
     
     def __init__(self, *args, **kw):
-        # set appropriate color for drawing
-        kw['texture'] = self._texture
         super(Landscape, self).__init__(*args, **kw)
 
 
 class Grass(Landscape):
-    texture_path = join(RESOURCES, 'grass/grass-01.png')
-    _texture = Image(texture_path, mipmap=True).texture \
-        .get_region(0, 0, 72, 72)
+        
+    def __init__(self, *args, **kw):
+        kw['texture'] = GameContext.resources['textures']['grass']
+        super(Grass, self).__init__(*args, **kw)
+
     
 
 class Water(Landscape):
