@@ -28,6 +28,11 @@ def load_resources():
         
     textures['water'] = texture
     
+    # rock
+    texture_path = join(RESOURCES_DIR, 'rock.jpg')
+    texture = Image(texture_path, mipmap=True).texture
+    textures['rock'] = texture
+    
     # load test star animation
     # TODO: delete it after it's unnecessary 
     frames = []
