@@ -8,6 +8,13 @@ from settings import BLOCK_SIZE, GAME_AREA_SIZE
 RESOURCES_DIR = join(dirname(__file__), 'resources')
 
 
+def flip_horizontal(tex):
+    #x1, x2, x3, x4, x5, x6, x7, x8 = tex.tex_coords
+    #tex.tex_coords = [x3, x4, x1, x2, x7, x8, x5, x6]
+    tex.uvpos = (tex.uvpos[0] + tex.uvsize[0], tex.uvpos[1])
+    tex.uvsize = (-tex.uvsize[0], tex.uvsize[1])
+    return tex
+
 def load_resources():
     context = GameContext
     
@@ -26,7 +33,8 @@ def load_resources():
     load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))    
     load_texture('rock', 'one-cell-snags/stone-01.png')
     load_texture('rock2', 'one-cell-snags/stone-02.png')
-    load_texture('rabbit_hero', 'hero/hero-rotate-down-01.png')
+    load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
+    
 
     
     # load test star animation
@@ -46,3 +54,32 @@ def load_resources():
         texture = Image(join(RESOURCES_DIR, 'terrain/water-0{}.png'.format(i)), mipmap=True).texture
         frames.append((texture, frame_time))
     animations['water'] = SimpleAnimation(frames)
+    
+    # hero run down animation
+    frames = []
+    frame_time = 0.25  # sec
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hero_run_down'] = SimpleAnimation(frames)
+    
+    frames = []
+    frame_time = 0.25  # sec
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hero_run_up'] = SimpleAnimation(frames)
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-idle-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_idle'] = SimpleAnimation(frames)
+    
+    
+    

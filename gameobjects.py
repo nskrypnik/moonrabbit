@@ -106,12 +106,19 @@ class HeroRabbit(Character, AnimationMixin):
         
         self.body_size = (46, 66)
         
+        self.animations['idle'] = GameContext.resources['animations']['hero_idle']
+        self.animations['run_down'] = GameContext.resources['animations']['hero_run_down']
+        self.animations['run_up'] = GameContext.resources['animations']['hero_run_up']
+        
         controller = HeroRabbitController(self)
         super(HeroRabbit, self).__init__(inner_pos, controller,
                                         mass=mass, moment=moment,
                                         elasticity=elasticity,
                                         texture=texture, size=size
                                         )
+        
+        self.set_animation('idle')
+        self.animate(endless=True)
         
     def define_shape(self):
         self.shape = phy.Poly.create_box(self.body, self.body_size)
