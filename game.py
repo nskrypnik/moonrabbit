@@ -18,7 +18,7 @@ from resources import load_resources, read_map
 
 
 class Timer(object):
-    def __init__(self, callback, time=90, **kw):
+    def __init__(self, callback, time=70, **kw):
         self.timer_counter = time
         self.callback = callback
 
@@ -37,9 +37,11 @@ class Timer(object):
         return self.timer_counter
 
     def get_formated_time(self):
-        minute = self.timer_counter / 60 or '00'
-        return "{minute}:{seconds}".format(minute=minute,
-                                           seconds=self.timer_counter % 60)
+        minutes = self.timer_counter / 60
+        seconds = self.timer_counter % 60
+
+        return "{minutes}:{seconds}".format(minutes=minutes if minutes >=10 else '0'+str(minutes),
+                                           seconds=seconds if seconds >=10 else '0'+str(seconds))
 
     def timer_callback(self, dt):
         self.timer_counter -= 1
