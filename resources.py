@@ -52,6 +52,7 @@ def load_resources():
     load_texture('mountain_vertical_top_end', 'mountains/mountain-vertical-top-end-01.png')
     load_texture('mountain_vertical_bottom_start', 'mountains/mountain-vertical-down-start-01.png')
     load_texture('mountain_vertical_bottom_end', 'mountains/mountain-vertical-down-end-01.png')
+    load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
 
 
 

@@ -184,7 +184,11 @@ class Mountain(StaticBox):
             'right': [
                 'mountain_horizontal_right_end_top'
             ],
-        }
+        },
+        'center':
+            'mountain_central'
+
+
 
     }
 
@@ -192,14 +196,14 @@ class Mountain(StaticBox):
         self.size = BLOCK_SIZE
         self.type = kw.pop('type')
         texture = GameContext.resources['textures'][self.get_texture()]
-
-        # self.top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
         super(Mountain, self).__init__(pos=pos,
                                        size=self.size,
                                        texture=texture,
                                        **kw)
 
     def get_texture(self):
+        if self.type == 'center':
+            return self.mountain_texture_names['center']
         m_type = self.type.split('_')
         return choice(self.mountain_texture_names[m_type[0]][m_type[1]])
 
