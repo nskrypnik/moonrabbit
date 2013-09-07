@@ -1,6 +1,8 @@
+import random
+
 from physics import phy
 from gamecontext import GameContext
-import random
+from settings import HERO_SPEED, OBJECT_MASS
 
 def wait_counter(func):
     " Wait counter decorator "
@@ -85,8 +87,8 @@ class HeroRabbitController(BaseController):
     _state = 'IDLE'
     _counter = 30
     _direction = 'l'
-    _directions = ['l', 't', 'r', 'b']
-    _dir_vectors = {'l': (-1, 0), 't': (0, 1), 'r': (1, 0), 'b': (0, -1)}
+    _directions = ['l', 'u', 'r', 'd']
+    _dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
     faced = False
     vision = VisionVector((-1, 0), 36)
     
@@ -96,7 +98,7 @@ class HeroRabbitController(BaseController):
         
     @wait_counter
     def do_turning(self):
-        pass
+        self.switch_to_moving()
         
     def do_moving(self):
         some = self.vision.look_from(self.obj.body.position)
@@ -113,38 +115,46 @@ class HeroRabbitController(BaseController):
                        'TURNING': do_turning,
                     }
     
-    def switch_animation(self, animation):
-        self.obj.set_animation(animation)
-        self.obj.animate()
+    def switch_animation(self, animation, endless=False):
+        self.obj.set_animation(animation, True)
+        self.obj.animate(endless=endless)
     
     def switch_to_moving(self):
         animation = 'run' if self._direction in ('l', 'r')\
-                        else 'run_top' if self._direction == 't'\
+                        else 'run_up' if self._direction == 'u'\
                         else 'run_down'
-        self.switch_animation(animation)
+        self.switch_animation(animation, True)
         self.set_state('MOVING')
         
     def switch_to_turning(self):
         if self._direction in ('l', 'r'):
             self._direction = random.choice(('u', 'd'))
+            animation = {'u': 'rotate_top', 'd': 'rotate_down'}[self._direction]
         else:
+            animation = {'u': 'rotate_top_r', 'd': 'rotate_down_r'}[self._direction]
             self._direction = random.choice(('l', 'r'))
-        self.vision.set_direction(self._direction)
-        animation = {'u': 'rotate_top',
-                     'd': 'rotate_down'
-                     }[self._direction]
+        
+        if self._direction == 'r' and not self.obj.h_flipped \
+                or self._direction == 'l' and self.obj.h_flipped:
+            self.obj.flip_h()
+        
+        self.vision.set_direction(self._dir_vectors[self._direction])
+        
         self.switch_animation(animation)
         self.set_state('TURNING', 15)
     
     def define_velocity(self):
         """ Should get velocity according to conditions """
-        SPEED = 50
+        SPEED = HERO_SPEED
         v = self._dir_vectors[self._direction]
         return v[0]*SPEED, v[1]*SPEED
     
     def handle_collision(self, arbiter):
         """ Implement handle of object collision here """
-        self.faced = True
+        if arbiter.total_ke > OBJECT_MASS:
+            self.faced = True
         
     def stop(self):
-        self.obj.body.velocity = (0, 0)                 
+        self.obj.body.velocity = (0, 0)
+
+            

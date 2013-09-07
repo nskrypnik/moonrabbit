@@ -32,8 +32,8 @@ class AnimationMixin(object):
     
     current_animation = None
     animations = {}
+    endless_animation = False
     restore_original = True
-    _animator = None
     
     def redraw(self):
         assert not self.widget is None
@@ -55,6 +55,10 @@ class AnimationMixin(object):
             self.current_animation = self.animations[animation]
     
     def animate(self, endless=False):
+        self.endless_animation = endless
+        self._animate()
+    
+    def _animate(self, *largs):
         
         animation = self.current_animation
         if animation.is_first_call():
@@ -62,7 +66,7 @@ class AnimationMixin(object):
             self.original_texture = self.texture
         next_frame = next(animation, None)
         if next_frame is None: # all frames are shown
-            if not endless:
+            if not self.endless_animation:
                 # restore texture
                 if self.restore_original:
                     self.texture = self.original_texture
@@ -73,11 +77,10 @@ class AnimationMixin(object):
         texture, _time = next_frame
         self.texture = texture
         self.redraw()
-        self._animator = lambda dt: self.animate(endless=endless)
-        Clock.schedule_once(self._animator, _time)
+        Clock.schedule_once(self._animate, _time)
     
     def stop_animation(self):
-        Clock.unschedule(self._animator)
+        Clock.unschedule(self._animate)
         
 
 
@@ -86,3 +89,10 @@ class SimpleAnimation(Animation):
     def __init__(self, frames):
         self._frames = frames
         super(SimpleAnimation, self).__init__()
+        
+class ReverseAnimation(Animation):
+    def __init__(self, frames):
+        frames.reverse()
+        self._frames = frames
+        super(ReverseAnimation, self).__init__()
+
