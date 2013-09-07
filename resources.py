@@ -34,7 +34,24 @@ def load_resources():
     load_texture('rock', 'one-cell-snags/stone-01.png')
     load_texture('rock2', 'one-cell-snags/stone-02.png')
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
-    
+    load_texture('mountain_horizontal_bottom1', 'mountains/mountain-horizontal-bottom-01.png')
+    load_texture('mountain_horizontal_bottom2', 'mountains/mountain-horizontal-bottom-02.png')
+    load_texture('mountain_horizontal_bottom3', 'mountains/mountain-horizontal-bottom-03.png')
+    load_texture('mountain_horizontal_top1', 'mountains/mountain-horizontal-top-01.png')
+    load_texture('mountain_horizontal_top2', 'mountains/mountain-horizontal-top-02.png')
+    load_texture('mountain_horizontal_top3', 'mountains/mountain-horizontal-top-03.png')
+    load_texture('mountain_horizontal_left_end_top', 'mountains/mountain-horizontal-left-end-top-01.png')
+    load_texture('mountain_horizontal_left_end_bottom', 'mountains/mountain-horizontal-left-end-bottom-01.png')
+    load_texture('mountain_horizontal_right_end_top', 'mountains/mountain-horizontal-right-end-top-01.png')
+    load_texture('mountain_horizontal_right_end_bottom', 'mountains/mountain-horizontal-right-end-bottom-01.png')
+    load_texture('mountain_vertical1', 'mountains/mountain-vertical-01.png')
+    load_texture('mountain_vertical2', 'mountains/mountain-vertical-02.png')
+    load_texture('mountain_vertical_top_start', 'mountains/mountain-vertical-top-start-01.png')
+    load_texture('mountain_vertical_top_end', 'mountains/mountain-vertical-top-end-01.png')
+    load_texture('mountain_vertical_bottom_start', 'mountains/mountain-vertical-down-start-01.png')
+    load_texture('mountain_vertical_bottom_end', 'mountains/mountain-vertical-down-end-01.png')
+
+
 
     
     # load test star animation

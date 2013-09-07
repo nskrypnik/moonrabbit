@@ -4,12 +4,12 @@
 from kivy.graphics import VertexInstruction, Rectangle, Color
 from kivy.uix.scatter import ScatterPlane
 from kivy.graphics import Rectangle, Color, Ellipse
-from physics import Circle, DynamicObject, Box, phy
+from physics import Circle, DynamicObject, Box, phy, StaticBox
 from animation import AnimationMixin
 from gamecontext import GameContext
 from controller import HeroRabbitController
 from settings import BLOCK_SIZE, OBJECT_MASS, CHARACTER_MASS
-from physics import phy
+from random import choice
 
 class AnimatedCircle(Circle, AnimationMixin):
     """ It's just for test """
@@ -118,5 +118,70 @@ class HeroRabbit(Character, AnimationMixin):
         
     def define_shape(self):
         self.shape = phy.Poly.create_box(self.body, self.body_size)
-  
-    
+
+
+class Mountain(StaticBox):
+
+    mountain_texture_names = {
+        'vertical': {
+            'top': [
+                'mountain_vertical_top_end',
+            ],
+            'center': [
+                'mountain_vertical1',
+                'mountain_vertical2',
+            ],
+            'bottom': [
+                'mountain_vertical_bottom_end'
+            ]
+
+        },
+        'horizontal': {
+            'left': [
+                'mountain_horizontal_left_end_bottom',
+            ],
+            'center': [
+                'mountain_horizontal_bottom1',
+                'mountain_horizontal_bottom2',
+                'mountain_horizontal_bottom3',
+            ],
+            'right': [
+                'mountain_horizontal_right_end_bottom'
+            ],
+
+        },
+        'top': [
+            'mountain_horizontal_top1',
+            'mountain_horizontal_top2',
+            'mountain_horizontal_top3',
+        ]
+    }
+
+    def __init__(self, *pos, **kw):
+        self.size = BLOCK_SIZE
+        self.type = kw.pop('type')
+        texture = GameContext.resources['textures'][self.get_texture()]
+
+        self.top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
+        super(Mountain, self).__init__(pos=pos,
+                                       size=self.size,
+                                       texture=texture,
+                                       **kw)
+
+    def get_texture(self):
+        m_type = self.type.split('_')
+        return choice(self.mountain_texture_names[m_type[0]][m_type[1]])
+
+    def get_horizontal_top_texture(self):
+        return choice(self.mountain_texture_names['top'])
+
+
+    def widget_factory(self):
+        widget = super(Mountain, self).widget_factory()
+        if 'horizontal' in self.type:
+            top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
+            with widget.canvas:
+                Rectangle(pos=(widget.pos[0], self.pos[1]+36), texture=top_texture, size=(72, 36))
+        return widget
+
+

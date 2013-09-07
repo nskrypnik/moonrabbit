@@ -10,7 +10,7 @@ from kivy.core.window import Window
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit
+from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain
 
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources
@@ -131,7 +131,13 @@ class MoonRabbitGame(Widget):
         texture = texture.get_region(1, 20, 98, 98)
         
         rock = Rock(600, 500)
-        rock2 = Rock2(600, 100)      
+        rock2 = Rock2(600, 100)
+        Mountain(356, 300, type='horizontal_left')
+        Mountain(428, 300, type='horizontal_center')
+        Mountain(500, 300, type='horizontal_center')
+        Mountain(572, 300, type='horizontal_center')
+        Mountain(644, 300, type='horizontal_right')
+        Mountain(500, 228, type='vertical_center')
         HeroRabbit(700, 600)
 
     
