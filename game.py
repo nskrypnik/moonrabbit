@@ -10,7 +10,7 @@ from kivy.core.window import Window
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood, Bush, Character
+from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood, Bush, Character, MoonStone
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources
 
@@ -132,7 +132,7 @@ class MoonRabbitGame(Widget):
         self.build_landscape()
          
         st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
-        bsh = Bush(pos=(400, 50))
+        bsh = Bush(400, 50)
 
         
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
@@ -141,6 +141,7 @@ class MoonRabbitGame(Widget):
         rock = Rock(600, 500)
         rock2 = Rock2(600, 100)
         wood = Wood(700, 100)
+        MoonStone(300, 400)
         # Mountain(500, 372, type='vertical_top')
         Mountain(356, 300, type='horizontal_left')
         Mountain(428, 300, type='horizontal_center')
