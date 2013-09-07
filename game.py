@@ -145,8 +145,8 @@ class MoonRabbitGame(Widget):
 
             # init statics
             def _is_mountain(i, j):
-                return bool(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
-                            statics[i][j] == 'mountain')
+                return int(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
+                           statics[i][j] == 'mountain')
 
             def _get_mountain_type(i, j):
                 opensides = (_is_mountain(i - 1, j), _is_mountain(i, j + 1),
@@ -173,17 +173,17 @@ class MoonRabbitGame(Widget):
                             print pos, _get_mountain_type(i, j)
                             Mountain(*pos, type=_get_mountain_type(i, j))
 
+            # init dynamics
+            for x, y, class_name in dynamics:
+                eval(class_name.capitalize())(x, y)
+
         #self.build_landscape()
          
         # st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
-        bsh = Bush(400, 50)
 
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
-        rock = Rock(600, 500)
-        rock2 = Rock2(600, 100)
-        wood = Wood(700, 100)
         MoonStone(300, 400)
         # Mountain(500, 372, type='vertical_top')
         
