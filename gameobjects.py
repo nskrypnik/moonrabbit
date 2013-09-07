@@ -35,11 +35,11 @@ class Rock(Circle):
                                    texture=texture)
         
 
-class Rock2(DynamicObject):
+class Rock2(Box):
 
     def __init__(self, *pos, **kw):
         # note that order of vertices should be counterclockwise
-        self.size = (72, 72) # size of texture
+        size = BLOCK_SIZE # size of texture
         self.vertices = [(69, 3), (69, 50), (54, 65), (20, 65), (0, 27), (0, 3)] # taken from stone-02_BORDERS.png
         self.mass_center = (-36, -36) # size_of_text_texture/2
         texture = GameContext.resources['textures']['rock2']
@@ -50,19 +50,10 @@ class Rock2(DynamicObject):
         elasticity = 0.1 # not elastic
 
         super(Rock2, self).__init__(mass, pos=pos, elasticity=elasticity, moment=moment, texture=texture,
-                                    draggable=True, **kw)
+                                    draggable=True, size=size, **kw)
 
     def define_shape(self):
         self.shape = phy.Poly(self.body, self.vertices, offset=self.mass_center)
-
-    def widget_factory(self):
-        widget = ScatterPlane(size=self.size)
-        widget.center = self.pos
-        with widget.canvas:
-            if self.texture:
-                Color(1, 1, 1, 1)
-                Rectangle(pos=(0, 0), texture=self.texture, size=self.size)
-        return widget
 
 
 class FlipMixin(object):
