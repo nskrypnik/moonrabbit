@@ -109,7 +109,7 @@ class MoonRabbitGame(Widget):
         self.space.add_collision_handler(0, 0, post_solve=self.collision_handler)
 
 
-        self.timer = Timer(self.update_time, time=5)
+        self.timer = Timer(self.update_time)
         self.clock = Label(text=self.timer.get_formated_time(),
                            pos=(Window.width - 100, Window.height-100),
                            font_size = 30
@@ -226,38 +226,6 @@ class MoonRabbitGame(Widget):
 
 
         MoonStone(300, 400)
-        # Mountain(500, 372, type='vertical_top')
-        # HeroRabbit(700, 600)
-
-        # Mountain(356, 300, type='horizontal_left')
-        # Mountain(428, 300, type='horizontal_center')
-        # Mountain(572, 300, type='horizontal_center')
-        # Mountain(644, 300, type='horizontal_right')
-        #
-        # Mountain(500, 498, type='vertical_top')
-        # Mountain(500, 444, type='vertical_center')
-        # Mountain(500, 372, type='vertical_center')
-        # Mountain(500, 238, type='vertical_center')
-        # Mountain(500, 166, type='vertical_bottom')
-        #
-        # Mountain(500, 300, type='center')
-
-    # def build_landscape(self):
-    #     # while build only with grass
-    #
-    #         for i in xrange(self.num_of_blocks_X):
-    #             for j in xrange(self.num_of_blocks_Y):
-    #                 if (i, j) in ((0, 0), (0, 1), (1, 0), (1, 1), (1, 3), (5, 2)):
-    #                     landscape = Water(
-    #                         pos=(i*self.block_width, j*self.block_height),
-    #                         size=(self.block_width, self.block_height)
-    #                     )
-    #                 else:
-    #                     landscape = Grass(
-    #                         pos=(i*self.block_width, j*self.block_height),
-    #                         size=(self.block_width, self.block_height)
-    #                     )
-    #                 self.blocks[i][j] = landscape
 
     def update(self, dt):
         self.context.space.step(self.spf)
@@ -279,11 +247,11 @@ class MoonRabbitGame(Widget):
             touch.bodydragmgr = None
 
     def on_touch_move(self, touch):
-        if touch.bodydragmgr:
+        if hasattr(touch, 'bodydragmgr') and touch.bodydragmgr:
             touch.bodydragmgr.update()
 
     def on_touch_up(self, touch):
-        if touch.bodydragmgr:
+        if hasattr(touch, 'bodydragmgr') and touch.bodydragmgr:
             touch.bodydragmgr.release()
 
     def load_resources(self):
