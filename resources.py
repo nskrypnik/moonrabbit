@@ -34,6 +34,7 @@ def load_resources():
     load_texture('rock', 'one-cell-snags/stone-01.png')
     load_texture('rock2', 'one-cell-snags/stone-02.png')
     load_texture('wood', 'one-cell-snags/log-01.png')
+    load_texture('bush', 'one-cell-snags/bush-01.png')
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
     
 
