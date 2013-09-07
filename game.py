@@ -144,11 +144,16 @@ class MoonRabbitGame(Widget):
         # Mountain(500, 372, type='vertical_top')
         Mountain(356, 300, type='horizontal_left')
         Mountain(428, 300, type='horizontal_center')
-        Mountain(500, 300, type='center')
         Mountain(572, 300, type='horizontal_center')
         Mountain(644, 300, type='horizontal_right')
-        # Mountain(500, 238, type='vertical_center')
-        # Mountain(500, 166, type='vertical_bottom')
+
+        Mountain(500, 498, type='vertical_top')
+        Mountain(500, 444, type='vertical_center')
+        Mountain(500, 372, type='vertical_center')
+        Mountain(500, 238, type='vertical_center')
+        Mountain(500, 166, type='vertical_bottom')
+
+        Mountain(500, 300, type='center')
         HeroRabbit(700, 600)
 
     
@@ -169,8 +174,6 @@ class MoonRabbitGame(Widget):
                         )
                     self.blocks[i][j] = landscape
                     
-    
-
     def update(self, dt):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:

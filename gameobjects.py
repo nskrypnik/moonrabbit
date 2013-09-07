@@ -203,11 +203,11 @@ class Mountain(StaticBox):
     }
 
     def __init__(self, *pos, **kw):
-        self.size = BLOCK_SIZE
         self.type = kw.pop('type')
         texture = GameContext.resources['textures'][self.get_texture()]
+        self.size = texture.size
         super(Mountain, self).__init__(pos=pos,
-                                       size=self.size,
+                                       size=texture.size,
                                        texture=texture,
                                        **kw)
 
@@ -221,13 +221,15 @@ class Mountain(StaticBox):
         m_type = self.type.split('_')
         return choice(self.mountain_texture_names['top'][m_type[1]])
 
-
     def widget_factory(self):
         widget = super(Mountain, self).widget_factory()
-        if 'horizontal' in self.type:
-            top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
+        if 'horizontal' in self.type or self.type == 'center':
+            try:
+                top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
+            except IndexError:
+                top_texture = GameContext.resources['textures']['mountain_central_top']
             with widget.canvas:
-                Rectangle(pos=(widget.pos[0], self.pos[1]+36), texture=top_texture, size=(72, 36))
+                Rectangle(pos=(widget.pos[0], self.pos[1]+36), texture=top_texture, size=top_texture.size)
         return widget
 
 
