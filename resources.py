@@ -32,7 +32,12 @@ def load_resources():
     texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-01.png')
     texture = Image(texture_path, mipmap=True).texture
     textures['rock'] = texture
-    
+
+    # rock2
+    texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-02.png')
+    texture = Image(texture_path, mipmap=True).texture
+    textures['rock2'] = texture
+
     # load test star animation
     # TODO: delete it after it's unnecessary 
     frames = []
