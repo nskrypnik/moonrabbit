@@ -40,6 +40,9 @@ class AnimationMixin(object):
         for obj in self.widget.canvas.children:
             if isinstance(obj, VertexInstruction):
                 obj.texture = self.texture
+        
+        if hasattr(self, 'post_redraw_hook'):
+            self.post_redraw_hook()
                             
     def set_animation(self, animation):
         """ Here you can set animation directly or give key of predefined animation """
