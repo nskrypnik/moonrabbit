@@ -10,7 +10,7 @@ from kivy.core.window import Window
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood, Bush
+from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood, Bush, Character
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources
 
@@ -73,25 +73,32 @@ class MoonRabbitGame(Widget):
         self.setup_scene()
         self.create_bounds()
         
-        def _handler(space, arbiter, *args, **kw):
-            for shape in arbiter.shapes:
-                if not hasattr(shape.body, 'data'):
-                    continue
-                phyobj = shape.body.data
-                if not phyobj.draggable:
-                    continue 
-                dragmgrs = GameContext.dragged[phyobj]
-                if dragmgrs:
-                    if arbiter.total_ke > 1e5*shape.body.mass:
-                        for dragmgr in dragmgrs:
-                            dragmgr.release()
-            return True
-        
-        self.space.add_collision_handler(0, 0, post_solve=_handler)
+        self.space.add_collision_handler(0, 0, post_solve=self.collision_handler)
         
         # FIXME: rid test function from here
         # self.test()
         Clock.schedule_interval(self.update, self.spf)
+
+
+    def collision_handler(self, space, arbiter, *args, **kw):
+
+        for shape in arbiter.shapes:
+            if not hasattr(shape.body, 'data'):
+                continue
+            phyobj = shape.body.data
+            
+            if isinstance(phyobj, Character):
+                phyobj.controller.handle_collision(arbiter)
+                
+            if not phyobj.draggable:
+                continue 
+            dragmgrs = GameContext.dragged[phyobj]
+            if dragmgrs:
+                if arbiter.total_ke > 1e5*shape.body.mass:
+                    for dragmgr in dragmgrs:
+                        dragmgr.release()
+        return True
+        
 
     def init_physics(self):
         self.space = init_physics()
@@ -177,11 +184,6 @@ class MoonRabbitGame(Widget):
         # animation test here
         if shape and isinstance(shape.body.data, AnimatedCircle):
             shape.body.data.animate()
-        if shape and isinstance(shape.body.data, HeroRabbit):
-            #shape.body.data.flip_h()
-            shape.body.data.stop_animation()
-            shape.body.data.set_animation('run_up')
-            shape.body.data.animate(endless=True)
         # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)

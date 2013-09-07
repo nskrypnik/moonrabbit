@@ -114,6 +114,8 @@ class Character(Box, FlipMixin):
 
 class HeroRabbit(Character, AnimationMixin):
     
+    restore_original = False # never restore original texture after animation
+    
     def __init__(self, *inner_pos):
         
         mass = CHARACTER_MASS
@@ -125,8 +127,16 @@ class HeroRabbit(Character, AnimationMixin):
         self.body_size = (46, 66)
         
         self.animations['idle'] = GameContext.resources['animations']['hero_idle']
+        self.animations['run'] = GameContext.resources['animations']['hero_run']
         self.animations['run_down'] = GameContext.resources['animations']['hero_run_down']
         self.animations['run_up'] = GameContext.resources['animations']['hero_run_up']
+        self.animations['rotate_top'] = GameContext.resources['animations']['hero_rotate_top']
+        self.animations['rotate_down'] = GameContext.resources['animations']['hero_rotate_down']
+        # reversed animations
+        self.animations['rotate_top_r'] = GameContext.resources['animations']['hero_rotate_top_r']
+        self.animations['rotate_down_r'] = GameContext.resources['animations']['hero_rotate_down_r']
+        
+        
         
         controller = HeroRabbitController(self)
         super(HeroRabbit, self).__init__(inner_pos, controller,
