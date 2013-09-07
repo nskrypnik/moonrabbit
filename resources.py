@@ -29,7 +29,7 @@ def load_resources():
     textures['water'] = texture
     
     # rock
-    texture_path = join(RESOURCES_DIR, 'terrain/sample-rock-01.png')
+    texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-01.png')
     texture = Image(texture_path, mipmap=True).texture
     textures['rock'] = texture
     

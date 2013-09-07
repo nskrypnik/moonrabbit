@@ -1,6 +1,7 @@
 
 """ Here should be Game objects, based on Physical objects """
 
+from kivy.graphics import VertexInstruction
 from physics import Circle, DynamicObject
 from animation import AnimationMixin
 from gamecontext import GameContext
@@ -37,6 +38,13 @@ class Character(DynamicObject):
     def __init__(self, inner_pos, controller, **kw):
         
         self.controller = controller
+        self.mirrored = False
         super(Character, self).__init__(pos=inner_pos, **kw)
-        
+    
+    def mirror_horizontal(self):
+        """ Flip sprite in horizontal direction """
+        self.mirrored = not self.mirrored
+        for obj in self.widget.canvas.children:
+            if isinstance(obj, VertexInstruction):
+                pass
         
