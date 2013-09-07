@@ -33,6 +33,7 @@ def load_resources():
     load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))    
     load_texture('rock', 'one-cell-snags/stone-01.png')
     load_texture('rock2', 'one-cell-snags/stone-02.png')
+    load_texture('wood', 'one-cell-snags/log-01.png')
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
     
 
