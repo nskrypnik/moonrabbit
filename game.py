@@ -10,7 +10,7 @@ from kivy.core.window import Window
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain
+from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood
 
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources
@@ -138,6 +138,7 @@ class MoonRabbitGame(Widget):
         Mountain(572, 300, type='horizontal_center')
         Mountain(644, 300, type='horizontal_right')
         Mountain(500, 228, type='vertical_center')
+        wood = Wood(700, 100)
         HeroRabbit(700, 600)
 
     
@@ -174,7 +175,10 @@ class MoonRabbitGame(Widget):
         if shape and isinstance(shape.body.data, AnimatedCircle):
             shape.body.data.animate()
         if shape and isinstance(shape.body.data, HeroRabbit):
-            shape.body.data.flip_h()
+            #shape.body.data.flip_h()
+            shape.body.data.stop_animation()
+            shape.body.data.set_animation('run_up')
+            shape.body.data.animate(endless=True)
         # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)

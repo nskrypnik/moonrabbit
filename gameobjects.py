@@ -33,24 +33,46 @@ class Rock(Circle):
                                    elasticity=elasticity, mass=mass,
                                    moment=moment, draggable=True,
                                    texture=texture)
-        
+
 
 class Rock2(Box):
 
     def __init__(self, *pos, **kw):
         # note that order of vertices should be counterclockwise
-        size = BLOCK_SIZE # size of texture
-        self.vertices = [(69, 3), (69, 50), (54, 65), (20, 65), (0, 27), (0, 3)] # taken from stone-02_BORDERS.png
-        self.mass_center = (-36, -36) # size_of_text_texture/2
+        size = BLOCK_SIZE  # size of texture
+        self.vertices = [(69, 3), (69, 50), (54, 65), (20, 65), (0, 27), (0, 3)]  # taken from stone-02_BORDERS.png
+        self.mass_center = (-36, -36)  # size_of_text_texture/2
         texture = GameContext.resources['textures']['rock2']
 
         # physical params
         mass = OBJECT_MASS
-        moment = 1e500 # very high moment to prevent rotation
-        elasticity = 0.1 # not elastic
+        moment = 1e500  # very high moment to prevent rotation
+        elasticity = 0.1  # not elastic
 
         super(Rock2, self).__init__(mass, pos=pos, elasticity=elasticity, moment=moment, texture=texture,
                                     draggable=True, size=size, **kw)
+
+    def define_shape(self):
+        self.shape = phy.Poly(self.body, self.vertices, offset=self.mass_center)
+
+
+class Wood(Box):
+
+    def __init__(self, *pos, **kw):
+        # note that order of vertices should be counterclockwise
+        size = BLOCK_SIZE  # size of texture
+        # taken from log-01_BORDERS.png:
+        self.vertices = [(61, 0), (71, 4), (71, 17), (68, 59), (55, 71), (41, 71), (21, 62), (0, 27), (0, 17), (7, 3)]
+        self.mass_center = (-36, -36)  # size_of_text_texture/2
+        texture = GameContext.resources['textures']['wood']
+
+        # physical params
+        mass = OBJECT_MASS
+        moment = 1e500  # very high moment to prevent rotation
+        elasticity = 0.1  # not elastic
+
+        super(Wood, self).__init__(mass, pos=pos, elasticity=elasticity, moment=moment, texture=texture,
+                                   draggable=True, size=size, **kw)
 
     def define_shape(self):
         self.shape = phy.Poly(self.body, self.vertices, offset=self.mass_center)

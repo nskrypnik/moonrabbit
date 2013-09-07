@@ -33,6 +33,7 @@ def load_resources():
     load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))    
     load_texture('rock', 'one-cell-snags/stone-01.png')
     load_texture('rock2', 'one-cell-snags/stone-02.png')
+    load_texture('wood', 'one-cell-snags/log-01.png')
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
     load_texture('mountain_horizontal_bottom1', 'mountains/mountain-horizontal-bottom-01.png')
     load_texture('mountain_horizontal_bottom2', 'mountains/mountain-horizontal-bottom-02.png')
@@ -75,16 +76,18 @@ def load_resources():
     # hero run down animation
     frames = []
     frame_time = 0.25  # sec
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True, nocache=True).texture
     frames.append((texture, frame_time))
+    print texture
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
     texture = flip_horizontal(texture)
+    print texture
     frames.append((texture, frame_time))
     animations['hero_run_down'] = SimpleAnimation(frames)
     
     frames = []
     frame_time = 0.25  # sec
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), nocache=True, mipmap=True).texture
     frames.append((texture, frame_time))
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
     texture = flip_horizontal(texture)
