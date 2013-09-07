@@ -218,6 +218,9 @@ class MoonRabbitGame(Widget):
         if i >= self.num_of_blocks_X or j >= self.num_of_blocks_Y or x < 0 or y < 0:
             raise ValueError("Coordinates out of playground")
         return self.blocks[i][j]
+    
+    def game_over(self, win=False):
+        pass
 
     def test(self):
         with self.canvas:
