@@ -98,6 +98,8 @@ class HeroRabbitController(BaseController):
     _state = 'IDLE'
     _counter = 30
     _direction = 'l'
+    _last_failed_direction = ''
+    _steps_from_last_turning = 0
     _directions = ['l', 'u', 'r', 'd']
     _dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
     faced = False
@@ -112,6 +114,7 @@ class HeroRabbitController(BaseController):
         self.switch_to_moving()
         
     def do_moving(self):
+        self._steps_from_last_turning += 1
         some = self.vision.look_from(self.obj.body.position)
         if some or self.faced:
             self.stop()
@@ -138,12 +141,15 @@ class HeroRabbitController(BaseController):
         self.set_state('MOVING')
         
     def switch_to_turning(self):
+        direction_before = self._direction
         if self._direction in ('l', 'r'):
-            self._direction = random.choice(('u', 'd'))
+            self._direction = random.choice(('u', 'd') if self._steps_from_last_turning > 1 else \
+                [d for d in ('u', 'd') if d != self._last_failed_direction])
             animation = {'u': 'rotate_top', 'd': 'rotate_down'}[self._direction]
         else:
             animation = {'u': 'rotate_top_r', 'd': 'rotate_down_r'}[self._direction]
-            self._direction = random.choice(('l', 'r'))
+            self._direction = random.choice(('l', 'r') if self._steps_from_last_turning > 1 else \
+                [d for d in ('l', 'r') if d != self._last_failed_direction])
         
         if self._direction == 'r' and not self.obj.h_flipped \
                 or self._direction == 'l' and self.obj.h_flipped:
@@ -153,6 +159,9 @@ class HeroRabbitController(BaseController):
         
         self.switch_animation(animation)
         self.set_state('TURNING', 15)
+
+        self._last_failed_direction = direction_before
+        self._steps_from_last_turning = 0
     
     def define_velocity(self):
         """ Should get velocity according to conditions """
