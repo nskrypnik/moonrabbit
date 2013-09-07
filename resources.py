@@ -77,9 +77,10 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['water'] = SimpleAnimation(frames)
     
+    frame_time = 0.1
+    
     # hero run down animation
     frames = []
-    frame_time = 0.25  # sec
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True, nocache=True).texture
     frames.append((texture, frame_time))
     print texture
@@ -90,13 +91,20 @@ def load_resources():
     animations['hero_run_down'] = SimpleAnimation(frames)
     
     frames = []
-    frame_time = 0.25  # sec
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), nocache=True, mipmap=True).texture
     frames.append((texture, frame_time))
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
     texture = flip_horizontal(texture)
     frames.append((texture, frame_time))
     animations['hero_run_up'] = SimpleAnimation(frames)
+    
+    
+    frame_time = 0.05
+    frames = []
+    for i in xrange(1, 10):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_run'] = SimpleAnimation(frames)
     
     frames = []
     frame_time = 0.25  # sec
@@ -121,14 +129,6 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['hero_rotate_down'] = SimpleAnimation(frames)
     animations['hero_rotate_down_r'] = ReverseAnimation(copy(frames))
-    
-    
-    frames = []
-    frame_time = 0.25  # sec
-    for i in xrange(1, 10):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
-        frames.append((texture, frame_time))
-    animations['hero_run'] = SimpleAnimation(frames)
     
         
     

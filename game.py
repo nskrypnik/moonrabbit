@@ -130,8 +130,7 @@ class MoonRabbitGame(Widget):
         """ Create here and add to scene all game objects """
         
         self.build_landscape()
-         
-        st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
+        
         bsh = Bush(pos=(400, 50))
 
         
@@ -142,6 +141,9 @@ class MoonRabbitGame(Widget):
         rock2 = Rock2(600, 100)
         wood = Wood(700, 100)
         # Mountain(500, 372, type='vertical_top')
+        
+        HeroRabbit(700, 600)
+        
         Mountain(356, 300, type='horizontal_left')
         Mountain(428, 300, type='horizontal_center')
         Mountain(572, 300, type='horizontal_center')
@@ -154,7 +156,6 @@ class MoonRabbitGame(Widget):
         Mountain(500, 166, type='vertical_bottom')
 
         Mountain(500, 300, type='center')
-        HeroRabbit(700, 600)
 
     
     def build_landscape(self):
