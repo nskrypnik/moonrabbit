@@ -32,7 +32,8 @@ class AnimationMixin(object):
     
     current_animation = None
     animations = {}
-    stop_flag = False
+    _animator = None
+    
     
     def redraw(self):
         assert not self.widget is None
@@ -53,10 +54,6 @@ class AnimationMixin(object):
     
     def animate(self, endless=False):
         
-        if self.stop_flag:
-            self.stop_flag = False
-            return
-        
         animation = self.current_animation
         if animation.is_first_call():
             # backup texture:
@@ -73,10 +70,11 @@ class AnimationMixin(object):
         texture, _time = next_frame
         self.texture = texture
         self.redraw()
-        Clock.schedule_once(lambda dt: self.animate(endless=endless), _time)
+        self._animator = lambda dt: self.animate(endless=endless)
+        Clock.schedule_once(self._animator, _time)
     
     def stop_animation(self):
-        self.stop_flag = True
+        Clock.unschedule(self._animator)
         
 
 

@@ -168,7 +168,10 @@ class MoonRabbitGame(Widget):
         if shape and isinstance(shape.body.data, AnimatedCircle):
             shape.body.data.animate()
         if shape and isinstance(shape.body.data, HeroRabbit):
-            shape.body.data.flip_h()
+            #shape.body.data.flip_h()
+            shape.body.data.stop_animation()
+            shape.body.data.set_animation('run_up')
+            shape.body.data.animate(endless=True)
         # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)
