@@ -10,7 +10,7 @@ from kivy.core.window import Window
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, HeroRabbit
+from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit
 
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources
@@ -139,6 +139,8 @@ class MoonRabbitGame(Widget):
         b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.15e8)
         # 0.2e8 is perfect value for dragging and rotation
         rock = Rock(600, 500)
+
+        rock2 = Rock2(600, 100)
         
         HeroRabbit(700, 600)
 

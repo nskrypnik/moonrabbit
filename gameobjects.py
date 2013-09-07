@@ -1,7 +1,7 @@
 
 """ Here should be Game objects, based on Physical objects """
 
-from kivy.graphics import VertexInstruction
+from kivy.graphics import VertexInstruction, Rectangle, Color
 from kivy.uix.scatter import ScatterPlane
 from kivy.graphics import Rectangle, Color, Ellipse
 from physics import Circle, DynamicObject, Box, phy
@@ -34,28 +34,58 @@ class Rock(Circle):
                                    moment=moment, draggable=True,
                                    texture=texture)
         
-        
+
+class Rock2(DynamicObject):
+
+    def __init__(self, *pos, **kw):
+        # note that order of vertices should be counterclockwise
+        self.size = (72, 72) # size of texture
+        self.vertices = [(69, 3), (69, 50), (54, 65), (20, 65), (0, 27), (0, 3)] # taken from stone-02_BORDERS.png
+        self.mass_center = (-36, -36) # size_of_text_texture/2
+        texture = GameContext.resources['textures']['rock2']
+
+        # physical params
+        mass = 1e50
+        moment = 1e500 # very high moment to prevent rotation
+        elasticity = 0.1 # not elastic
+
+        super(Rock2, self).__init__(mass, pos=pos, elasticity=elasticity, moment=moment, texture=texture,
+                                    draggable=True, **kw)
+
+    def define_shape(self):
+        self.shape = phy.Poly(self.body, self.vertices, offset=self.mass_center)
+
+    def widget_factory(self):
+        widget = ScatterPlane(size=self.size)
+        widget.center = self.pos
+        with widget.canvas:
+            if self.texture:
+                Color(1, 1, 1, 1)
+                Rectangle(pos=(0, 0), texture=self.texture, size=self.size)
+        return widget
+
+
 class FlipMixin(object):
     """ Provides for mixed class ability to
         flip its texture
     """
-    
+
     # TODO: for optimization it should be
     # rewritten with Cython
-    
+
     h_flipped = False
-    
+
     def flip_h(self):
         """ Flip sprite in horizontal direction """
         self.h_flipped = not self.h_flipped
         for obj in self.widget.canvas.children:
             if isinstance(obj, VertexInstruction):
-                x1, x2, x3, x4, x5, x6, x7, x8 = obj.tex_coords 
+                x1, x2, x3, x4, x5, x6, x7, x8 = obj.tex_coords
                 obj.tex_coords = [x3, x4, x1, x2, x7, x8, x5, x6]
-    
+
 
 class Character(Box, FlipMixin):
-    
+
     """ Base class for all characters """
     
     def __init__(self, inner_pos, controller, **kw):

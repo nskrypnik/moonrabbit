@@ -21,7 +21,12 @@ def load_resources():
             texture = texture.get_region(*region)
     
         textures[key] = texture
-    
+
+    # rock2
+    texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-02.png')
+    texture = Image(texture_path, mipmap=True).texture
+    textures['rock2'] = texture
+
     load_texture('grass', 'grass/grass-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))
     load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))    
     load_texture('rock', 'one-cell-snags/stone-01.png')
