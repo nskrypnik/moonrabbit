@@ -4,11 +4,14 @@ from kivy.graphics import Color, Rectangle, Mesh
 from kivy.core.image import Image
 from kivy.clock import Clock
 from kivy.properties import DictProperty, ListProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+import sys
 from landscape import *
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
@@ -18,7 +21,7 @@ from resources import load_resources, read_map
 
 
 class Timer(object):
-    def __init__(self, callback, time=90, **kw):
+    def __init__(self, callback, time=70, **kw):
         self.timer_counter = time
         self.callback = callback
 
@@ -37,9 +40,11 @@ class Timer(object):
         return self.timer_counter
 
     def get_formated_time(self):
-        minute = self.timer_counter / 60 or '00'
-        return "{minute}:{seconds}".format(minute=minute,
-                                           seconds=self.timer_counter % 60)
+        minutes = self.timer_counter / 60
+        seconds = self.timer_counter % 60
+
+        return "{minutes}:{seconds}".format(minutes=minutes if minutes >=10 else '0'+str(minutes),
+                                           seconds=seconds if seconds >=10 else '0'+str(seconds))
 
     def timer_callback(self, dt):
         self.timer_counter -= 1
@@ -272,16 +277,23 @@ class MoonRabbitGame(Widget):
 
     def game_over(self, win=False):
         self.timer.stop()
-        print "popup!!"
         if win:
             text = "You win!"
         else:
             text = "You lose!"
         Clock.unschedule(self.update)
+
+        content = BoxLayout(orientation='vertical')
+        content.add_widget(Label(text=text))
+        content.add_widget(Button(text="Close",
+                                  on_press=sys.exit,
+                                  size_hint=(None, None),
+                                  size=(375, 50)))
         popup = Popup(title=text,
-                      content=Label(text=text),
+                      content=content,
                       size=(400, 400),
-                      size_hint=(None, None))
+                      size_hint=(None, None),
+                      auto_dismiss=False)
         popup.open()
 
 
