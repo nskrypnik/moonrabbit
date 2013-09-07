@@ -59,16 +59,18 @@ def load_resources():
     # hero run down animation
     frames = []
     frame_time = 0.25  # sec
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True, nocache=True).texture
     frames.append((texture, frame_time))
+    print texture
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
     texture = flip_horizontal(texture)
+    print texture
     frames.append((texture, frame_time))
     animations['hero_run_down'] = SimpleAnimation(frames)
     
     frames = []
     frame_time = 0.25  # sec
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), nocache=True, mipmap=True).texture
     frames.append((texture, frame_time))
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
     texture = flip_horizontal(texture)
