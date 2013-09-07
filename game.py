@@ -143,6 +143,13 @@ class MoonRabbitGame(Widget):
                     self.blocks[i][j] = clazz(pos=(i * self.block_width, j * self.block_height),
                                               size=(self.block_width, self.block_height))
 
+            # init dynamics
+            for x, y, class_name in dynamics:
+                eval(class_name.capitalize())(x, y)
+
+            # draw or hero
+            HeroRabbit(700, 600)
+
             # init statics
             def _is_mountain(i, j):
                 return int(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
@@ -159,7 +166,7 @@ class MoonRabbitGame(Widget):
                     (0, 1, 0, 0): 'vertical_bottom',
                     (0, 0, 1, 0): 'horizontal_left',
                     (0, 0, 0, 1): 'vertical_top',
-                }
+                    }
                 return opensides_to_type.get(opensides, 'horizontal_center')
 
             for i in xrange(self.num_of_blocks_X):
@@ -168,14 +175,10 @@ class MoonRabbitGame(Widget):
                     if class_name is not None:
                         pos = (i + 0.5) * self.block_width, (j + 0.5) * self.block_height
                         if class_name == 'bush':
-                           Bush(*pos)
+                            Bush(*pos)
                         elif class_name == 'mountain':
                             print pos, _get_mountain_type(i, j)
                             Mountain(*pos, type=_get_mountain_type(i, j))
-
-            # init dynamics
-            for x, y, class_name in dynamics:
-                eval(class_name.capitalize())(x, y)
 
         #self.build_landscape()
          
@@ -186,9 +189,7 @@ class MoonRabbitGame(Widget):
         
         MoonStone(300, 400)
         # Mountain(500, 372, type='vertical_top')
-        
-        HeroRabbit(700, 600)
-        
+
         # Mountain(356, 300, type='horizontal_left')
         # Mountain(428, 300, type='horizontal_center')
         # Mountain(572, 300, type='horizontal_center')
