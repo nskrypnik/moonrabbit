@@ -1,0 +1,6 @@
+{
+	"dynamics": [],
+	"landscapes": [[1, 1, "sand"], [0, 1, "water"]],
+	"statics": [[1, 0, "bush"], [11, 5, "mountain"], [10, 5, "mountain"], [12, 5, "mountain"], [11, 6, "mountain"], [11, 4, "mountain"], [11, 7, "mountain"], [11, 3, "mountain"]],
+	"size": [14, 10]
+}
