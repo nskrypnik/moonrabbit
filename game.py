@@ -4,6 +4,8 @@ from kivy.graphics import Color, Rectangle, Mesh
 from kivy.core.image import Image
 from kivy.clock import Clock
 from kivy.properties import DictProperty, ListProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 
@@ -275,11 +277,18 @@ class MoonRabbitGame(Widget):
         else:
             text = "You lose!"
         Clock.unschedule(self.update)
+
+        content = BoxLayout(orientation='vertical')
+        content.add_widget(Label(text=text))
+        content.add_widget(Button(text="Close",
+                                  on_press=sys.exit,
+                                  size_hint=(None, None),
+                                  size=(375, 50)))
         popup = Popup(title=text,
-                      content=Label(text=text),
+                      content=content,
                       size=(400, 400),
-                      size_hint=(None, None))
-        popup.on_dismiss(sys.exit(0))
+                      size_hint=(None, None),
+                      auto_dismiss=False)
         popup.open()
 
 
