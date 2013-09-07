@@ -172,11 +172,20 @@ class Mountain(StaticBox):
             ],
 
         },
-        'top': [
-            'mountain_horizontal_top1',
-            'mountain_horizontal_top2',
-            'mountain_horizontal_top3',
-        ]
+        'top': {
+            'left': [
+                'mountain_horizontal_left_end_top',
+            ],
+            'center': [
+                'mountain_horizontal_top1',
+                'mountain_horizontal_top2',
+                'mountain_horizontal_top3',
+            ],
+            'right': [
+                'mountain_horizontal_right_end_top'
+            ],
+        }
+
     }
 
     def __init__(self, *pos, **kw):
@@ -184,7 +193,7 @@ class Mountain(StaticBox):
         self.type = kw.pop('type')
         texture = GameContext.resources['textures'][self.get_texture()]
 
-        self.top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
+        # self.top_texture = GameContext.resources['textures'][self.get_horizontal_top_texture()]
         super(Mountain, self).__init__(pos=pos,
                                        size=self.size,
                                        texture=texture,
@@ -195,7 +204,8 @@ class Mountain(StaticBox):
         return choice(self.mountain_texture_names[m_type[0]][m_type[1]])
 
     def get_horizontal_top_texture(self):
-        return choice(self.mountain_texture_names['top'])
+        m_type = self.type.split('_')
+        return choice(self.mountain_texture_names['top'][m_type[1]])
 
 
     def widget_factory(self):

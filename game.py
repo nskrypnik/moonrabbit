@@ -132,13 +132,15 @@ class MoonRabbitGame(Widget):
         
         rock = Rock(600, 500)
         rock2 = Rock2(600, 100)
+        wood = Wood(700, 100)
+        Mountain(500, 372, type='vertical_top')
         Mountain(356, 300, type='horizontal_left')
         Mountain(428, 300, type='horizontal_center')
-        Mountain(500, 300, type='horizontal_center')
+        # Mountain(500, 300, type='vertical_center')
         Mountain(572, 300, type='horizontal_center')
         Mountain(644, 300, type='horizontal_right')
-        Mountain(500, 228, type='vertical_center')
-        wood = Wood(700, 100)
+        Mountain(500, 238, type='vertical_center')
+        Mountain(500, 166, type='vertical_bottom')
         HeroRabbit(700, 600)
 
     
