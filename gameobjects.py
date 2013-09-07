@@ -217,3 +217,7 @@ class Mountain(StaticBox):
         return widget
 
 
+class Bush(StaticBox):
+    def __init__(self, pos=(0, 0), **kw):
+        texture = GameContext.resources['textures']['bush']
+        super(Bush, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
