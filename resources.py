@@ -1,9 +1,10 @@
 
 from kivy.core.image import Image
 from gamecontext import GameContext
-from animation import SimpleAnimation
+from animation import SimpleAnimation, ReverseAnimation
 from os.path import join, dirname
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
+from copy import copy
 
 RESOURCES_DIR = join(dirname(__file__), 'resources')
 
@@ -86,4 +87,29 @@ def load_resources():
     animations['hero_idle'] = SimpleAnimation(frames)
     
     
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-top-and-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_rotate_top'] = SimpleAnimation(frames)
+    animations['hero_rotate_top_r'] = ReverseAnimation(copy(frames))
+
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-down-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_rotate_down'] = SimpleAnimation(frames)
+    animations['hero_rotate_down_r'] = ReverseAnimation(copy(frames))
+    
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 10):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_run'] = SimpleAnimation(frames)
+    
+        
     
