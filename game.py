@@ -7,12 +7,12 @@ from kivy.properties import DictProperty, ListProperty
 
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
-from landscape import Water, Grass, Sand
+from landscape import *
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
 from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood, Bush, Character, MoonStone
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
-from resources import load_resources
+from resources import load_resources, read_map
 
 class BodyDragMgr():
     
@@ -66,7 +66,7 @@ class MoonRabbitGame(Widget):
         
         # create 2-dimensional array to store blocks
         self.blocks = [[0 for j in xrange(self.num_of_blocks_Y)]
-                            for i in xrange(self.num_of_blocks_X)]
+                       for i in xrange(self.num_of_blocks_X)]
         
         self.init_physics()
         self.load_resources()
@@ -128,12 +128,55 @@ class MoonRabbitGame(Widget):
 
     def setup_scene(self):
         """ Create here and add to scene all game objects """
-        
-        self.build_landscape()
 
+        # read map
+        (self.num_of_blocks_X, self.num_of_blocks_Y), landscapes, statics, dynamics = read_map('test.map')
+        with self.canvas:
+            # init landscapes
+            for i in xrange(self.num_of_blocks_X):
+                for j in xrange(self.num_of_blocks_Y):
+                    class_name = landscapes[i][j]
+                    if class_name is not None:
+                        clazz = eval(class_name.capitalize())
+                    else:
+                        clazz = Grass
+                    self.blocks = clazz(pos=(i * self.block_width, j * self.block_height),
+                                        size=(self.block_width, self.block_height))
+
+            # init statics
+            def _is_mountain(i, j, statics):
+                return bool(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
+                            statics[i][j] == 'mountain')
+
+            def _get_mountain_type(i, j, statics):
+                opensides = (_is_mountain(i - 1, j), _is_mountain(i, j + 1),
+                             _is_mountain(i + 1, j), _is_mountain(i, j - 1))  # left, top, right, bottom
+                opensides_to_type = {
+                    (1, 1, 1, 1): 'center',
+                    (1, 0, 1, 0): 'horizontal_center',
+                    (0, 1, 0, 1): 'vertical_center',
+                    (1, 0, 0, 0): 'horizontal_right',
+                    (0, 1, 0, 0): 'vertical_bottom',
+                    (0, 0, 1, 0): 'horizontal_left',
+                    (0, 0, 0, 1): 'vertical_top',
+                }
+                return opensides_to_type.get(opensides, 'horizontal_center')
+
+            for i in xrange(self.num_of_blocks_X):
+                for j in xrange(self.num_of_blocks_Y):
+                    class_name = statics[i][j]
+                    if class_name is not None:
+                        if class_name == 'bush':
+                           Bush(pos=(i * self.block_width, j * self.block_height))
+                        elif class_name == 'mountain':
+                            Mountain(i * self.block_width, j * self.block_height, _get_mountain_type(i, j, statics))
+
+        #self.build_landscape()
+         
         st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
         bsh = Bush(400, 50)
 
+        
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
@@ -159,28 +202,24 @@ class MoonRabbitGame(Widget):
         Mountain(500, 300, type='center')
 
     
-    def build_landscape(self):
-        # while build only with grass
-        with self.canvas:
-            for i in xrange(self.num_of_blocks_X):
-                for j in xrange(self.num_of_blocks_Y):
-                    if (i, j) in ((0, 0), (0, 1), (1, 0), (1, 1), (1, 3), (5, 2)):
-                        landscape = Water(
-                            pos=(i*self.block_width, j*self.block_height),
-                            size=(self.block_width, self.block_height)
-                        )
-                    elif (i, j) in ((2, 2), (2, 3), (3, 2), (7, 8), (8, 7), (7, 7)):
-                        landscape = Sand(
-                            pos=(i*self.block_width, j*self.block_height),
-                            size=(self.block_width, self.block_height)
-                        )
-                    else:
-                        landscape = Grass(
-                            pos=(i*self.block_width, j*self.block_height),
-                            size=(self.block_width, self.block_height)
-                        )
-                    self.blocks[i][j] = landscape
+    # def build_landscape(self):
+    #     # while build only with grass
+    #
+    #         for i in xrange(self.num_of_blocks_X):
+    #             for j in xrange(self.num_of_blocks_Y):
+    #                 if (i, j) in ((0, 0), (0, 1), (1, 0), (1, 1), (1, 3), (5, 2)):
+    #                     landscape = Water(
+    #                         pos=(i*self.block_width, j*self.block_height),
+    #                         size=(self.block_width, self.block_height)
+    #                     )
+    #                 else:
+    #                     landscape = Grass(
+    #                         pos=(i*self.block_width, j*self.block_height),
+    #                         size=(self.block_width, self.block_height)
+    #                     )
+    #                 self.blocks[i][j] = landscape
                     
+    
     def update(self, dt):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:

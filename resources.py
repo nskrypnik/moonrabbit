@@ -5,6 +5,7 @@ from animation import SimpleAnimation, ReverseAnimation
 from os.path import join, dirname
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from copy import copy
+import json
 
 RESOURCES_DIR = join(dirname(__file__), 'resources')
 
@@ -57,8 +58,6 @@ def load_resources():
     load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
     load_texture('mountain_central_top', 'mountains/mountain-center-top-01.png')
     load_texture('moon_stone', 'moon_stone.png')
-
-
 
     
     # load test star animation
@@ -132,5 +131,48 @@ def load_resources():
     animations['hero_rotate_down'] = SimpleAnimation(frames)
     animations['hero_rotate_down_r'] = ReverseAnimation(copy(frames))
     
-        
     
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 10):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_run'] = SimpleAnimation(frames)
+
+
+def read_map(fname):
+    """
+    read map from file which contains data in json format
+
+    format of file:
+    global dict which contains the next keys
+        size: [num_of_blocks_X, num_of_blocks_Y]
+        landscapes: [(i,j,type), ...], where type is in ['grass', 'water', 'sand', 'hole', 'carrot']
+        statics: [(i,j,type), ...], where type is in ['mountain', 'bush']
+        dynamics: [(x,y,type), ...], where type is in ['wood', 'rock', 'rock2']
+    """
+
+    required_fields = {'landscapes', 'statics', 'dynamics', 'size'}
+    try:
+        with open(fname, 'r') as ifile:
+            data = ifile.read()
+            map = json.loads(data)
+            # check that all required fields are presented
+            assert len(required_fields - set(map.keys())) == 0
+    except:
+        raise ValueError('Invalid map file')
+
+    def list_to_2d_array(num_X, num_Y, lst):
+        array = [[None for j in xrange(num_Y)]
+                 for i in xrange(num_X)]
+        for i, j, _type in lst:
+            array[i][j] = _type
+        return array
+
+    # number of blocks
+    num_X, num_Y = map['size']
+    landscapes = list_to_2d_array(num_X, num_Y, map['landscapes'])
+    statics = list_to_2d_array(num_X, num_Y, map['statics'])
+    dynamics = map['dynamics']
+
+    return map['size'], landscapes, statics, dynamics
