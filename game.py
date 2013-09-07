@@ -131,9 +131,7 @@ class MoonRabbitGame(Widget):
         
         self.build_landscape()
 
-        st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
         bsh = Bush(400, 50)
-
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
