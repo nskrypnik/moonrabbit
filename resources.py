@@ -14,30 +14,24 @@ def load_resources():
     textures = context.resources['textures'] = {}
     animations = context.resources['animations'] = {}
     
-    texture_path = join(RESOURCES_DIR, 'grass/grass-01.png')
-    texture = Image(texture_path, mipmap=True).texture \
-        .get_region(0, 0, *BLOCK_SIZE)
+    def load_texture(key, path, region=None):
+        texture_path = join(RESOURCES_DIR, path)
+        texture = Image(texture_path, mipmap=True).texture
+        if region:
+            texture = texture.get_region(*region)
     
-    textures['grass'] = texture
-    
-    # load water texture
-
-    texture_path = join(RESOURCES_DIR, 'terrain/water-01.png')
-    texture = Image(texture_path, mipmap=True).texture \
-        .get_region(0, 0, *BLOCK_SIZE)
-        
-    textures['water'] = texture
-    
-    # rock
-    texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-01.png')
-    texture = Image(texture_path, mipmap=True).texture
-    textures['rock'] = texture
+        textures[key] = texture
 
     # rock2
     texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-02.png')
     texture = Image(texture_path, mipmap=True).texture
     textures['rock2'] = texture
 
+    load_texture('grass', 'grass/grass-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))
+    load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))    
+    load_texture('rock', 'one-cell-snags/stone-01.png')
+    load_texture('rabbit_hero', 'hero/hero-rotate-down-01.png')
+    
     # load test star animation
     # TODO: delete it after it's unnecessary 
     frames = []
