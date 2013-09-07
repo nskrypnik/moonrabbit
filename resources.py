@@ -56,6 +56,7 @@ def load_resources():
     load_texture('mountain_vertical_bottom_end', 'mountains/mountain-vertical-down-end-01.png')
     load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
     load_texture('mountain_central_top', 'mountains/mountain-center-top-01.png')
+    load_texture('moon_stone', 'moon_stone.png')
 
 
 

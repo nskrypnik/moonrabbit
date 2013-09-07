@@ -195,11 +195,7 @@ class Mountain(StaticBox):
                 'mountain_horizontal_right_end_top'
             ],
         },
-        'center':
-            'mountain_central'
-
-
-
+        'center': 'mountain_central'
     }
 
     def __init__(self, *pos, **kw):
@@ -234,6 +230,12 @@ class Mountain(StaticBox):
 
 
 class Bush(StaticBox):
-    def __init__(self, pos=(0, 0), **kw):
+    def __init__(self, *pos, **kw):
         texture = GameContext.resources['textures']['bush']
         super(Bush, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
+
+
+class MoonStone(StaticBox):
+    def __init__(self, *pos, **kw):
+        texture = GameContext.resources['textures']['moon_stone']
+        super(MoonStone, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
