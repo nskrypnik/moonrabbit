@@ -2,7 +2,7 @@ import random
 
 from physics import phy
 from gamecontext import GameContext
-from settings import HERO_SPEED, OBJECT_MASS
+from settings import HERO_SPEED, OBJECT_MASS, CHARACTER_MASS
 
 def wait_counter(func):
     " Wait counter decorator "
@@ -151,6 +151,32 @@ class HeroRabbitController(BaseController):
     
     def handle_collision(self, arbiter):
         """ Implement handle of object collision here """
+        
+        shape1, shape2 = arbiter.shapes[:2]
+        
+        if isinstance(shape1, phy.Segment) or isinstance(shape2, phy.Segment):
+            if arbiter.total_ke > CHARACTER_MASS:
+                self.faced = True
+            return
+        
+        if not arbiter.is_first_contact:
+            return
+        
+        other = None
+        if hasattr(shape1.body, 'data') and shape1.body.data == self.obj:
+                other = shape2.body
+        else:
+                other = shape1.body
+                
+        if other and hasattr(other, 'data') and other.data.draggable:
+            x, y = self._dir_vectors[self._direction]
+            if x:
+                if self.obj.body.position.x*x > other.position.x*x:
+                    return
+            if y:
+                if self.obj.body.position.y*y > other.position.y*y:
+                    return
+
         if arbiter.total_ke > OBJECT_MASS:
             self.faced = True
         
