@@ -173,6 +173,8 @@ class MoonRabbitGame(Widget):
         # animation test here
         if shape and isinstance(shape.body.data, AnimatedCircle):
             shape.body.data.animate()
+        if shape and isinstance(shape.body.data, HeroRabbit):
+            shape.body.data.flip_h()
         # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)

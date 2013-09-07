@@ -82,8 +82,6 @@ class HeroRabbit(Character, AnimationMixin):
                                         elasticity=elasticity,
                                         texture=texture, size=size
                                         )
-
-        self.widget.bind(on_touch_down=lambda inst: self.flip_h())
         
     def define_shape(self):
         self.shape = phy.Poly.create_box(self.body, self.body_size)
