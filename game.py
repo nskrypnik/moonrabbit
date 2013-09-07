@@ -140,15 +140,15 @@ class MoonRabbitGame(Widget):
                         clazz = eval(class_name.capitalize())
                     else:
                         clazz = Grass
-                    self.blocks = clazz(pos=(i * self.block_width, j * self.block_height),
-                                        size=(self.block_width, self.block_height))
+                    self.blocks[i][j] = clazz(pos=(i * self.block_width, j * self.block_height),
+                                              size=(self.block_width, self.block_height))
 
             # init statics
-            def _is_mountain(i, j, statics):
+            def _is_mountain(i, j):
                 return bool(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
                             statics[i][j] == 'mountain')
 
-            def _get_mountain_type(i, j, statics):
+            def _get_mountain_type(i, j):
                 opensides = (_is_mountain(i - 1, j), _is_mountain(i, j + 1),
                              _is_mountain(i + 1, j), _is_mountain(i, j - 1))  # left, top, right, bottom
                 opensides_to_type = {
@@ -166,14 +166,16 @@ class MoonRabbitGame(Widget):
                 for j in xrange(self.num_of_blocks_Y):
                     class_name = statics[i][j]
                     if class_name is not None:
+                        pos = (i + 0.5) * self.block_width, (j + 0.5) * self.block_height
                         if class_name == 'bush':
-                           Bush(pos=(i * self.block_width, j * self.block_height))
+                           Bush(*pos)
                         elif class_name == 'mountain':
-                            Mountain(i * self.block_width, j * self.block_height, _get_mountain_type(i, j, statics))
+                            print pos, _get_mountain_type(i, j)
+                            Mountain(*pos, type=_get_mountain_type(i, j))
 
         #self.build_landscape()
          
-        st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
+        # st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
         bsh = Bush(400, 50)
 
         
@@ -188,18 +190,18 @@ class MoonRabbitGame(Widget):
         
         HeroRabbit(700, 600)
         
-        Mountain(356, 300, type='horizontal_left')
-        Mountain(428, 300, type='horizontal_center')
-        Mountain(572, 300, type='horizontal_center')
-        Mountain(644, 300, type='horizontal_right')
-
-        Mountain(500, 498, type='vertical_top')
-        Mountain(500, 444, type='vertical_center')
-        Mountain(500, 372, type='vertical_center')
-        Mountain(500, 238, type='vertical_center')
-        Mountain(500, 166, type='vertical_bottom')
-
-        Mountain(500, 300, type='center')
+        # Mountain(356, 300, type='horizontal_left')
+        # Mountain(428, 300, type='horizontal_center')
+        # Mountain(572, 300, type='horizontal_center')
+        # Mountain(644, 300, type='horizontal_right')
+        #
+        # Mountain(500, 498, type='vertical_top')
+        # Mountain(500, 444, type='vertical_center')
+        # Mountain(500, 372, type='vertical_center')
+        # Mountain(500, 238, type='vertical_center')
+        # Mountain(500, 166, type='vertical_bottom')
+        #
+        # Mountain(500, 300, type='center')
 
     
     # def build_landscape(self):
