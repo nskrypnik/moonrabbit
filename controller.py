@@ -1,5 +1,4 @@
 import random
-
 from physics import phy
 from gamecontext import GameContext
 from settings import HERO_SPEED, OBJECT_MASS, CHARACTER_MASS
@@ -105,6 +104,7 @@ class HeroRabbitController(BaseController):
     
     @wait_counter
     def do_idle(self):
+        self.context.game.timer.start()
         self.switch_to_moving()
         
     @wait_counter
@@ -114,6 +114,9 @@ class HeroRabbitController(BaseController):
     def do_moving(self):
         some = self.vision.look_from(self.obj.body.position)
         if some or self.faced:
+            if hasattr(some, 'body'):
+                if some.body.data.__class__.__name__ == 'MoonStone':
+                    self.context.game.game_over(win=True)
             self.stop()
             self.faced = False
             self.switch_to_turning()
@@ -192,5 +195,3 @@ class HeroRabbitController(BaseController):
         
     def stop(self):
         self.obj.body.velocity = (0, 0)
-
-            

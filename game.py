@@ -4,6 +4,8 @@ from kivy.graphics import Color, Rectangle, Mesh
 from kivy.core.image import Image
 from kivy.clock import Clock
 from kivy.properties import DictProperty, ListProperty
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
@@ -14,8 +16,40 @@ from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood,
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
 
+
+class Timer(object):
+    def __init__(self, callback, time=90, **kw):
+        self.timer_counter = time
+        self.callback = callback
+
+    def start(self):
+        Clock.max_iteration = self.timer_counter
+        Clock.schedule_interval(self.timer_callback, 1)
+
+    def stop(self):
+        self.timer_counter = 0
+        Clock.unschedule(self.timer_callback)
+
+    def pause(self):
+        Clock.unschedule(self.timer_callback)
+
+    def get_left_time(self):
+        return self.timer_counter
+
+    def get_formated_time(self):
+        minute = self.timer_counter / 60 or '00'
+        return "{minute}:{seconds}".format(minute=minute,
+                                           seconds=self.timer_counter % 60)
+
+    def timer_callback(self, dt):
+        self.timer_counter -= 1
+        self.callback()
+        if self.timer_counter <= 0:
+            self.stop()
+
+
 class BodyDragMgr():
-    
+
     def __init__(self, space, body, touch):
         self.controlled = body
         self.controller = phy.Body(1e1000, 1e1000)
@@ -30,16 +64,16 @@ class BodyDragMgr():
         joint.max_bias = 1e5
         self.joint = joint
         space.add(joint)
-        
+
         # add Physical object as dragged to context
         GameContext.dragged[body.data].append(self)
-        
+
     def update(self):
         #print self.touch.dx, self.touch.dy
         pos = self.controller.position.x + self.touch.dx, \
                 self.controller.position.y + self.touch.dy
         self.controller.position = pos
-    
+
     def release(self):
         self.space.remove(self.joint)
         self.controlled.velocity = 0., 0.
@@ -49,7 +83,7 @@ class BodyDragMgr():
 
 
 class MoonRabbitGame(Widget):
-    
+
     block_width = BLOCK_SIZE[0]
     block_height = BLOCK_SIZE[1]
     spf = 1 / 30.
@@ -59,26 +93,38 @@ class MoonRabbitGame(Widget):
         self.context = GameContext
         self.context.game = self
         #self._touches = [] # container for touches
-        
         super(MoonRabbitGame, self).__init__(**kwargs)
         self.num_of_blocks_X = GAME_AREA_SIZE[0]
         self.num_of_blocks_Y = GAME_AREA_SIZE[1]
-        
+
         # create 2-dimensional array to store blocks
         self.blocks = [[0 for j in xrange(self.num_of_blocks_Y)]
                        for i in xrange(self.num_of_blocks_X)]
-        
+
         self.init_physics()
         self.load_resources()
         self.setup_scene()
         self.create_bounds()
-        
+
         self.space.add_collision_handler(0, 0, post_solve=self.collision_handler)
-        
-        # FIXME: rid test function from here
-        # self.test()
+
+
+        self.timer = Timer(self.update_time)
+        self.clock = Label(text=self.timer.get_formated_time(),
+                           pos=(Window.width - 100, Window.height-100),
+                           font_size = 30
+        )
+
+        self.add_widget(self.clock)
+        # self.timer.start()
+
         Clock.schedule_interval(self.update, self.spf)
 
+    def update_time(self):
+        left_seconds = self.timer.get_left_time()
+        if left_seconds <= 0:
+            self.game_over()
+        self.clock.text = self.timer.get_formated_time()
 
     def collision_handler(self, space, arbiter, *args, **kw):
 
@@ -86,19 +132,18 @@ class MoonRabbitGame(Widget):
             if not hasattr(shape.body, 'data'):
                 continue
             phyobj = shape.body.data
-            
+
             if isinstance(phyobj, Character):
                 phyobj.controller.handle_collision(arbiter)
-                
+
             if not phyobj.draggable:
-                continue 
+                continue
             dragmgrs = GameContext.dragged[phyobj]
             if dragmgrs:
                 if arbiter.total_ke > 1e5*shape.body.mass:
                     for dragmgr in dragmgrs:
                         dragmgr.release()
         return True
-        
 
     def init_physics(self):
         self.space = init_physics()
@@ -106,7 +151,6 @@ class MoonRabbitGame(Widget):
     def step(self, dt):
         self.space.step(dt)
         self.update_objects()
-
 
     def create_bounds(self):
         """ Make bounds of the game space """
@@ -178,17 +222,17 @@ class MoonRabbitGame(Widget):
                 eval(class_name.capitalize())(x, y)
 
         #self.build_landscape()
-         
+
         # st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
 
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
-        
+
         MoonStone(300, 400)
         # Mountain(500, 372, type='vertical_top')
-        
+
         HeroRabbit(700, 600)
-        
+
         # Mountain(356, 300, type='horizontal_left')
         # Mountain(428, 300, type='horizontal_center')
         # Mountain(572, 300, type='horizontal_center')
@@ -201,7 +245,7 @@ class MoonRabbitGame(Widget):
         # Mountain(500, 166, type='vertical_bottom')
         #
         # Mountain(500, 300, type='center')
-    
+
     # def build_landscape(self):
     #     # while build only with grass
     #
@@ -218,14 +262,14 @@ class MoonRabbitGame(Widget):
     #                         size=(self.block_width, self.block_height)
     #                     )
     #                 self.blocks[i][j] = landscape
-                    
+
     def update(self, dt):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:
             obj.update()
         for obj in self.context.characters:
             obj.controller()
-    
+
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
         print shape
@@ -237,11 +281,11 @@ class MoonRabbitGame(Widget):
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)
         else:
             touch.bodydragmgr = None
-        
+
     def on_touch_move(self, touch):
         if touch.bodydragmgr:
             touch.bodydragmgr.update()
-    
+
     def on_touch_up(self, touch):
         if touch.bodydragmgr:
             touch.bodydragmgr.release()
@@ -249,16 +293,27 @@ class MoonRabbitGame(Widget):
     def load_resources(self):
         # see resources module
         load_resources()
-                
+
     def get_block(self, x, y):
         i = int(x) / self.block_width
         j = int(y) / self.block_height
         if i >= self.num_of_blocks_X or j >= self.num_of_blocks_Y or x < 0 or y < 0:
             raise ValueError("Coordinates out of playground")
         return self.blocks[i][j]
-    
+
     def game_over(self, win=False):
-        pass
+        self.timer.stop()
+        if win:
+            text = "You win!"
+        else:
+            text = "You lose!"
+        Clock.unschedule(self.update)
+        popup = Popup(title=text,
+                      content=Label(text=text),
+                      size=(400, 400),
+                      size_hint=(None, None))
+        popup.open()
+
 
     def test(self):
         with self.canvas:
