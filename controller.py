@@ -1,11 +1,13 @@
 from physics import phy
 
 
-class Controller(object):
+class BaseController(object):
+    
+    def __init__(self, phyobj):
+        self.obj = phyobj # set object we control
 
-    def __call__(self, body):
-        if body.force == phy.Vec2d(0,0):
-            body.apply_force((300, -1000), r=(0, 0))
+    def __call__(self):
+        pass
 
     def set_speed(self, speed):
         """
@@ -24,3 +26,8 @@ class Controller(object):
         get current block
         """
         pass
+
+
+class HeroRabbitController(BaseController):
+    
+    """ This is the controller for main Rabbit character """

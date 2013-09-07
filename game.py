@@ -7,11 +7,10 @@ from kivy.properties import DictProperty, ListProperty
 
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
-from controller import Controller
 from landscape import Water, Grass, Sand
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock
+from gameobjects import AnimatedCircle, Rock, HeroRabbit
 
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources
@@ -97,7 +96,6 @@ class MoonRabbitGame(Widget):
 
     def init_physics(self):
         self.space = init_physics()
-        self.controller = Controller()
 
     def step(self, dt):
         self.space.step(dt)
@@ -138,23 +136,12 @@ class MoonRabbitGame(Widget):
         c.set_animation(self.context.resources['animations']['star'])
         c.body.velocity = (0., 0.)
         
-        b = Box(1e1000, moment=1e500, pos=(370, 550), size=(100, 50), elasticity=.5)
-        b.body.angular_velocity = 2.
-        
         b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.15e8)
         # 0.2e8 is perfect value for dragging and rotation
         rock = Rock(600, 500)
         
-        widget = Widget()
-        texture = Image(join(dirname(__file__), 'resources/hero/hero-rotate-down-01.png'), mipmap=True).texture
-        
-        with widget.canvas:
-            Color(1, 1, 1, 1)
-            rect = Rectangle(pos=(300, 400), size=(72, 72), texture=texture)
-        self.add_widget(widget)
-        texture.uvpos = (0.5625, 0.5625)
-        texture.uvsize = (-0.5625, -0.5625)
-        rect.texture = texture
+        HeroRabbit(700, 600)
+
     
     def build_landscape(self):
         # while build only with grass
