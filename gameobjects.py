@@ -8,7 +8,7 @@ from physics import Circle, DynamicObject, Box, phy
 from animation import AnimationMixin
 from gamecontext import GameContext
 from controller import HeroRabbitController
-from settings import BLOCK_SIZE
+from settings import BLOCK_SIZE, OBJECT_MASS, CHARACTER_MASS
 from physics import phy
 
 class AnimatedCircle(Circle, AnimationMixin):
@@ -24,7 +24,7 @@ class Rock(Circle):
         # Rock is circle, so we should
         # define its radius
         radius = BLOCK_SIZE[0] / 2.
-        mass = 1e50
+        mass = OBJECT_MASS
         moment = 1e500 # very high moment to prevent rotation
         elasticity = 0.1 # not elastic
         texture = GameContext.resources['textures']['rock']
@@ -45,7 +45,7 @@ class Rock2(DynamicObject):
         texture = GameContext.resources['textures']['rock2']
 
         # physical params
-        mass = 1e50
+        mass = OBJECT_MASS
         moment = 1e500 # very high moment to prevent rotation
         elasticity = 0.1 # not elastic
 
@@ -98,7 +98,7 @@ class HeroRabbit(Character, AnimationMixin):
     
     def __init__(self, *inner_pos):
         
-        mass = 1e10
+        mass = CHARACTER_MASS
         moment = 1e500 # very high moment to prevent rotation
         elasticity = 0.1 # not elastic
         texture = GameContext.resources['textures']['rabbit_hero']

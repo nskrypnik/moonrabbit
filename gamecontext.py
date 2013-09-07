@@ -15,6 +15,7 @@ class _GameContext(object):
         self.dynamic_objects = []
         self.static_objects = []
         self._objs = []
+        self.characters = []
         self.space = None
         self.resources = {}
         self.dragged = {}
@@ -22,6 +23,7 @@ class _GameContext(object):
     def add(self, obj):
         
         from physics import DynamicObject, StaticObject
+        from gameobjects import Character
         
         # if object support some widget - add it to main game widget
         if hasattr(obj, 'widget'):
@@ -32,6 +34,9 @@ class _GameContext(object):
             self.dynamic_objects.append(obj)
             if obj.draggable:
                 self.dragged[obj] = []
+        
+        if isinstance(obj, Character):
+            self.characters.append(obj)
                 
         if isinstance(obj, StaticObject):
             self.static_objects.append(obj)

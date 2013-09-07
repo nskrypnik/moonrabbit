@@ -22,15 +22,12 @@ def load_resources():
     
         textures[key] = texture
 
-    # rock2
-    texture_path = join(RESOURCES_DIR, 'one-cell-snags/stone-02.png')
-    texture = Image(texture_path, mipmap=True).texture
-    textures['rock2'] = texture
-
     load_texture('grass', 'grass/grass-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))
     load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))    
     load_texture('rock', 'one-cell-snags/stone-01.png')
+    load_texture('rock2', 'one-cell-snags/stone-02.png')
     load_texture('rabbit_hero', 'hero/hero-rotate-down-01.png')
+
     
     # load test star animation
     # TODO: delete it after it's unnecessary 

@@ -130,18 +130,8 @@ class MoonRabbitGame(Widget):
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
-        c = AnimatedCircle(1e2, pos=(100, 100), radius=50, texture=texture, elasticity=.5, draggable=True)
-        #c.body.apply_force((1e4, 1e4), r=(0, 0))
-        #c.body.velocity = (400., 400.)
-        c.set_animation(self.context.resources['animations']['star'])
-        c.body.velocity = (0., 0.)
-        
-        b1 = Box(1e3, pos=(500, 350), size=(200, 70), elasticity=.5, draggable=True, moment=0.15e8)
-        # 0.2e8 is perfect value for dragging and rotation
         rock = Rock(600, 500)
-
-        rock2 = Rock2(600, 100)
-        
+        rock2 = Rock2(600, 100)      
         HeroRabbit(700, 600)
 
     
@@ -168,6 +158,8 @@ class MoonRabbitGame(Widget):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:
             obj.update()
+        for obj in self.context.characters:
+            obj.controller()
     
     def on_touch_down(self, touch):
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
