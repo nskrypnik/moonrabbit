@@ -33,6 +33,8 @@ class Rock(Circle):
                                    elasticity=elasticity, mass=mass,
                                    moment=moment, draggable=True,
                                    texture=texture)
+    def define_shape(self):
+        self.shape = phy.Circle(self.body, self.radius-4)
 
 
 class Rock2(Box):
@@ -40,7 +42,7 @@ class Rock2(Box):
     def __init__(self, *pos, **kw):
         # note that order of vertices should be counterclockwise
         size = BLOCK_SIZE  # size of texture
-        self.vertices = [(69, 3), (69, 50), (54, 65), (20, 65), (0, 27), (0, 3)]  # taken from stone-02_BORDERS.png
+        self.vertices = [(63, 6), (63, 47), (51, 59), (23, 59), (3, 27), (3, 6)]  # taken from stone-02_BORDERS.png
         self.mass_center = (-36, -36)  # size_of_text_texture/2
         texture = GameContext.resources['textures']['rock2']
 
@@ -232,7 +234,11 @@ class Mountain(StaticBox):
 class Bush(StaticBox):
     def __init__(self, *pos, **kw):
         texture = GameContext.resources['textures']['bush']
+        self.body_size = [BLOCK_SIZE[0]-4,BLOCK_SIZE[1]-4]
         super(Bush, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
+    
+    def define_shape(self):
+        self.shape = phy.Poly.create_box(self.body, self.body_size)
 
 
 class MoonStone(StaticBox):

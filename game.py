@@ -140,7 +140,7 @@ class MoonRabbitGame(Widget):
                 continue
             dragmgrs = GameContext.dragged[phyobj]
             if dragmgrs:
-                if arbiter.total_ke > 1e5*shape.body.mass:
+                if arbiter.total_ke > 1e8*shape.body.mass:
                     for dragmgr in dragmgrs:
                         dragmgr.release()
         return True
