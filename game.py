@@ -9,6 +9,7 @@ from kivy.uix.popup import Popup
 
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+import sys
 from landscape import *
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
@@ -269,7 +270,6 @@ class MoonRabbitGame(Widget):
 
     def game_over(self, win=False):
         self.timer.stop()
-        print "popup!!"
         if win:
             text = "You win!"
         else:
@@ -279,6 +279,7 @@ class MoonRabbitGame(Widget):
                       content=Label(text=text),
                       size=(400, 400),
                       size_hint=(None, None))
+        popup.on_dismiss(sys.exit(0))
         popup.open()
 
 
