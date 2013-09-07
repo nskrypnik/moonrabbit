@@ -109,7 +109,7 @@ class MoonRabbitGame(Widget):
         self.space.add_collision_handler(0, 0, post_solve=self.collision_handler)
 
 
-        self.timer = Timer(self.update_time)
+        self.timer = Timer(self.update_time, time=5)
         self.clock = Label(text=self.timer.get_formated_time(),
                            pos=(Window.width - 100, Window.height-100),
                            font_size = 30
@@ -224,17 +224,10 @@ class MoonRabbitGame(Widget):
                             print pos, _get_mountain_type(i, j)
                             Mountain(*pos, type=_get_mountain_type(i, j))
 
-        #self.build_landscape()
-
-        # st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
-
-        texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
-        texture = texture.get_region(1, 20, 98, 98)
 
         MoonStone(300, 400)
         # Mountain(500, 372, type='vertical_top')
-
-        HeroRabbit(700, 600)
+        # HeroRabbit(700, 600)
 
         # Mountain(356, 300, type='horizontal_left')
         # Mountain(428, 300, type='horizontal_center')
@@ -306,6 +299,7 @@ class MoonRabbitGame(Widget):
 
     def game_over(self, win=False):
         self.timer.stop()
+        print "popup!!"
         if win:
             text = "You win!"
         else:
