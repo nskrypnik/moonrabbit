@@ -168,6 +168,11 @@ class MoonRabbitGame(Widget):
                             pos=(i*self.block_width, j*self.block_height),
                             size=(self.block_width, self.block_height)
                         )
+                    elif (i, j) in ((2, 2), (2, 3), (3, 2), (7, 8), (8, 7), (7, 7)):
+                        landscape = Sand(
+                            pos=(i*self.block_width, j*self.block_height),
+                            size=(self.block_width, self.block_height)
+                        )
                     else:
                         landscape = Grass(
                             pos=(i*self.block_width, j*self.block_height),

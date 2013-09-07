@@ -3,6 +3,7 @@ import random
 from physics import phy
 from gamecontext import GameContext
 from settings import HERO_SPEED, OBJECT_MASS, CHARACTER_MASS
+from landscape import Grass, Sand, Water
 
 def wait_counter(func):
     " Wait counter decorator "
@@ -12,6 +13,10 @@ def wait_counter(func):
         else:
             func(self)
     return wrap
+
+
+class Edge(object):
+    pass
 
 
 class VisionVector(object):
@@ -32,7 +37,12 @@ class VisionVector(object):
             x, y = pos
         lx, ly = self._dir[0]*self._d + x, \
                     self._dir[1]*self._d + y
+        if lx < 0 or lx > GameContext.scene_width:
+            return Edge()
+        if ly < 0 or ly > GameContext.scene_height:
+            return Edge()
         return self.space.point_query_first(phy.Vec2d(lx, ly))
+
 
 class BaseController(object):
     
@@ -46,6 +56,7 @@ class BaseController(object):
     
     def __init__(self, phyobj):
         self.obj = phyobj # set object we control
+        self.context = GameContext
 
     def __call__(self):
         handler = self._state_handlers.get(self._state)
@@ -146,21 +157,20 @@ class HeroRabbitController(BaseController):
     def define_velocity(self):
         """ Should get velocity according to conditions """
         SPEED = HERO_SPEED
+        
+        # define landscape type where we are
+        pos = self.obj.body.position 
+        block = self.context.game.get_block(pos.x, pos.y)
+        SPEED *= block.velocity_coefficient
+        
         v = self._dir_vectors[self._direction]
         return v[0]*SPEED, v[1]*SPEED
     
     def handle_collision(self, arbiter):
         """ Implement handle of object collision here """
         
+        # TODO: delete all this bullshit and implement EdgeVisor
         shape1, shape2 = arbiter.shapes[:2]
-        
-        if isinstance(shape1, phy.Segment) or isinstance(shape2, phy.Segment):
-            if arbiter.total_ke > CHARACTER_MASS:
-                self.faced = True
-            return
-        
-        if not arbiter.is_first_contact:
-            return
         
         other = None
         if hasattr(shape1.body, 'data') and shape1.body.data == self.obj:

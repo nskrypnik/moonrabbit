@@ -49,7 +49,10 @@ class Water(Landscape):
 
 
 class Sand(Landscape):
-    velocity_coefficient = 0.7
+    velocity_coefficient = 0.5
+    def __init__(self, *args, **kw):
+        kw['texture'] = GameContext.resources['textures']['sand']
+        super(Sand, self).__init__(*args, **kw)
 
     
 class Hole(Landscape):

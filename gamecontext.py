@@ -1,4 +1,6 @@
 
+from settings import BLOCK_SIZE, GAME_AREA_SIZE
+
 class _GameContext(object):
     """ Should be singletone """
     
@@ -19,6 +21,8 @@ class _GameContext(object):
         self.space = None
         self.resources = {}
         self.dragged = {}
+        self.scene_width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
+        self.scene_height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
     
     def add(self, obj):
         
