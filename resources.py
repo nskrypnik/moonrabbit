@@ -146,17 +146,18 @@ def read_map(fname):
 
     format of file:
     global dict which contains the next keys
-        size: [num_of_blocks_X, num_of_blocks_Y]
+        options: { "size": [num_of_blocks_X, num_of_blocks_Y], ...}
         landscapes: [(i,j,type), ...], where type is in ['grass', 'water', 'sand', 'hole', 'carrot']
         statics: [(i,j,type), ...], where type is in ['mountain', 'bush']
         dynamics: [(x,y,type), ...], where type is in ['wood', 'rock', 'rock2']
     """
 
-    required_fields = {'landscapes', 'statics', 'dynamics', 'size'}
+    required_fields = {'landscapes', 'statics', 'dynamics', 'options'}
     try:
         with open(fname, 'r') as ifile:
             data = ifile.read()
             map = json.loads(data)
+            print 10000
             # check that all required fields are presented
             assert len(required_fields - set(map.keys())) == 0
     except:
@@ -170,9 +171,9 @@ def read_map(fname):
         return array
 
     # number of blocks
-    num_X, num_Y = map['size']
+    num_X, num_Y = map['options']['size']
     landscapes = list_to_2d_array(num_X, num_Y, map['landscapes'])
     statics = list_to_2d_array(num_X, num_Y, map['statics'])
     dynamics = map['dynamics']
 
-    return map['size'], landscapes, statics, dynamics
+    return map['options'], landscapes, statics, dynamics
