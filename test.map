@@ -8,14 +8,15 @@
     [11, 0, "water"], [12, 0, "water"], [13, 0, "water"]
     ],
 
-	"statics": [[10, 0, "mountain"], [4, 2, "mountain"], [4, 3, "mountain"], [4, 4, "mountain"], [4, 5, "mountain"],
+	"statics": [
+	[5, 5, "bush"], [6, 5, "bush"], [7, 5, "bush"], [6, 9, "bush"], [6, 8, "bush"], [7, 5, "bush"], [12, 5, "bush"],
+	[13, 5, "bush"], [12, 8, "bush"], [12, 9, "bush"], [10, 7, "bush"], [10, 8, "bush"], [10, 9, "bush"],
+	[11, 4, "bush"],[10, 0, "mountain"], [4, 2, "mountain"], [4, 3, "mountain"], [4, 4, "mountain"], [4, 5, "mountain"],
 	[4, 6, "mountain"], [4, 7, "mountain"], [4, 8, "mountain"], [3, 4, "mountain"], [4, 4, "mountain"], [5, 4, "mountain"],
 	[6, 4, "mountain"], [7, 4, "mountain"], [8, 4, "mountain"], [9, 4, "mountain"], [8, 1, "mountain"], [8, 2, "mountain"],
 	[8, 3, "mountain"], [8, 4, "mountain"], [8, 5, "mountain"], [7, 2, "mountain"], [8, 2, "mountain"], [9, 2, "mountain"],
-	[10, 2, "mountain"], [11, 2, "mountain"], [12, 2, "mountain"], [8, 1, "mountain"], [12, 1, "mountain"],
-	[5, 5, "bush"], [6, 5, "bush"], [7, 5, "bush"], [6, 9, "bush"], [6, 8, "bush"], [7, 5, "bush"], [12, 5, "bush"],
-	[13, 5, "bush"], [12, 8, "bush"], [12, 9, "bush"], [10, 7, "bush"], [10, 8, "bush"], [10, 9, "bush"],
-	[11, 4, "bush"]],
+	[10, 2, "mountain"], [11, 2, "mountain"], [12, 2, "mountain"], [8, 1, "mountain"], [12, 1, "mountain"]
+	],
 
 	"options": {"size": [14, 10], "dynamics_as_blocks": true}
 }

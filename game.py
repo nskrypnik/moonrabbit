@@ -92,6 +92,29 @@ class MoonRabbitGame(Widget):
     block_width = BLOCK_SIZE[0]
     block_height = BLOCK_SIZE[1]
     spf = 1 / 30.
+    
+    def greeting(self, dt):
+        content = BoxLayout(orientation='vertical')
+        label = Label(text='Help Rabbit to find the Moon Stone. You cannot directly control the'\
+                      ' Rabbit, but you may move some stones and wood to show the right way for'\
+                      ' Moon Stone', valign="middle", halign="center")
+        content.add_widget(label)
+        content.add_widget(Button(text="Start",
+                                  on_press=self.start,
+                                  size_hint=(None, None),
+                                  size=(375, 50)))
+        popup = Popup(title='Moon Rabbit',
+                      content=content,
+                      size=(400, 400),
+                      size_hint=(None, None),
+                      auto_dismiss=False)
+        self.greeting_popup = popup
+        popup.open()
+        label.bind(size=label.setter('text_size'))
+        
+    def start(self, btn):
+        self.greeting_popup.dismiss()
+        Clock.schedule_interval(self.update, self.spf)
 
     def __init__(self, **kwargs):
         # setup game context
@@ -122,8 +145,8 @@ class MoonRabbitGame(Widget):
 
         self.add_widget(self.clock)
         # self.timer.start()
-
-        Clock.schedule_interval(self.update, self.spf)
+        Clock.schedule_once(self.greeting, -1)
+        #Clock.schedule_interval(self.update, self.spf)
 
     def update_time(self):
         left_seconds = self.timer.get_left_time()
@@ -280,7 +303,7 @@ class MoonRabbitGame(Widget):
         if win:
             text = "You win!"
         else:
-            text = "You lose!"
+            text = "You lose! Time is over!"
         Clock.unschedule(self.update)
 
         content = BoxLayout(orientation='vertical')
@@ -289,7 +312,7 @@ class MoonRabbitGame(Widget):
                                   on_press=sys.exit,
                                   size_hint=(None, None),
                                   size=(375, 50)))
-        popup = Popup(title=text,
+        popup = Popup(title='Game is over',
                       content=content,
                       size=(400, 400),
                       size_hint=(None, None),
