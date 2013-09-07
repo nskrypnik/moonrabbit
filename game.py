@@ -178,7 +178,6 @@ class MoonRabbitGame(Widget):
         # st = StaticBox(pos=(300, 150), size=(100, 200), elasticity=.5)
         bsh = Bush(400, 50)
 
-        
         texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star.png'), mipmap=True).texture
         texture = texture.get_region(1, 20, 98, 98)
         
@@ -202,7 +201,6 @@ class MoonRabbitGame(Widget):
         # Mountain(500, 166, type='vertical_bottom')
         #
         # Mountain(500, 300, type='center')
-
     
     # def build_landscape(self):
     #     # while build only with grass
@@ -221,7 +219,6 @@ class MoonRabbitGame(Widget):
     #                     )
     #                 self.blocks[i][j] = landscape
                     
-    
     def update(self, dt):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:
@@ -259,6 +256,9 @@ class MoonRabbitGame(Widget):
         if i >= self.num_of_blocks_X or j >= self.num_of_blocks_Y or x < 0 or y < 0:
             raise ValueError("Coordinates out of playground")
         return self.blocks[i][j]
+    
+    def game_over(self, win=False):
+        pass
 
     def test(self):
         with self.canvas:
