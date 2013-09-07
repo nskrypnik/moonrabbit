@@ -83,5 +83,27 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['hero_idle'] = SimpleAnimation(frames)
     
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-top-and-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_rotate_top'] = SimpleAnimation(frames)
+
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-down-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_rotate_down'] = SimpleAnimation(frames)
     
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 10):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
+        frames.append((texture, frame_time))
+    animations['hero_run'] = SimpleAnimation(frames)
+    
+        
     

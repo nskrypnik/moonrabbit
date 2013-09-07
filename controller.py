@@ -1,4 +1,5 @@
 from physics import phy
+from gamecontext import GameContext
 import random
 
 def wait_counter(func):
@@ -10,6 +11,26 @@ def wait_counter(func):
             func(self)
     return wrap
 
+
+class VisionVector(object):
+    
+    def __init__(self, direction, distance):
+        self._dir = direction
+        self._d = distance
+        self.space = GameContext.space
+        
+    def set_direction(self, direction):
+        self._dir = direction
+        
+    def look_from(self, pos):
+        if isinstance(pos, phy.Vec2d):
+            x = pos.x
+            y = pos.y
+        else:
+            x, y = pos
+        lx, ly = self._dir[0]*self._d + x, \
+                    self._dir[1]*self._d + y
+        return self.space.point_query_first(phy.Vec2d(lx, ly))
 
 class BaseController(object):
     
@@ -51,6 +72,10 @@ class BaseController(object):
         get current block
         """
         pass
+    
+    def handle_collision(self, arbiter):
+        """ Implement handle of object collision here """
+        pass
 
 
 class HeroRabbitController(BaseController):
@@ -58,14 +83,68 @@ class HeroRabbitController(BaseController):
     """ This is the controller for main Rabbit character """
     
     _state = 'IDLE'
-    _counter = 20
+    _counter = 30
+    _direction = 'l'
+    _directions = ['l', 't', 'r', 'b']
+    _dir_vectors = {'l': (-1, 0), 't': (0, 1), 'r': (1, 0), 'b': (0, -1)}
+    faced = False
+    vision = VisionVector((-1, 0), 36)
     
     @wait_counter
     def do_idle(self):
-        next_state = random.choice(['TURN_LEFT', 'TURN_RIGHT'])
+        self.switch_to_moving()
+        
+    @wait_counter
+    def do_turning(self):
+        pass
+        
+    def do_moving(self):
+        some = self.vision.look_from(self.obj.body.position)
+        if some or self.faced:
+            self.stop()
+            self.faced = False
+            self.switch_to_turning()
+            return
+        self.obj.body.velocity = self.define_velocity()
     
     _state_handlers = {
-                       'IDLE': do_idle   
-                    } 
-                       
-                       
+                       'IDLE': do_idle,
+                       'MOVING': do_moving,
+                       'TURNING': do_turning,
+                    }
+    
+    def switch_animation(self, animation):
+        self.obj.set_animation(animation)
+        self.obj.animate()
+    
+    def switch_to_moving(self):
+        animation = 'run' if self._direction in ('l', 'r')\
+                        else 'run_top' if self._direction == 't'\
+                        else 'run_down'
+        self.switch_animation(animation)
+        self.set_state('MOVING')
+        
+    def switch_to_turning(self):
+        if self._direction in ('l', 'r'):
+            self._direction = random.choice(('u', 'd'))
+        else:
+            self._direction = random.choice(('l', 'r'))
+        self.vision.set_direction(self._direction)
+        animation = {'u': 'rotate_top',
+                     'd': 'rotate_down'
+                     }[self._direction]
+        self.switch_animation(animation)
+        self.set_state('TURNING', 15)
+    
+    def define_velocity(self):
+        """ Should get velocity according to conditions """
+        SPEED = 50
+        v = self._dir_vectors[self._direction]
+        return v[0]*SPEED, v[1]*SPEED
+    
+    def handle_collision(self, arbiter):
+        """ Implement handle of object collision here """
+        self.faced = True
+        
+    def stop(self):
+        self.obj.body.velocity = (0, 0)                 

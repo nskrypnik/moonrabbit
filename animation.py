@@ -32,8 +32,8 @@ class AnimationMixin(object):
     
     current_animation = None
     animations = {}
+    restore_original = True
     _animator = None
-    
     
     def redraw(self):
         assert not self.widget is None
@@ -45,8 +45,10 @@ class AnimationMixin(object):
         if hasattr(self, 'post_redraw_hook'):
             self.post_redraw_hook()
                             
-    def set_animation(self, animation):
+    def set_animation(self, animation, stop=False):
         """ Here you can set animation directly or give key of predefined animation """
+        if stop:
+            self.stop_animation()
         if isinstance(animation, Animation):
             self.current_animation = animation
         else:
@@ -62,8 +64,9 @@ class AnimationMixin(object):
         if next_frame is None: # all frames are shown
             if not endless:
                 # restore texture
-                self.texture = self.original_texture
-                self.redraw()
+                if self.restore_original:
+                    self.texture = self.original_texture
+                    self.redraw()
                 return
             else:
                 next_frame = next(animation, None)
