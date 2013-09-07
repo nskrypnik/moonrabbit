@@ -179,7 +179,8 @@ class MoonRabbitGame(Widget):
         """ Create here and add to scene all game objects """
 
         # read map
-        (self.num_of_blocks_X, self.num_of_blocks_Y), landscapes, statics, dynamics = read_map('test.map')
+        options, landscapes, statics, dynamics = read_map('test.map')
+        self.num_of_blocks_X, self.num_of_blocks_Y = options['size']
         with self.canvas:
             # init landscapes
             for i in xrange(self.num_of_blocks_X):
@@ -194,10 +195,12 @@ class MoonRabbitGame(Widget):
 
             # init dynamics
             for x, y, class_name in dynamics:
+                if 'dynamics_as_blocks' in options and options['dynamics_as_blocks']:
+                    x, y = (x + 0.5) * self.block_width, (y + 0.5) * self.block_height
                 eval(class_name.capitalize())(x, y)
 
             # draw or hero
-            HeroRabbit(700, 600)
+            HeroRabbit(self.block_width/2., self.block_height/2.)
 
             # init statics
             def _is_mountain(i, j):
@@ -229,8 +232,7 @@ class MoonRabbitGame(Widget):
                             print pos, _get_mountain_type(i, j)
                             Mountain(*pos, type=_get_mountain_type(i, j))
 
-
-        MoonStone(300, 400)
+        MoonStone(13.5*self.block_width, 7.5*self.block_height)
 
     def update(self, dt):
         self.context.space.step(self.spf)
@@ -263,9 +265,12 @@ class MoonRabbitGame(Widget):
         # see resources module
         load_resources()
 
+    def get_indices_by_coord(self, x, y):
+        return int(x) / self.block_width, int(y) / self.block_height
+                
+
     def get_block(self, x, y):
-        i = int(x) / self.block_width
-        j = int(y) / self.block_height
+        i, j = self.get_indices_by_coord(x, y)
         if i >= self.num_of_blocks_X or j >= self.num_of_blocks_Y or x < 0 or y < 0:
             raise ValueError("Coordinates out of playground")
         return self.blocks[i][j]

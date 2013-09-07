@@ -3,9 +3,10 @@
 # hook for windows
 
 import sys
+from kivy.config import Config
 
-sys.argv.append('--size')
-sys.argv.append('1008x720')
+Config.set('graphics', 'width','1008')
+Config.set('graphics', 'height', '720')
 
 from kivy.app import App
 from game import MoonRabbitGame
