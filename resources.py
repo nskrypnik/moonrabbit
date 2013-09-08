@@ -7,7 +7,7 @@ from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from copy import copy
 import json
 
-RESOURCES_DIR = join(dirname(__file__), 'resources')
+RESOURCES_DIR = 'resources'
 
 
 def flip_horizontal(tex):
@@ -58,17 +58,6 @@ def load_resources():
     load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
     load_texture('mountain_central_top', 'mountains/mountain-center-top-01.png')
     load_texture('moon_stone', 'moon_stone.png')
-
-    
-    # load test star animation
-    # TODO: delete it after it's unnecessary 
-    frames = []
-    frame_time = 0.04  # sec
-    for i in xrange(6):
-        texture = Image(join(dirname(__file__), 'examples/PlanetCute PNG/Star{}.png'.format(i)), mipmap=True).texture
-        texture = texture.get_region(1, 20, 98, 98)
-        frames.append((texture, frame_time))
-    animations['star'] = SimpleAnimation(frames) # shine
 
     # load water animation
     frames = []
