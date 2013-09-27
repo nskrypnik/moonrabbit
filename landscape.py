@@ -33,7 +33,6 @@ class Grass(Landscape):
         kw['texture'] = GameContext.resources['textures']['grass']
         super(Grass, self).__init__(*args, **kw)
 
-    
 
 class Water(Landscape):
     _animation = None

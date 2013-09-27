@@ -8,7 +8,8 @@ from kivy.graphics import Rectangle, Color, Ellipse
 from kivy.clock import Clock
 from gamecontext import GameContext
 
-if platform() in ('ios', 'android'):
+#if platform() in ('ios', 'android'):
+if True:
     # use cymunk for mobile platforms 
     import cymunk as phy
 else:

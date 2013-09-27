@@ -190,7 +190,7 @@ class HeroRabbitController(BaseController):
         else:
                 other = shape1.body
                 
-        if other and hasattr(other, 'data') and other.data.draggable:
+        if other and hasattr(other, 'data') and other.data and other.data.draggable:
             x, y = self._dir_vectors[self._direction]
             if x:
                 if self.obj.body.position.x*x > other.position.x*x:

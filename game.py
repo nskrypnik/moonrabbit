@@ -60,6 +60,7 @@ class BodyDragMgr():
         self.controller = phy.Body(1e1000, 1e1000)
         self.space = space
         self.touch = touch
+        self.released = False
         self.controller.position = (touch.x, touch.y)
         anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
                 touch.y - self.controlled.position.y)
@@ -80,6 +81,8 @@ class BodyDragMgr():
         self.controller.position = pos
 
     def release(self):
+        if not self.touch.bodydragmgr:
+            return
         self.space.remove(self.joint)
         self.controlled.velocity = 0., 0.
         self.controlled.angular_velocity = 0.
@@ -91,6 +94,8 @@ class MoonRabbitGame(Widget):
 
     block_width = BLOCK_SIZE[0]
     block_height = BLOCK_SIZE[1]
+    game_area_size = BLOCK_SIZE[0]*GAME_AREA_SIZE[0],\
+                     BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
     spf = 1 / 30.
     
     def greeting(self, dt):
@@ -139,7 +144,7 @@ class MoonRabbitGame(Widget):
 
         self.timer = Timer(self.update_time)
         self.clock = Label(text=self.timer.get_formated_time(),
-                           pos=(Window.width - 100, Window.height-100),
+                           pos=(self.game_area_size[0] - 100, self.game_area_size[1]-100),
                            font_size = 30
         )
 
@@ -155,7 +160,7 @@ class MoonRabbitGame(Widget):
         self.clock.text = self.timer.get_formated_time()
 
     def collision_handler(self, space, arbiter, *args, **kw):
-
+        
         for shape in arbiter.shapes:
             if not hasattr(shape.body, 'data'):
                 continue
@@ -163,14 +168,14 @@ class MoonRabbitGame(Widget):
 
             if isinstance(phyobj, Character):
                 phyobj.controller.handle_collision(arbiter)
-
-            if not phyobj.draggable:
+            
+            if not phyobj or not phyobj.draggable:
                 continue
             dragmgrs = GameContext.dragged[phyobj]
             if dragmgrs:
                 if arbiter.total_ke > 1e8*shape.body.mass:
                     for dragmgr in dragmgrs:
-                        dragmgr.release()
+                        Clock.schedule_once(lambda dt: dragmgr.release(), -1)
         return True
 
     def init_physics(self):
@@ -184,8 +189,8 @@ class MoonRabbitGame(Widget):
         """ Make bounds of the game space """
         # Bounds should be created for
         x0, y0 = (0, 0)
-        x1 = Window.width
-        y1 = Window.height
+        x1 = self.game_area_size[0]
+        y1 = self.game_area_size[1]
         space = self.space
 
         borders = [
@@ -214,7 +219,7 @@ class MoonRabbitGame(Widget):
                     else:
                         clazz = Grass
                     self.blocks[i][j] = clazz(pos=(i * self.block_width, j * self.block_height),
-                                              size=(self.block_width, self.block_height))
+                                              size=(self.block_width*1.1, self.block_height*1.1))
 
             # init dynamics
             for x, y, class_name in dynamics:
