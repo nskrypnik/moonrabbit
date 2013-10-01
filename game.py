@@ -62,10 +62,10 @@ class BodyDragMgr():
         self.touch = touch
         self.released = False
         self.controller.position = (touch.x, touch.y)
-        #anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
-        #        touch.y - self.controlled.position.y)
-        #anchor.rotate(-body.angle)
-        args = self.controller, self.controlled, (0, 0), (0, 0)
+        anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
+                touch.y - self.controlled.position.y)
+        anchor.rotate(-body.angle)
+        args = self.controller, self.controlled, (0, 0), anchor
         joint = phy.constraint.PivotJoint(*args)
         joint.max_bias = 1e5
         self.joint = joint
@@ -233,39 +233,50 @@ class MoonRabbitGame(Widget):
                 if 'dynamics_as_blocks' in options and options['dynamics_as_blocks']:
                     x, y = (x + 0.5) * self.block_width, (y + 0.5) * self.block_height
                 eval(class_name.capitalize())(x, y)
-
+        
+        with self.canvas:
             # draw or hero
             HeroRabbit(self.block_width/2., self.block_height/2.)
 
-            # init statics
-            def _is_mountain(i, j):
-                return int(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
-                           statics[i][j] == 'mountain')
+        # init statics
+        def _is_mountain(i, j):
+            return int(0 <= i < self.num_of_blocks_X and 0 <= j <= self.num_of_blocks_Y and
+                       statics[i][j] == 'mountain')
 
-            def _get_mountain_type(i, j):
-                opensides = (_is_mountain(i - 1, j), _is_mountain(i, j + 1),
-                             _is_mountain(i + 1, j), _is_mountain(i, j - 1))  # left, top, right, bottom
-                opensides_to_type = {
-                    (1, 1, 1, 1): 'center',
-                    (1, 0, 1, 0): 'horizontal_center',
-                    (0, 1, 0, 1): 'vertical_center',
-                    (1, 0, 0, 0): 'horizontal_right',
-                    (0, 1, 0, 0): 'vertical_bottom',
-                    (0, 0, 1, 0): 'horizontal_left',
-                    (0, 0, 0, 1): 'vertical_top',
-                    }
-                return opensides_to_type.get(opensides, 'horizontal_center')
-
-            for i in xrange(self.num_of_blocks_X):
-                for j in xrange(self.num_of_blocks_Y):
-                    class_name = statics[i][j]
-                    if class_name is not None:
-                        pos = (i + 0.5) * self.block_width, (j + 0.5) * self.block_height
-                        if class_name == 'bush':
-                            Bush(*pos)
-                        elif class_name == 'mountain':
-                            print pos, _get_mountain_type(i, j)
-                            Mountain(*pos, type=_get_mountain_type(i, j))
+        def _get_mountain_type(i, j):
+            opensides = (_is_mountain(i - 1, j), _is_mountain(i, j + 1),
+                         _is_mountain(i + 1, j), _is_mountain(i, j - 1))  # left, top, right, bottom
+            opensides_to_type = {
+                (1, 1, 1, 1): 'center',
+                (1, 0, 1, 0): 'horizontal_center',
+                (0, 1, 0, 1): 'vertical_center',
+                (1, 0, 0, 0): 'horizontal_right',
+                (0, 1, 0, 0): 'vertical_bottom',
+                (0, 0, 1, 0): 'horizontal_left',
+                (0, 0, 0, 1): 'vertical_top',
+                }
+            return opensides_to_type.get(opensides, 'horizontal_center')
+        
+        _mountains = []
+        _bushes= []
+        
+        for i in xrange(self.num_of_blocks_X):
+            for j in xrange(self.num_of_blocks_Y):
+                class_name = statics[i][j]
+                if class_name is not None:
+                    pos = (i + 0.5) * self.block_width, (j + 0.5) * self.block_height
+                    if class_name == 'bush':
+                        #Bush(*pos)
+                        _bushes.append(pos)
+                    elif class_name == 'mountain':
+                        _mountains.append((pos, _get_mountain_type(i, j))) 
+                        #Mountain(*pos, type=_get_mountain_type(i, j))
+        
+        with self.canvas.after:
+            for pos in _bushes:
+                Bush(*pos)
+            for pos, type in _mountains:
+                Mountain(*pos, type=type)
 
         MoonStone(13.5*self.block_width, 7.5*self.block_height)
 
