@@ -62,10 +62,10 @@ class BodyDragMgr():
         self.touch = touch
         self.released = False
         self.controller.position = (touch.x, touch.y)
-        anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
-                touch.y - self.controlled.position.y)
-        anchor.rotate(-body.angle)
-        args = self.controller, self.controlled, (0, 0), anchor
+        #anchor = phy.Vec2d(touch.x - self.controlled.position.x, \
+        #        touch.y - self.controlled.position.y)
+        #anchor.rotate(-body.angle)
+        args = self.controller, self.controlled, (0, 0), (0, 0)
         joint = phy.constraint.PivotJoint(*args)
         joint.max_bias = 1e5
         self.joint = joint
