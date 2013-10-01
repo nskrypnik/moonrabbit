@@ -23,9 +23,9 @@ def load_resources():
     textures = context.resources['textures'] = {}
     animations = context.resources['animations'] = {}
     
-    def load_texture(key, path, region=None):
+    def load_texture(key, path, region=None, mipmap=False):
         texture_path = join(RESOURCES_DIR, path)
-        texture = Image(texture_path, mipmap=True).texture
+        texture = Image(texture_path, mipmap=mipmap).texture
         if region:
             texture = texture.get_region(*region)
     
@@ -63,7 +63,7 @@ def load_resources():
     frames = []
     frame_time = 0.2  # sec
     for i in xrange(1, 6):
-        texture = Image(join(RESOURCES_DIR, 'terrain/water-0{}.png'.format(i)), mipmap=True).texture
+        texture = Image(join(RESOURCES_DIR, 'terrain/water-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['water'] = SimpleAnimation(frames)
     
@@ -71,19 +71,19 @@ def load_resources():
     
     # hero run down animation
     frames = []
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True, nocache=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), nocache=True).texture
     frames.append((texture, frame_time))
     print texture
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png')).texture
     texture = flip_horizontal(texture)
     print texture
     frames.append((texture, frame_time))
     animations['hero_run_down'] = SimpleAnimation(frames)
     
     frames = []
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), nocache=True, mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), nocache=True).texture
     frames.append((texture, frame_time))
-    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png'), mipmap=True).texture
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-run-up-01.png')).texture
     texture = flip_horizontal(texture)
     frames.append((texture, frame_time))
     animations['hero_run_up'] = SimpleAnimation(frames)
@@ -92,14 +92,14 @@ def load_resources():
     frame_time = 0.05
     frames = []
     for i in xrange(1, 10):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_run'] = SimpleAnimation(frames)
     
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 3):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-idle-side-0{}.png'.format(i)), mipmap=True).texture
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-idle-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_idle'] = SimpleAnimation(frames)
     
@@ -107,7 +107,7 @@ def load_resources():
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 3):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-top-and-side-0{}.png'.format(i)), mipmap=True).texture
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-top-and-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_rotate_top'] = SimpleAnimation(frames)
     animations['hero_rotate_top_r'] = ReverseAnimation(copy(frames))
@@ -115,7 +115,7 @@ def load_resources():
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 3):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-down-0{}.png'.format(i)), mipmap=True).texture
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-rotate-down-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_rotate_down'] = SimpleAnimation(frames)
     animations['hero_rotate_down_r'] = ReverseAnimation(copy(frames))
@@ -124,7 +124,7 @@ def load_resources():
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 10):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i)), mipmap=True).texture
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_run'] = SimpleAnimation(frames)
 

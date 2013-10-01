@@ -213,15 +213,20 @@ class MoonRabbitGame(Widget):
         self.num_of_blocks_X, self.num_of_blocks_Y = options['size']
         with self.canvas:
             # init landscapes
+            block_x = 0
             for i in xrange(self.num_of_blocks_X):
+                block_y = 0
                 for j in xrange(self.num_of_blocks_Y):
                     class_name = landscapes[i][j]
                     if class_name is not None:
                         clazz = eval(class_name.capitalize())
                     else:
                         clazz = Grass
-                    self.blocks[i][j] = clazz(pos=(i * self.block_width, j * self.block_height),
-                                              size=(self.block_width*1.1, self.block_height*1.1))
+                    block = clazz(pos=(block_x, block_y),
+                                  size=(self.block_width, self.block_height), border=(0, 0))
+                    self.blocks[i][j] = block
+                    block_y += self.block_height 
+                block_x += self.block_width
 
             # init dynamics
             for x, y, class_name in dynamics:
@@ -340,15 +345,3 @@ class MoonRabbitGame(Widget):
                       size_hint=(None, None),
                       auto_dismiss=False)
         popup.open()
-
-
-    def test(self):
-        with self.canvas:
-            allowed_landscapes = (Water, Grass, Sand)
-            for i in xrange(self.num_of_blocks_X):
-                for j in xrange(self.num_of_blocks_Y):
-                    rand_landscape = allowed_landscapes[random.randint(0, 2)]
-                    self.blocks[i][j] = rand_landscape(
-                        pos=(i*self.block_width, j*self.block_height),
-                        size=(self.block_width, self.block_height)
-                    )
