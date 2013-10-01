@@ -129,6 +129,9 @@ class MoonRabbitGame(Widget):
         super(MoonRabbitGame, self).__init__(**kwargs)
         self.num_of_blocks_X = GAME_AREA_SIZE[0]
         self.num_of_blocks_Y = GAME_AREA_SIZE[1]
+        
+        self._touches = []
+        self.screen_mover = None
 
         # create 2-dimensional array to store blocks
         self.blocks = [[0 for j in xrange(self.num_of_blocks_Y)]
@@ -270,22 +273,40 @@ class MoonRabbitGame(Widget):
             obj.controller()
 
     def on_touch_down(self, touch):
+        self._touches.append(touch)
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
         print shape
-        # animation test here
-        if shape and isinstance(shape.body.data, AnimatedCircle):
-            shape.body.data.animate()
+        
         # drag logic here
         if shape and shape.body.data.draggable:
             touch.bodydragmgr = BodyDragMgr(self.context.space, shape.body, touch)
         else:
             touch.bodydragmgr = None
+        
+        if not shape:
+            if len(self._touches) == 1: 
+                self.screen_mover = touch
 
     def on_touch_move(self, touch):
         if hasattr(touch, 'bodydragmgr') and touch.bodydragmgr:
             touch.bodydragmgr.update()
+        else:
+            # Move game space
+            if self.screen_mover:
+                print self.parent.pos[0] + self.parent.width, Window.width
+                if self.parent.pos[0] + self.parent.width/self.parent.scale < Window.width: #or \
+                # self.parent.pos[0] + self.parent.height < Window.height:
+                    
+                    self.parent.pos = self.parent.pos[0] + touch.dx, self.parent.pos[1] + touch.dy
+                    
+                if self.parent.pos[0] > 0:
+                    self.parent.pos = 0, self.parent.pos[1]
+                if self.parent.pos[1] > 0:
+                    self.parent.pos = self.parent.pos[0], 0
 
     def on_touch_up(self, touch):
+        self._touches.remove(touch)
+        self.screen_mover = None
         if hasattr(touch, 'bodydragmgr') and touch.bodydragmgr:
             touch.bodydragmgr.release()
 
