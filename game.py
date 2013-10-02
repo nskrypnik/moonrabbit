@@ -20,39 +20,6 @@ from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
 
 
-class Timer(object):
-    def __init__(self, callback, time=70, **kw):
-        self.timer_counter = time
-        self.callback = callback
-
-    def start(self):
-        Clock.max_iteration = self.timer_counter
-        Clock.schedule_interval(self.timer_callback, 1)
-
-    def stop(self):
-        self.timer_counter = 0
-        Clock.unschedule(self.timer_callback)
-
-    def pause(self):
-        Clock.unschedule(self.timer_callback)
-
-    def get_left_time(self):
-        return self.timer_counter
-
-    def get_formated_time(self):
-        minutes = self.timer_counter / 60
-        seconds = self.timer_counter % 60
-
-        return "{minutes}:{seconds}".format(minutes=minutes if minutes >=10 else '0'+str(minutes),
-                                           seconds=seconds if seconds >=10 else '0'+str(seconds))
-
-    def timer_callback(self, dt):
-        self.timer_counter -= 1
-        self.callback()
-        if self.timer_counter <= 0:
-            self.stop()
-
-
 class BodyDragMgr():
     
     """ Body drag manager object. Manage dragging of draggable objects with touching  """
@@ -99,29 +66,6 @@ class MoonRabbitGame(Widget):
     game_area_size = BLOCK_SIZE[0]*GAME_AREA_SIZE[0],\
                      BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
     spf = 1 / 30.
-    
-    def greeting(self, dt):
-        content = BoxLayout(orientation='vertical')
-        label = Label(text='Help Rabbit to find the Moon Stone. You cannot directly control the'\
-                      ' Rabbit, but you may move some stones and wood to show the right way for'\
-                      ' Moon Stone', valign="middle", halign="center")
-        content.add_widget(label)
-        content.add_widget(Button(text="Start",
-                                  on_press=self.start,
-                                  size_hint=(None, None),
-                                  size=(375, 50)))
-        popup = Popup(title='Moon Rabbit',
-                      content=content,
-                      size=(400, 400),
-                      size_hint=(None, None),
-                      auto_dismiss=False)
-        self.greeting_popup = popup
-        popup.open()
-        label.bind(size=label.setter('text_size'))
-        
-    def start(self, btn):
-        self.greeting_popup.dismiss()
-        Clock.schedule_interval(self.update, self.spf)
 
     def __init__(self, **kwargs):
         # setup game context
@@ -144,24 +88,14 @@ class MoonRabbitGame(Widget):
         self.create_bounds()
 
         self.space.add_collision_handler(0, 0, post_solve=self.collision_handler)
-
-
-        self.timer = Timer(self.update_time)
-        self.clock = Label(text=self.timer.get_formated_time(),
-                           pos=(self.game_area_size[0] - 100, self.game_area_size[1]-100),
-                           font_size = 30
-        )
-
-        self.add_widget(self.clock)
-        # self.timer.start()
-        Clock.schedule_once(self.greeting, -1)
-        #Clock.schedule_interval(self.update, self.spf)
-
-    def update_time(self):
-        left_seconds = self.timer.get_left_time()
-        if left_seconds <= 0:
-            self.game_over()
-        self.clock.text = self.timer.get_formated_time()
+        
+    def start_round(self):
+        self.context.ui.greeting()
+    
+    def start(self, btn):
+        
+        self.context.ui.close_greeting()
+        Clock.schedule_interval(self.update, self.spf)
 
     def collision_handler(self, space, arbiter, *args, **kw):
         
@@ -339,22 +273,8 @@ class MoonRabbitGame(Widget):
         return self.blocks[i][j]
 
     def game_over(self, win=False):
-        self.timer.stop()
-        if win:
-            text = "You win!"
-        else:
-            text = "You lose! Time is over!"
+        self.context.ui.timer.stop()
+        # stop timer
         Clock.unschedule(self.update)
-
-        content = BoxLayout(orientation='vertical')
-        content.add_widget(Label(text=text))
-        content.add_widget(Button(text="Close",
-                                  on_press=sys.exit,
-                                  size_hint=(None, None),
-                                  size=(375, 50)))
-        popup = Popup(title='Game is over',
-                      content=content,
-                      size=(400, 400),
-                      size_hint=(None, None),
-                      auto_dismiss=False)
-        popup.open()
+        self.context.ui.game_over(win)
+    

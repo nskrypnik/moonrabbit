@@ -10,24 +10,30 @@ from kivy.config import Config
 
 from kivy.app import App
 from kivy.clock import Clock 
+from kivy.uix.widget import Widget
 from viewport import Viewport
 from game import MoonRabbitGame
+from ui import UI
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
-        
-
-#from kivy.graphics import Color, Rectangle
 
 
 class MoonRabbitApp(App):
     def build(self):
+        
+        root = Widget()
         width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
         height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
         game_scene = Viewport(width=width, height=height)
         game = MoonRabbitGame()
         game_scene.add_widget(game)
+        
+        root.add_widget(game_scene)
+        
+        root.add_widget(UI())
         # fir game scene to window
+        game.start_round()
         Clock.schedule_once(game_scene.fit_to_window, -1)
-        return game_scene
+        return root
 
 
 if __name__ == '__main__':

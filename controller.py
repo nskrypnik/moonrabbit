@@ -106,7 +106,7 @@ class HeroRabbitController(BaseController):
     
     @wait_counter
     def do_idle(self):
-        self.context.game.timer.start()
+        self.context.ui.timer.start()
         self.switch_to_moving()
         
     @wait_counter

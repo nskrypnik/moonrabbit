@@ -21,6 +21,7 @@ class _GameContext(object):
         self.space = None
         self.resources = {}
         self.dragged = {}
+        self.ui = None
         self.scene_width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
         self.scene_height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
     
