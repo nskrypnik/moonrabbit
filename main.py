@@ -22,11 +22,12 @@ class MoonRabbitApp(App):
     def build(self):
         width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
         height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
-        viewport = Viewport(width=width, height=height)
+        game_scene = Viewport(width=width, height=height)
         game = MoonRabbitGame()
-        viewport.add_widget(game)
-        Clock.schedule_once(viewport.fit_to_window, -1)
-        return viewport
+        game_scene.add_widget(game)
+        # fir game scene to window
+        Clock.schedule_once(game_scene.fit_to_window, -1)
+        return game_scene
 
 
 if __name__ == '__main__':

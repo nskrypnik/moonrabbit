@@ -54,6 +54,8 @@ class Timer(object):
 
 
 class BodyDragMgr():
+    
+    """ Body drag manager object. Manage dragging of draggable objects with touching  """
 
     def __init__(self, space, body, touch):
         self.controlled = body

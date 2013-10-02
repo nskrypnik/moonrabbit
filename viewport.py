@@ -21,10 +21,14 @@ class Viewport(ScatterPlane):
         return True
  
     def fit_to_window(self, *args):
-        if self.height > self.width:
+        if Window.height > Window.width:
             self.scale = Window.height/float(self.height)
         else:
             self.scale = Window.width/float(self.width)
+        
+            
+        self.scale_min = self.scale
+        self.scale_max = self.scale*3
  
         self.pos = 0, 0
         for c in self.children:
@@ -38,26 +42,18 @@ class Viewport(ScatterPlane):
         return super(Viewport, self).on_touch_down(touch)
  
     def on_touch_move(self, touch):
-
-        x, y = touch.x, touch.y
-        # let the child widgets handle the event if they want
-        if self.collide_point(x, y) and not touch.grab_current == self:
-            touch.push()
-            touch.apply_transform_2d(self.to_local)
-            if super(ScatterPlane, self).on_touch_move(touch):
-                touch.pop()
-                return True
-            touch.pop()
-
-        # rotate/scale/translate
-        if touch in self._touches and touch.grab_current == self:
-            if self.transform_with_touch(touch):
-                self.dispatch('on_transform_with_touch', touch)
-            self._last_touch_pos[touch] = touch.pos
-
-        # stop propagating if its within our bounds
-        if self.collide_point(x, y):
-            return True
- 
+        res = super(Viewport, self).on_touch_move(touch)
+        (x, y), (w, h) = self.bbox
+        if x > 0:
+            self.pos = 0, self.pos[1]
+        if y > 0:
+            self.pos = self.pos[0], 0
+        if x + w < Window.width:
+            self.pos = Window.width - w, self.pos[1]
+        if y + h < Window.height:
+            self.pos = self.pos[0], Window.height - h
+        
+        return res
+     
     def on_touch_up(self, touch):
         return super(Viewport, self).on_touch_up(touch)
