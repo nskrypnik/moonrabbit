@@ -97,12 +97,18 @@ class HeroRabbitController(BaseController):
     _state = 'IDLE'
     _counter = 30
     _direction = 'l'
-    _last_failed_direction = ''
+    _prev_direction = ''
+    _failed_directions = []
     _steps_from_last_turning = 0
     _directions = ['l', 'u', 'r', 'd']
+    _dir_opposites = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
     _dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
     faced = False
     vision = VisionVector((-1, 0), 36)
+    
+    @property
+    def _dir_opposite(self):
+        return self._dir_opposites[self._direction]
     
     @wait_counter
     def do_idle(self):
@@ -111,18 +117,18 @@ class HeroRabbitController(BaseController):
         
     @wait_counter
     def do_turning(self):
+        # check first after turning if current directions is avaliable
+        if self.meet_something():
+            return
         self.switch_to_moving()
         
     def do_moving(self):
         self._steps_from_last_turning += 1
-        some = self.vision.look_from(self.obj.body.position)
-        if some or self.faced:
-            if hasattr(some, 'body'):
-                if some.body.data.__class__.__name__ == 'MoonStone':
-                    self.context.game.game_over(win=True)
-            self.stop()
-            self.faced = False
-            self.switch_to_turning()
+        if self._steps_from_last_turning > 10:
+            # clear failled directions
+            self._failed_directions = []
+            self._failed_directions.append(self._dir_opposite)
+        if self.meet_something():
             return
         self.obj.body.velocity = self.define_velocity()
     
@@ -144,15 +150,31 @@ class HeroRabbitController(BaseController):
         self.set_state('MOVING')
         
     def switch_to_turning(self):
-        direction_before = self._direction
+        # current dirrection is bad
+        _d = self._direction
+        self._failed_directions.append(_d)
+        # check to avoid loop
+        if set(self._failed_directions) == set(self._directions):
+            self._failed_directions = [_d, self._prev_direction]
+        
+        print self._failed_directions
+
         if self._direction in ('l', 'r'):
-            self._direction = random.choice(('u', 'd') if self._steps_from_last_turning > 1 else \
-                [d for d in ('u', 'd') if d != self._last_failed_direction])
+            turn_choices = ('u', 'd') if self._steps_from_last_turning > 10 else \
+                [d for d in ('u', 'd') if d not in self._failed_directions]
+            if not turn_choices:
+                self._direction = self._prev_direction
+            else:
+                self._direction = random.choice(turn_choices)
             animation = {'u': 'rotate_top', 'd': 'rotate_down'}[self._direction]
         else:
             animation = {'u': 'rotate_top_r', 'd': 'rotate_down_r'}[self._direction]
-            self._direction = random.choice(('l', 'r') if self._steps_from_last_turning > 1 else \
-                [d for d in ('l', 'r') if d != self._last_failed_direction])
+            turn_choices = ('l', 'r') if self._steps_from_last_turning > 10 else \
+                [d for d in ('l', 'r') if d not in self._failed_directions]
+            if not turn_choices:
+                self._direction = self._prev_direction
+            else:
+                self._direction = random.choice(turn_choices)
         
         if self._direction == 'r' and not self.obj.h_flipped \
                 or self._direction == 'l' and self.obj.h_flipped:
@@ -163,8 +185,20 @@ class HeroRabbitController(BaseController):
         self.switch_animation(animation)
         self.set_state('TURNING', 15)
 
-        self._last_failed_direction = direction_before
         self._steps_from_last_turning = 0
+        self._prev_direction = _d
+        
+    def meet_something(self):
+        some = self.vision.look_from(self.obj.body.position)
+        if some or self.faced:
+            if hasattr(some, 'body'):
+                if some.body.data.__class__.__name__ ==  'MoonStone':
+                    self.context.game.game_over(win=True)
+            self.stop()
+            self.faced = False
+            self.switch_to_turning()
+            return True
+        return False
     
     def define_velocity(self):
         """ Should get velocity according to conditions """
