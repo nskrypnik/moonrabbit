@@ -1,7 +1,7 @@
 
 from kivy.core.image import Image
 from gamecontext import GameContext
-from animation import SimpleAnimation, ReverseAnimation
+from animation import SimpleAnimation, ReverseAnimation, ReturningAnimation
 from os.path import join, dirname
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from copy import copy
@@ -65,11 +65,12 @@ def load_resources():
     ##########################################################################
     
     frames = []
-    frame_time = 0.4  # sec
-    for i in xrange(1, 4):
+    frame_time = 0.25  # sec
+    for i in [3, 1, 2]:
         texture = Image(join(RESOURCES_DIR, 'holy-carrot/holy-carrot-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
-    animations['holy_carrot'] = SimpleAnimation(frames)
+    
+    animations['holy_carrot'] = ReturningAnimation(frames)
 
     # load water animation
     frames = []

@@ -1,6 +1,7 @@
 
 from kivy.graphics import VertexInstruction
 from kivy.clock import Clock
+from copy import copy
 
 class Animation(object):
     """
@@ -102,4 +103,15 @@ class ReverseAnimation(Animation):
         frames.reverse()
         self._frames = frames
         super(ReverseAnimation, self).__init__()
+
+
+class ReturningAnimation(Animation):
+    def __init__(self, frames):
+        
+        back_frames = copy(frames)
+        back_frames.reverse()
+        self._frames = frames
+        self._frames.extend(back_frames)
+        super(ReturningAnimation, self).__init__()
+    
 
