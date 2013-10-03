@@ -275,7 +275,7 @@ class HeroRabbitController(BaseCharacterController):
         some = self.vision.look_from(self.obj.body.position)
         if some or self.faced:
             if hasattr(some, 'body'):
-                if some.body.data.__class__.__name__ ==  'MoonStone':
+                if some.body.data.__class__.__name__ ==  'HolyCarrot':
                     self.context.game.game_over(win=True)
             self.stop()
             self.faced = False

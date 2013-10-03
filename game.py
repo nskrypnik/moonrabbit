@@ -16,7 +16,7 @@ from landscape import *
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
 from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Hare, \
-                        Mountain, Wood, Bush, Character, MoonStone
+                        Mountain, Wood, Bush, Character, HolyCarrot
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
 
@@ -216,7 +216,7 @@ class MoonRabbitGame(Widget):
             for pos, type in _mountains:
                 Mountain(*pos, type=type)
 
-        MoonStone(13.5*self.block_width, 7.5*self.block_height)
+        HolyCarrot(13.5*self.block_width, 7.5*self.block_height)
 
     def update(self, dt):
         self.context.space.step(self.spf)

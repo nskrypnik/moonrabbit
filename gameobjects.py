@@ -299,7 +299,12 @@ class Bush(StaticBox):
         self.shape = phy.Poly.create_box(self.body, self.body_size)
 
 
-class MoonStone(StaticBox):
+class HolyCarrot(StaticBox, AnimationMixin):
+    
+    restore_original = False
+    
     def __init__(self, *pos, **kw):
-        texture = GameContext.resources['textures']['moon_stone']
-        super(MoonStone, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
+        texture = GameContext.resources['textures']['holy_carrot']
+        self.set_animation(GameContext.resources['animations']['holy_carrot'])
+        super(HolyCarrot, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
+        self.animate(True)

@@ -40,7 +40,6 @@ class Water(Landscape):
 
     def __init__(self, *args, **kw):
         if not Water._animation:
-            print "Animation created"
             Water._animation = WaterAnimation()
             Water._animation.animate(endless=True)
         kw['texture'] = self._animation.widget.canvas.texture

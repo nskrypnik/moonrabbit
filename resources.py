@@ -58,7 +58,18 @@ def load_resources():
     load_texture('mountain_vertical_bottom_end', 'mountains/mountain-vertical-down-end-01.png')
     load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
     load_texture('mountain_central_top', 'mountains/mountain-center-top-01.png')
-    load_texture('moon_stone', 'moon_stone.png')
+    load_texture('holy_carrot', 'holy-carrot/holy-carrot-01.png')
+    
+    ##########################################################################
+    # Holly carrot animation
+    ##########################################################################
+    
+    frames = []
+    frame_time = 0.4  # sec
+    for i in xrange(1, 4):
+        texture = Image(join(RESOURCES_DIR, 'holy-carrot/holy-carrot-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['holy_carrot'] = SimpleAnimation(frames)
 
     # load water animation
     frames = []
