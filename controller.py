@@ -90,7 +90,7 @@ class BaseController(object):
         pass
 
 
-class HeroRabbitController(BaseController):
+class BaseCharacterController(BaseController):
     
     """ This is the controller for main Rabbit character """
     
@@ -103,8 +103,20 @@ class HeroRabbitController(BaseController):
     _directions = ['l', 'u', 'r', 'd']
     _dir_opposites = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
     _dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
+    swim_mode = False
+    _prev_swim_mode = False
     faced = False
     vision = VisionVector((-1, 0), 36)
+    
+    def __call__(self):
+        # check if we are in swim mode
+        pos = self.obj.body.position 
+        block = self.context.game.get_block(pos.x, pos.y)
+        if isinstance(block, Water):
+            self.swim_mode = True 
+        else:
+            self.swim_mode = False
+        super(BaseCharacterController, self).__call__()
     
     @property
     def _dir_opposite(self):
@@ -123,11 +135,15 @@ class HeroRabbitController(BaseController):
         self.switch_to_moving()
         
     def do_moving(self):
+        
         self._steps_from_last_turning += 1
         if self._steps_from_last_turning > 10:
             # clear failled directions
             self._failed_directions = []
             self._failed_directions.append(self._dir_opposite)
+        if self._prev_swim_mode != self.swim_mode:
+            self.set_run_animation()
+            self._prev_swim_mode = self.swim_mode
         if self.meet_something():
             return
         self.obj.body.velocity = self.define_velocity()
@@ -143,11 +159,16 @@ class HeroRabbitController(BaseController):
         self.obj.animate(endless=endless)
     
     def switch_to_moving(self):
+        self.set_run_animation()
+        self.set_state('MOVING')
+    
+    def set_run_animation(self):
         animation = 'run' if self._direction in ('l', 'r')\
                         else 'run_up' if self._direction == 'u'\
                         else 'run_down'
+        if self.swim_mode:
+            animation = animation.replace('run', 'swim')
         self.switch_animation(animation, True)
-        self.set_state('MOVING')
         
     def switch_to_turning(self):
         # current dirrection is bad
@@ -182,6 +203,8 @@ class HeroRabbitController(BaseController):
         
         self.vision.set_direction(self._dir_vectors[self._direction])
         
+        if self.swim_mode:
+            animation = "swim_%s" % animation
         self.switch_animation(animation)
         self.set_state('TURNING', 15)
 
@@ -238,3 +261,7 @@ class HeroRabbitController(BaseController):
         
     def stop(self):
         self.obj.body.velocity = (0, 0)
+        
+
+class HeroRabbitController(BaseCharacterController):
+    pass

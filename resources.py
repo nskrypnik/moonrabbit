@@ -73,10 +73,8 @@ def load_resources():
     frames = []
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png'), nocache=True).texture
     frames.append((texture, frame_time))
-    print texture
     texture = Image(join(RESOURCES_DIR, 'hero/hero-run-down-01.png')).texture
     texture = flip_horizontal(texture)
-    print texture
     frames.append((texture, frame_time))
     animations['hero_run_down'] = SimpleAnimation(frames)
     
@@ -127,6 +125,58 @@ def load_resources():
         texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_run'] = SimpleAnimation(frames)
+    
+    ##########################################################################
+    # Hero swim animations goes here
+    ##########################################################################
+    
+    # hero swim run side
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-run-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hero_swim'] = SimpleAnimation(frames)
+    
+    # hero swim up-down
+    
+    frame_time = 0.1
+    
+    # hero swim down 
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-run-down-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-run-down-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hero_swim_down'] = SimpleAnimation(frames)
+    
+    # hero swim down 
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-run-up-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-run-up-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hero_swim_up'] = SimpleAnimation(frames)
+    
+    # hero swim rotate top
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-rotate-top-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hero_swim_rotate_top'] = SimpleAnimation(frames)
+    animations['hero_swim_rotate_top_r'] = ReverseAnimation(copy(frames))
+
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-rotate-down-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hero_swim_rotate_down'] = SimpleAnimation(frames)
+    animations['hero_swim_rotate_down_r'] = ReverseAnimation(copy(frames))   
 
 
 def read_map(fname):

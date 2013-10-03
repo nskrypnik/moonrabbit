@@ -138,6 +138,14 @@ class HeroRabbit(Character, AnimationMixin):
         self.animations['rotate_top_r'] = GameContext.resources['animations']['hero_rotate_top_r']
         self.animations['rotate_down_r'] = GameContext.resources['animations']['hero_rotate_down_r']
         
+        # hero swim animations
+        self.animations['swim'] = GameContext.resources['animations']['hero_swim']
+        self.animations['swim_down'] = GameContext.resources['animations']['hero_swim_down']
+        self.animations['swim_up'] = GameContext.resources['animations']['hero_swim_up']
+        self.animations['swim_rotate_top'] = GameContext.resources['animations']['hero_swim_rotate_top']
+        self.animations['swim_rotate_top_r'] = GameContext.resources['animations']['hero_swim_rotate_top_r']
+        self.animations['swim_rotate_down'] = GameContext.resources['animations']['hero_swim_rotate_down']
+        self.animations['swim_rotate_down_r'] = GameContext.resources['animations']['hero_swim_rotate_down_r']
         
         
         controller = HeroRabbitController(self)
