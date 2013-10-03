@@ -15,7 +15,8 @@ import sys
 from landscape import *
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Mountain, Wood, Bush, Character, MoonStone
+from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Hare, \
+                        Mountain, Wood, Bush, Character, MoonStone
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
 
@@ -173,6 +174,7 @@ class MoonRabbitGame(Widget):
         with self.canvas:
             # draw or hero
             HeroRabbit(self.block_width/2., self.block_height/2.)
+            Hare(self.block_width*3.5, self.block_height*3.5)
 
         # init statics
         def _is_mountain(i, j):

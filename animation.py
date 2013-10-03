@@ -28,12 +28,19 @@ class Animation(object):
         return self.current_frame == 0
     
 
-class AnimationMixin(object):
+class AnimationMixin(object): 
     
-    current_animation = None
-    animations = {}
-    endless_animation = False
-    restore_original = True
+    def __new__(cls, *args, **kw):
+        self = super(AnimationMixin, cls).__new__(cls)
+
+        self.current_animation = None
+        self.animations = {}
+        self.endless_animation = False
+        if hasattr(cls, 'restore_original'):
+            self.restore_original = cls.restore_original
+        
+        return self
+        
     
     def redraw(self):
         assert not self.widget is None

@@ -39,6 +39,7 @@ def load_resources():
     load_texture('wood', 'one-cell-snags/log-01.png')
     load_texture('bush', 'one-cell-snags/bush-01.png')
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
+    load_texture('hare', 'hare/hare-idle-side-01.png')
     load_texture('mountain_horizontal_bottom1', 'mountains/mountain-horizontal-bottom-01.png')
     load_texture('mountain_horizontal_bottom2', 'mountains/mountain-horizontal-bottom-02.png')
     load_texture('mountain_horizontal_bottom3', 'mountains/mountain-horizontal-bottom-03.png')
@@ -85,14 +86,6 @@ def load_resources():
     texture = flip_horizontal(texture)
     frames.append((texture, frame_time))
     animations['hero_run_up'] = SimpleAnimation(frames)
-    
-    
-    frame_time = 0.05
-    frames = []
-    for i in xrange(1, 10):
-        texture = Image(join(RESOURCES_DIR, 'hero/hero-run-side-0{}.png'.format(i))).texture
-        frames.append((texture, frame_time))
-    animations['hero_run'] = SimpleAnimation(frames)
     
     frames = []
     frame_time = 0.25  # sec
@@ -176,7 +169,125 @@ def load_resources():
         texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-rotate-down-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_swim_rotate_down'] = SimpleAnimation(frames)
-    animations['hero_swim_rotate_down_r'] = ReverseAnimation(copy(frames))   
+    animations['hero_swim_rotate_down_r'] = ReverseAnimation(copy(frames))
+    
+    ##########################################################################
+    ##########################################################################
+    #
+    # Load Hare animation here
+    #
+    ##########################################################################
+    ##########################################################################
+
+    frames = []
+    frame_time = 0.2  # sec
+    for i in xrange(1, 6):
+        texture = Image(join(RESOURCES_DIR, 'terrain/water-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['water'] = SimpleAnimation(frames)
+    
+    frame_time = 0.1
+    
+    # hare run down animation
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-run-down-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-run-down-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hare_run_down'] = SimpleAnimation(frames)
+    
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-run-up-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-run-up-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hare_run_up'] = SimpleAnimation(frames)
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-idle-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_idle'] = SimpleAnimation(frames)
+    
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-rotate-top-and-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_rotate_top'] = SimpleAnimation(frames)
+    animations['hare_rotate_top_r'] = ReverseAnimation(copy(frames))
+
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-rotate-down-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_rotate_down'] = SimpleAnimation(frames)
+    animations['hare_rotate_down_r'] = ReverseAnimation(copy(frames))
+    
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 9):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-run-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_run'] = SimpleAnimation(frames)
+    
+    ##########################################################################
+    # Hare swim animations goes here
+    ##########################################################################
+    
+    # hare swim run side
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-run-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_swim'] = SimpleAnimation(frames)
+    
+    # hare swim up-down
+    
+    frame_time = 0.1
+    
+    # hare swim down 
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-run-down-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-run-down-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hare_swim_down'] = SimpleAnimation(frames)
+    
+    # hare swim down 
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-rotate-02.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-rotate-02.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hare_swim_up'] = SimpleAnimation(frames)
+    
+    # hare swim rotate top
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-rotate-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_swim_rotate_top'] = SimpleAnimation(frames)
+    animations['hare_swim_rotate_top_r'] = ReverseAnimation(copy(frames))
+
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-rotate-down-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_swim_rotate_down'] = SimpleAnimation(frames)
+    animations['hare_swim_rotate_down_r'] = ReverseAnimation(copy(frames))
 
 
 def read_map(fname):

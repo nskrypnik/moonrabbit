@@ -7,7 +7,7 @@ from kivy.graphics import Rectangle, Color, Ellipse
 from physics import Circle, DynamicObject, Box, phy, StaticBox
 from animation import AnimationMixin
 from gamecontext import GameContext
-from controller import HeroRabbitController
+from controller import HeroRabbitController, HareController
 from settings import BLOCK_SIZE, OBJECT_MASS, CHARACTER_MASS
 from random import choice
 
@@ -116,6 +116,8 @@ class Character(Box, FlipMixin):
 
 class HeroRabbit(Character, AnimationMixin):
     
+    """ Hero rabbit object """
+    
     restore_original = False # never restore original texture after animation
     
     def __init__(self, *inner_pos):
@@ -150,6 +152,54 @@ class HeroRabbit(Character, AnimationMixin):
         
         controller = HeroRabbitController(self)
         super(HeroRabbit, self).__init__(inner_pos, controller,
+                                        mass=mass, moment=moment,
+                                        elasticity=elasticity,
+                                        texture=texture, size=size
+                                        )
+        
+        self.set_animation('idle')
+        self.animate(endless=True)
+        
+    def define_shape(self):
+        self.shape = phy.Poly.create_box(self.body, self.body_size)
+        
+
+class Hare(Character, AnimationMixin):
+
+    restore_original = False # never restore original texture after animation
+    
+    def __init__(self, *inner_pos):
+        
+        mass = CHARACTER_MASS
+        moment = 1e500 # very high moment to prevent rotation
+        elasticity = 0.1 # not elastic
+        texture = GameContext.resources['textures']['rabbit_hero']
+        size = BLOCK_SIZE
+        
+        self.body_size = (46, 66)
+        
+        self.animations['idle'] = GameContext.resources['animations']['hare_idle']
+        self.animations['run'] = GameContext.resources['animations']['hare_run']
+        self.animations['run_down'] = GameContext.resources['animations']['hare_run_down']
+        self.animations['run_up'] = GameContext.resources['animations']['hare_run_up']
+        self.animations['rotate_top'] = GameContext.resources['animations']['hare_rotate_top']
+        self.animations['rotate_down'] = GameContext.resources['animations']['hare_rotate_down']
+        # reversed animations
+        self.animations['rotate_top_r'] = GameContext.resources['animations']['hare_rotate_top_r']
+        self.animations['rotate_down_r'] = GameContext.resources['animations']['hare_rotate_down_r']
+        
+        # hare swim animations
+        self.animations['swim'] = GameContext.resources['animations']['hare_swim']
+        self.animations['swim_down'] = GameContext.resources['animations']['hare_swim_down']
+        self.animations['swim_up'] = GameContext.resources['animations']['hare_swim_up']
+        self.animations['swim_rotate_top'] = GameContext.resources['animations']['hare_swim_rotate_top']
+        self.animations['swim_rotate_top_r'] = GameContext.resources['animations']['hare_swim_rotate_top_r']
+        self.animations['swim_rotate_down'] = GameContext.resources['animations']['hare_swim_rotate_down']
+        self.animations['swim_rotate_down_r'] = GameContext.resources['animations']['hare_swim_rotate_down_r']
+        
+        
+        controller = HareController(self)
+        super(Hare, self).__init__(inner_pos, controller,
                                         mass=mass, moment=moment,
                                         elasticity=elasticity,
                                         texture=texture, size=size

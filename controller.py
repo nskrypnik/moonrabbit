@@ -60,7 +60,7 @@ class BaseController(object):
     def __call__(self):
         handler = self._state_handlers.get(self._state)
         if handler:
-            handler(self)
+            handler()
     
     def set_state(self, state, counter=0):
         assert state in self._state_handlers
@@ -93,20 +93,31 @@ class BaseController(object):
 class BaseCharacterController(BaseController):
     
     """ This is the controller for main Rabbit character """
-    
-    _state = 'IDLE'
-    _counter = 30
-    _direction = 'l'
-    _prev_direction = ''
-    _failed_directions = []
-    _steps_from_last_turning = 0
-    _directions = ['l', 'u', 'r', 'd']
-    _dir_opposites = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
-    _dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
-    swim_mode = False
-    _prev_swim_mode = False
-    faced = False
-    vision = VisionVector((-1, 0), 36)
+        
+    def __init__(self, *args):
+
+        self.faced = False
+        self._state = 'IDLE'
+        self._counter = 30
+        self._direction = 'l'
+        self._prev_direction = ''
+        self._failed_directions = []
+        self._steps_from_last_turning = 0
+        self._directions = ['l', 'u', 'r', 'd']
+        self._dir_opposites = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
+        self._dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
+        self.swim_mode = False
+        self._prev_swim_mode = False
+        self.vision = VisionVector((-1, 0), 36)
+
+        super(BaseCharacterController, self).__init__(*args)
+        
+        # set controller states
+        self._state_handlers = {
+                       'IDLE': self.do_idle,
+                       'MOVING': self.do_moving,
+                       'TURNING': self.do_turning,
+                    }
     
     def __call__(self):
         # check if we are in swim mode
@@ -124,7 +135,6 @@ class BaseCharacterController(BaseController):
     
     @wait_counter
     def do_idle(self):
-        self.context.ui.timer.start()
         self.switch_to_moving()
         
     @wait_counter
@@ -147,12 +157,6 @@ class BaseCharacterController(BaseController):
         if self.meet_something():
             return
         self.obj.body.velocity = self.define_velocity()
-    
-    _state_handlers = {
-                       'IDLE': do_idle,
-                       'MOVING': do_moving,
-                       'TURNING': do_turning,
-                    }
     
     def switch_animation(self, animation, endless=False):
         self.obj.set_animation(animation, True)
@@ -214,9 +218,6 @@ class BaseCharacterController(BaseController):
     def meet_something(self):
         some = self.vision.look_from(self.obj.body.position)
         if some or self.faced:
-            if hasattr(some, 'body'):
-                if some.body.data.__class__.__name__ ==  'MoonStone':
-                    self.context.game.game_over(win=True)
             self.stop()
             self.faced = False
             self.switch_to_turning()
@@ -264,4 +265,24 @@ class BaseCharacterController(BaseController):
         
 
 class HeroRabbitController(BaseCharacterController):
+    
+    @wait_counter
+    def do_idle(self):
+        self.context.ui.timer.start()
+        self.switch_to_moving()
+
+    def meet_something(self):
+        some = self.vision.look_from(self.obj.body.position)
+        if some or self.faced:
+            if hasattr(some, 'body'):
+                if some.body.data.__class__.__name__ ==  'MoonStone':
+                    self.context.game.game_over(win=True)
+            self.stop()
+            self.faced = False
+            self.switch_to_turning()
+            return True
+        return False
+
+
+class HareController(BaseCharacterController):
     pass
