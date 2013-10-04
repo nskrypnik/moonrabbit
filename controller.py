@@ -159,6 +159,8 @@ class BaseCharacterController(BaseController):
         self.obj.body.velocity = self.define_velocity()
     
     def switch_animation(self, animation, endless=False):
+        #if self._state == 'SAWING':
+        #    import ipdb; ipdb.set_trace()
         self.obj.set_animation(animation, True)
         self.obj.animate(endless=endless)
     
@@ -218,11 +220,17 @@ class BaseCharacterController(BaseController):
     def meet_something(self):
         some = self.vision.look_from(self.obj.body.position)
         if some or self.faced:
+            if self.meet_callback(some):
+                # if returnse true - this function should make some custom logic
+                return True
             self.stop()
             self.faced = False
             self.switch_to_turning()
             return True
         return False
+    
+    def meet_callback(self, some):
+        pass
     
     def define_velocity(self):
         """ Should get velocity according to conditions """
@@ -260,6 +268,8 @@ class BaseCharacterController(BaseController):
         if arbiter.total_ke > OBJECT_MASS:
             self.faced = True
         
+        return other
+        
     def stop(self):
         self.obj.body.velocity = (0, 0)
         
@@ -271,32 +281,59 @@ class HeroRabbitController(BaseCharacterController):
         self.context.ui.timer.start()
         self.switch_to_moving()
 
-    def meet_something(self):
-        some = self.vision.look_from(self.obj.body.position)
-        if some or self.faced:
-            if hasattr(some, 'body'):
-                if some.body.data.__class__.__name__ ==  'HolyCarrot':
-                    self.context.game.game_over(win=True)
-            self.stop()
-            self.faced = False
-            self.switch_to_turning()
-            return True
-        return False
+    def meet_callback(self, some):
+        if hasattr(some, 'body'):
+            if some.body.data.__class__.__name__ ==  'HolyCarrot':
+                self.context.game.game_over(win=True)
+                return True
 
 
 class HareController(BaseCharacterController):
     
+    _sawing_steps = 0
+    
+    def __init__(self, *args, **kw):
+        super(HareController, self).__init__(*args, **kw)
+        self._state_handlers['SAWING'] = self.do_sawing
+        self.tree_vision = VisionVector((-1, 0), 54)
+        
+    
+    def meet_callback(self, some):
+        if hasattr(some, 'body'):
+            if some.body.data.__class__.__name__ ==  'HeroRabbit':
+                self.switch_to_sawing()
+                self.context.game.game_over(win=False, text="Rabbit was sawn by Hare")
+                return True
+            
+    def switch_to_sawing(self):
+        self._sawing_steps = 0
+        animation = 'rage_run' if self._direction in ('l', 'r')\
+                        else 'rage_run_up' if self._direction == 'u'\
+                        else 'rage_run_down'
+        self.switch_animation(animation, True)
+        self.set_state('SAWING')
+        
+    def switch_to_turning(self):
+        super(HareController, self).switch_to_turning()
+        self.tree_vision.set_direction(self._dir_vectors[self._direction])
+    
+    def do_sawing(self):
+        # almost same as do moving
+        if self._sawing_steps > 30:
+            self.switch_to_moving()
+        if self.meet_something():
+            return
+        self.obj.body.velocity = self.define_velocity()
+        self._sawing_steps += 1
+    
     def meet_something(self):
-        some = self.vision.look_from(self.obj.body.position)
-        if some or self.faced:
-            if hasattr(some, 'body'):
-                if some.body.data.__class__.__name__ ==  'HeroRabbit':
-                    self.context.game.game_over(win=False, text="Rabbit was sawn by Hare")
-            self.stop()
-            self.faced = False
-            self.switch_to_turning()
-            return True
-        return False
+        some = self.tree_vision.look_from(self.obj.body.position)
+        if some:
+            if hasattr(some, 'body') and some.body.data.__class__.__name__ ==  'Tree':
+                some.body.data.destroy()
+                self.switch_to_sawing()
+                return True
+        return super(HareController, self).meet_something()
 
     def define_velocity(self):
         SPEED = HERO_SPEED
@@ -312,3 +349,12 @@ class HareController(BaseCharacterController):
         
         v = self._dir_vectors[self._direction]
         return v[0]*SPEED, v[1]*SPEED
+    
+    def handle_collision(self, arbiter):
+        obj = super(HareController, self).handle_collision(arbiter)
+        if hasattr(obj, 'data') and obj.data.__class__.__name__ == 'Tree':
+            # if Hare faced tree - saw it
+            obj.data.destroy()
+            self.switch_to_sawing()
+            self.faced = False
+            

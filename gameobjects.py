@@ -199,6 +199,10 @@ class Hare(Character, AnimationMixin):
         self.animations['swim_rotate_down'] = GameContext.resources['animations']['hare_swim_rotate_down']
         self.animations['swim_rotate_down_r'] = GameContext.resources['animations']['hare_swim_rotate_down_r']
         
+        self.animations['rage_run'] = GameContext.resources['animations']['hare_rage_run']
+        self.animations['rage_run_up'] = GameContext.resources['animations']['hare_rage_run_up']
+        self.animations['rage_run_down'] = GameContext.resources['animations']['hare_rage_run_down']
+        
         
         controller = HareController(self)
         super(Hare, self).__init__(inner_pos, controller,
@@ -312,5 +316,38 @@ class HolyCarrot(StaticBox, AnimationMixin):
         self.animate(True)
 
 
-class Tree(StaticBox):
-    pass
+class Tree(StaticBox, AnimationMixin):
+    
+    restore_original = False
+    
+    def define_shape(self):
+        vertices = [(0, 0), (0, 50), (50, 50), (50, 0)]
+        self.shape = phy.Poly(self.body, vertices, offset=(-35, -50))
+    
+    def __init__(self, *pos, **kw):
+        growing = kw.pop('growing', False)
+        texture = GameContext.resources['textures']['tree']
+        self.animations['blow'] = GameContext.resources['animations']['tree_blow']
+        self.animations['grow'] = GameContext.resources['animations']['tree_grow']
+        super(Tree, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
+        if growing:
+            # rid shape from emulation
+            self.space.remove(self.shape)
+            
+    def start_grow(self, *largs):
+        self.space.add(self.shape)
+        self.set_animation('grow', True)
+        self.animate()
+    
+    def start_grow_deffered(self):
+        Clock.schedule_once(self.start_grow, 4)
+    
+    def destroy(self):
+        # first remove shape from emulated space
+        self.space.remove(self.shape)
+        #then set blow animation
+        self.set_animation('blow', True)
+        self.animation_callback = self.start_grow_deffered()
+        self.animate()
+    
+    

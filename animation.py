@@ -28,6 +28,9 @@ class Animation(object):
     def is_first_call(self):
         return self.current_frame == 0
     
+    def reset(self):
+        self.current_frame = 0
+
 
 class AnimationMixin(object): 
     
@@ -37,6 +40,7 @@ class AnimationMixin(object):
         self.current_animation = None
         self.animations = {}
         self.endless_animation = False
+        self.animation_callback = None
         if hasattr(cls, 'restore_original'):
             self.restore_original = cls.restore_original
         
@@ -74,6 +78,8 @@ class AnimationMixin(object):
             self.original_texture = self.texture
         next_frame = next(animation, None)
         if next_frame is None: # all frames are shown
+            if callable(self.animation_callback):
+                self.callback()
             if not self.endless_animation:
                 # restore texture
                 if self.restore_original:
@@ -88,9 +94,10 @@ class AnimationMixin(object):
         Clock.schedule_once(self._animate, _time)
     
     def stop_animation(self):
+        if self.current_animation:
+            self.current_animation.reset()
         Clock.unschedule(self._animate)
         
-
 
 # implementation
 class SimpleAnimation(Animation):
@@ -98,6 +105,7 @@ class SimpleAnimation(Animation):
         self._frames = frames
         super(SimpleAnimation, self).__init__()
         
+
 class ReverseAnimation(Animation):
     def __init__(self, frames):
         frames.reverse()

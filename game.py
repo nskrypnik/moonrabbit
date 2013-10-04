@@ -16,7 +16,7 @@ from landscape import *
 from physics import phy, init_physics, StaticBox, Circle, Box
 from gamecontext import GameContext
 from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Hare, \
-                        Mountain, Wood, Bush, Character, HolyCarrot
+                        Mountain, Wood, Bush, Character, HolyCarrot, Tree
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
 
@@ -207,12 +207,15 @@ class MoonRabbitGame(Widget):
                         #Bush(*pos)
                         _bushes.append(pos)
                     elif class_name == 'mountain':
-                        _mountains.append((pos, _get_mountain_type(i, j))) 
+                        _mountains.append((pos, _get_mountain_type(i, j)))
                         #Mountain(*pos, type=_get_mountain_type(i, j))
+                        
+        Tree(self.block_width*1.5, self.block_height*3.5)
         
         with self.canvas.after:
             for pos in _bushes:
-                Bush(*pos)
+                Bush(*pos)    
+            
             for pos, type in _mountains:
                 Mountain(*pos, type=type)
 

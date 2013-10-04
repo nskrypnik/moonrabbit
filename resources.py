@@ -38,6 +38,7 @@ def load_resources():
     load_texture('rock2', 'one-cell-snags/stone-02.png')
     load_texture('wood', 'one-cell-snags/log-01.png')
     load_texture('bush', 'one-cell-snags/bush-01.png')
+    load_texture('tree', 'tree/tree-01.png')
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
     load_texture('hare', 'hare/hare-idle-side-01.png')
     load_texture('mountain_horizontal_bottom1', 'mountains/mountain-horizontal-bottom-01.png')
@@ -61,8 +62,32 @@ def load_resources():
     load_texture('holy_carrot', 'holy-carrot/holy-carrot-01.png')
     
     ##########################################################################
+    # All tree animation
+    ##########################################################################
+    
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 5):
+        texture = Image(join(RESOURCES_DIR, 'tree/tree-blow-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'tree/tree-place-01.png')).texture
+    frames.append((texture, frame_time))
+    
+    animations['tree_blow'] = SimpleAnimation(frames)
+    
+    frames = []
+    frame_time = 1.25  # sec
+    for i in xrange(1, 5):
+        texture = Image(join(RESOURCES_DIR, 'tree/tree-grow-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    frames.append((textures['tree'], frame_time))
+    
+    animations['tree_grow'] = SimpleAnimation(frames)
+    
+    ##########################################################################
     # Holly carrot animation
     ##########################################################################
+    
     
     frames = []
     frame_time = 0.25  # sec
@@ -263,7 +288,7 @@ def load_resources():
     
     # hare swim up-down
     
-    frame_time = 0.1
+    frame_time = 0.25
     
     # hare swim down 
     frames = []
@@ -301,6 +326,28 @@ def load_resources():
     animations['hare_swim_rotate_down'] = SimpleAnimation(frames)
     animations['hare_swim_rotate_down_r'] = ReverseAnimation(copy(frames))
 
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-rage-run-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_rage_run'] = SimpleAnimation(frames)
+    
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-rage-run-down-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-rage-run-down-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hare_rage_run_down'] = SimpleAnimation(frames)
+    
+    frames = []
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-rage-run-up-01.png'), nocache=True).texture
+    frames.append((texture, frame_time))
+    texture = Image(join(RESOURCES_DIR, 'hare/hare-rage-run-up-01.png')).texture
+    texture = flip_horizontal(texture)
+    frames.append((texture, frame_time))
+    animations['hare_rage_run_up'] = SimpleAnimation(frames)
 
 def read_map(fname):
     """

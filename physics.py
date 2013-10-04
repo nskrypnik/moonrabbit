@@ -1,5 +1,6 @@
 
 import math
+import sys
 
 from kivy.utils import platform
 from kivy.uix.widget import Widget
@@ -9,12 +10,11 @@ from kivy.clock import Clock
 from gamecontext import GameContext
 
 #if platform() in ('ios', 'android'):
-if True:
-    # use cymunk for mobile platforms 
-    import cymunk as phy
+if sys.platform in ('win32', ): 
+    import pymunk as phy
 else:
     # othervise use pymunk
-    import pymunk as phy
+    import cymunk as phy
 
 # init space as global variable 
 space = phy.Space()
