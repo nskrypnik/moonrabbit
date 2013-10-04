@@ -285,4 +285,30 @@ class HeroRabbitController(BaseCharacterController):
 
 
 class HareController(BaseCharacterController):
-    pass
+    
+    def meet_something(self):
+        some = self.vision.look_from(self.obj.body.position)
+        if some or self.faced:
+            if hasattr(some, 'body'):
+                if some.body.data.__class__.__name__ ==  'HeroRabbit':
+                    self.context.game.game_over(win=False, text="Rabbit was sawn by Hare")
+            self.stop()
+            self.faced = False
+            self.switch_to_turning()
+            return True
+        return False
+
+    def define_velocity(self):
+        SPEED = HERO_SPEED
+        
+        # define landscape type where we are
+        pos = self.obj.body.position 
+        block = self.context.game.get_block(pos.x, pos.y)
+        if isinstance(block, Water):
+            # hardcoded value for speed on water for Hare
+            SPEED = HERO_SPEED*0.5
+        else:
+            SPEED *= block.velocity_coefficient
+        
+        v = self._dir_vectors[self._direction]
+        return v[0]*SPEED, v[1]*SPEED

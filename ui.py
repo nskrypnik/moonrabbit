@@ -98,12 +98,13 @@ class UI(Widget):
         if self.greeting_popup:
             self.greeting_popup.dismiss()
             
-    def game_over(self, win):
+    def game_over(self, win, text=None):
         
-        if win:
-            text = "You win!"
-        else:
-            text = "You lose! Time is over!"
+        if not text:
+            if win:
+                text = "You win!"
+            else:
+                text = "You lose! Time is over!"
         
         content = BoxLayout(orientation='vertical')
         content.add_widget(Label(text=text))

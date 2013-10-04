@@ -274,9 +274,9 @@ class MoonRabbitGame(Widget):
             raise ValueError("Coordinates out of playground")
         return self.blocks[i][j]
 
-    def game_over(self, win=False):
+    def game_over(self, win=False, text=None):
         self.context.ui.timer.stop()
         # stop timer
         Clock.unschedule(self.update)
-        self.context.ui.game_over(win)
+        self.context.ui.game_over(win, text)
     

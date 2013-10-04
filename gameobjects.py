@@ -4,6 +4,7 @@
 from kivy.graphics import VertexInstruction, Rectangle, Color
 from kivy.uix.scatter import ScatterPlane
 from kivy.graphics import Rectangle, Color, Ellipse
+from kivy.clock import Clock
 from physics import Circle, DynamicObject, Box, phy, StaticBox
 from animation import AnimationMixin
 from gamecontext import GameContext
@@ -156,6 +157,7 @@ class HeroRabbit(Character, AnimationMixin):
                                         elasticity=elasticity,
                                         texture=texture, size=size
                                         )
+        GameContext.hero = self
         
         self.set_animation('idle')
         self.animate(endless=True)
@@ -308,3 +310,7 @@ class HolyCarrot(StaticBox, AnimationMixin):
         self.set_animation(GameContext.resources['animations']['holy_carrot'])
         super(HolyCarrot, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
         self.animate(True)
+
+
+class Tree(StaticBox):
+    pass
