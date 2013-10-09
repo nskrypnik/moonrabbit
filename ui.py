@@ -90,7 +90,8 @@ class ToolBar(ScatterPlane):
         
         anchor_center = AnchorLayout(anchor_x='center', anchor_y="bottom", size_hint=(None, None),
                                      size=(Window.width, '%sdp' % self._height))
-        steps = Label(text="STEPS:24", font_size="44dp") #, font_name="resources/Intro.otf")
+        steps = Label(text="STEPS:0", font_size="44dp") #, font_name="resources/Intro.otf")
+        self.steps = steps
         anchor_center.add_widget(steps)
         
         self.add_widget(anchor_center)
@@ -170,9 +171,9 @@ class UI(Widget):
         def _greeting(dt):
             
             content = BoxLayout(orientation='vertical')
-            label = Label(text='Help Rabbit to find the Moon Stone. You cannot directly control the'\
+            label = Label(text='Help Rabbit to find the Holly Carrot. You cannot directly control the'\
                           ' Rabbit, but you may move some stones and wood to show the right way for'\
-                          ' Moon Stone', valign="middle", halign="center")
+                          ' Holly Carrot. Keep the Rabbit from the White Hare!', valign="middle", halign="center")
             content.add_widget(label)
             content.add_widget(Button(text="Start",
                                       on_press=self.context.game.start,

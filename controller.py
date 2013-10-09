@@ -277,10 +277,23 @@ class BaseCharacterController(BaseController):
 
 class HeroRabbitController(BaseCharacterController):
     
+    def __init__(self, *args, **kw):
+        super(HeroRabbitController, self).__init__(*args, **kw)
+        self._steps_counter = 0
+        self._steps = 0
+    
     @wait_counter
     def do_idle(self):
         self.context.ui.timer.start()
         self.switch_to_moving()
+        
+    def do_moving(self):
+        super(HeroRabbitController, self).do_moving()
+        self._steps_counter += 1
+        if self._steps_counter > 5:
+            self._steps += 1
+            self.context.ui.toolbar.steps.text = "STEPS:%s" % self._steps
+            self._steps_counter = 0
 
     def meet_callback(self, some):
         if hasattr(some, 'body'):
