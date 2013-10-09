@@ -7,6 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup 
 from kivy.uix.button import Button
 from kivy.uix.scatter import ScatterPlane
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Rectangle, Color
@@ -61,6 +62,54 @@ class ToolBar(ScatterPlane):
         self.on_resize(Window.width, Window.height)
         self.set_background()
         
+        self.set_layout()
+    
+    def set_layout(self):
+        
+        anchor_left = AnchorLayout(anchor_x='left', anchor_y='bottom')
+        boxlayout1 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('350dp', 0))
+        button_menu = Button(size_hint=(None, None), size=('141dp', '57dp'), border=(0, 0, 0, 0), 
+                             background_normal='resources/interface/menu.png',
+                             background_down='resources/interface/menu_press.png',
+                             background_color=(1, 1, 1, 1))
+        button_save = Button(size_hint=(None, None), size=('132dp', '57dp'), border=(0, 0, 0, 0),
+                             background_normal='resources/interface/save.png',
+                             background_down='resources/interface/save_press.png',
+                             background_color=(1, 1, 1, 1))
+        button_play = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
+                             background_normal='resources/interface/pause.png',
+                             background_down='resources/interface/pause_press.png',
+                             background_color=(1, 1, 1, 1))
+        boxlayout1.add_widget(button_menu)
+        boxlayout1.add_widget(button_save)
+        boxlayout1.add_widget(button_play)
+        
+        anchor_left.add_widget(boxlayout1)
+        
+        self.add_widget(anchor_left)
+        
+        anchor_center = AnchorLayout(anchor_x='center', anchor_y="bottom", size_hint=(None, None),
+                                     size=(Window.width, '%sdp' % self._height))
+        steps = Label(text="STEPS:24", font_size="44dp") #, font_name="resources/Intro.otf")
+        anchor_center.add_widget(steps)
+        
+        self.add_widget(anchor_center)
+        
+        anchor_right = AnchorLayout(anchor_x='right', anchor_y="bottom", size_hint=(None, None),
+                                     size=(Window.width, '%sdp' % self._height))
+        boxlayout2 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('146dp', 0))
+        button_trees = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
+                             background_normal='resources/interface/trees.png',
+                             background_down='resources/interface/trees_press.png',
+                             background_color=(1, 1, 1, 1))
+        number_of_trees = Label(text='x5', font_size="44dp")
+        boxlayout2.add_widget(button_trees)
+        boxlayout2.add_widget(number_of_trees)
+        
+        anchor_right.add_widget(boxlayout2)
+        self.add_widget(anchor_right)
+        
+        
     
     def set_background(self):
         texture = GameContext.resources['textures']['toolbar_bg']
@@ -80,7 +129,10 @@ class ToolBar(ScatterPlane):
         self.pos = (0, height_in_pixels)
         
     def collide_point(self, x, y):
-        return False
+        if y > Window.height - dp(self._height):
+            return True
+        else:
+            return False
 
 
 class UI(Widget):
