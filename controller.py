@@ -1,4 +1,5 @@
 import random
+from kivy.clock import Clock
 from physics import phy
 from gamecontext import GameContext
 from settings import HERO_SPEED, OBJECT_MASS, CHARACTER_MASS
@@ -319,21 +320,26 @@ class HareController(BaseCharacterController):
     
     def do_sawing(self):
         # almost same as do moving
-        if self._sawing_steps > 30:
+        if self._sawing_steps > 45:
             self.switch_to_moving()
         if self.meet_something():
             return
-        self.obj.body.velocity = self.define_velocity()
+        v = self._dir_vectors[self._direction]
+        speed = HERO_SPEED * 0.5
+        self.obj.body.velocity = v[0]*speed, v[1]*speed
         self._sawing_steps += 1
     
     def meet_something(self):
         some = self.tree_vision.look_from(self.obj.body.position)
         if some:
             if hasattr(some, 'body') and some.body.data.__class__.__name__ ==  'Tree':
-                some.body.data.destroy()
-                self.switch_to_sawing()
+                self.saw_the_tree(some.body.data)
                 return True
         return super(HareController, self).meet_something()
+    
+    def saw_the_tree(self, tree):
+        tree.destroy()
+        self.switch_to_sawing()
 
     def define_velocity(self):
         SPEED = HERO_SPEED
@@ -354,7 +360,6 @@ class HareController(BaseCharacterController):
         obj = super(HareController, self).handle_collision(arbiter)
         if hasattr(obj, 'data') and obj.data.__class__.__name__ == 'Tree':
             # if Hare faced tree - saw it
-            obj.data.destroy()
-            self.switch_to_sawing()
+            Clock.schedule_once(obj.data)
             self.faced = False
             

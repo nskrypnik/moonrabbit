@@ -23,7 +23,7 @@ def load_resources():
     textures = context.resources['textures'] = {}
     animations = context.resources['animations'] = {}
     
-    def load_texture(key, path, region=None, mipmap=False):
+    def load_texture(key, path, region=None, mipmap=False, wrap=None):
         texture_path = join(RESOURCES_DIR, path)
         texture = Image(texture_path, mipmap=mipmap).texture
         if region:
@@ -60,6 +60,7 @@ def load_resources():
     load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
     load_texture('mountain_central_top', 'mountains/mountain-center-top-01.png')
     load_texture('holy_carrot', 'holy-carrot/holy-carrot-01.png')
+    load_texture('toolbar_bg', 'interface/background.png')
     
     ##########################################################################
     # All tree animation
@@ -327,7 +328,7 @@ def load_resources():
     animations['hare_swim_rotate_down_r'] = ReverseAnimation(copy(frames))
 
     frames = []
-    frame_time = 0.25  # sec
+    frame_time = 0.15  # sec
     for i in xrange(1, 3):
         texture = Image(join(RESOURCES_DIR, 'hare/hare-rage-run-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))

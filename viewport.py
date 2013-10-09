@@ -1,8 +1,7 @@
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.scatter import ScatterPlane
- 
- 
+from gamecontext import GameContext
  
  
 class Viewport(ScatterPlane):
@@ -11,21 +10,21 @@ class Viewport(ScatterPlane):
         height = kwargs.pop('height', 600)
         kwargs.setdefault('size', (width, height))
         kwargs.setdefault('size_hint', (None, None))
-        #kwargs.setdefault('do_scale', False)
-        #kwargs.setdefault('do_translation', False)
         kwargs.setdefault('do_rotation', False)
         kwargs.setdefault('auto_bring_to_front', False)
         super(Viewport, self).__init__( **kwargs)
+        
+        self.viewport_height = 0
 
     def collide_point(self, x, y):
         return True
  
     def fit_to_window(self, *args):
+        
         if Window.height > Window.width:
             self.scale = Window.height/float(self.height)
         else:
             self.scale = Window.width/float(self.width)
-        
             
         self.scale_min = self.scale
         self.scale_max = self.scale*3
@@ -50,8 +49,12 @@ class Viewport(ScatterPlane):
             self.pos = self.pos[0], 0
         if x + w < Window.width:
             self.pos = Window.width - w, self.pos[1]
-        if y + h < Window.height:
-            self.pos = self.pos[0], Window.height - h
+        if GameContext.ui:
+            _height = Window.height - GameContext.ui.toolbar.get_real_height()
+        else:
+            _height = Window.height
+        if y + h < _height:
+            self.pos = self.pos[0], _height - h
         
         return res
      
