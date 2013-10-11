@@ -331,9 +331,12 @@ class Tree(StaticBox, AnimationMixin):
             # rid shape from emulation
             self.space.remove(self.shape)
             self.start_grow()
+        self._destroyed = False
             
     def start_grow(self, *largs):
+        
         self.space.add(self.shape)
+        self._destroyed = False
         self.set_animation('grow', True)
         self.animate()
     
@@ -342,10 +345,13 @@ class Tree(StaticBox, AnimationMixin):
     
     def destroy(self, *largs):
         # first remove shape from emulated space
-        self.space.remove(self.shape)
-        #then set blow animation
-        self.set_animation('blow', True)
-        self.animation_callback = self.start_grow_deffered()
-        self.animate()
+        if not self._destroyed:
+            self._destroyed = True
+            self.space.remove(self.shape)
+            #then set blow animation
+            self.set_animation('blow', True)
+            self.animation_callback = self.start_grow_deffered()
+            self.animate()
+            
     
     
