@@ -13,9 +13,9 @@ from kivy.uix.widget import Widget
 from kivy.core.window import Window
 import sys
 from landscape import *
-from physics import phy, init_physics, StaticBox, Circle, Box
+from physics import phy, init_physics, StaticBox, Circle, Box, PhysicalObject
 from gamecontext import GameContext
-from gameobjects import AnimatedCircle, Rock, Rock2, HeroRabbit, Hare, \
+from gameobjects import Rock, Rock2, HeroRabbit, Hare, \
                         Mountain, Wood, Bush, Character, HolyCarrot, Tree
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
@@ -61,7 +61,11 @@ class BodyDragMgr():
 
 
 class MoonRabbitGame(Widget):
-
+    
+    IDLE_MODE = 0
+    PLANT_TREE_MODE = 1
+    
+    trees_count = 5
     block_width = BLOCK_SIZE[0]
     block_height = BLOCK_SIZE[1]
     game_area_size = BLOCK_SIZE[0]*GAME_AREA_SIZE[0],\
@@ -89,6 +93,9 @@ class MoonRabbitGame(Widget):
         self.create_bounds()
 
         self.space.add_collision_handler(0, 0, post_solve=self.collision_handler)
+        
+        # set game mode
+        self.mode = self.IDLE_MODE
         
     def start_round(self):
         self.context.ui.greeting()
@@ -229,6 +236,11 @@ class MoonRabbitGame(Widget):
             obj.controller()
 
     def on_touch_down(self, touch):
+        
+        if self.mode == self.PLANT_TREE_MODE:
+            self.plant_a_tree(touch)
+            return
+        
         self._touches.append(touch)
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
         print shape
@@ -269,7 +281,6 @@ class MoonRabbitGame(Widget):
 
     def get_indices_by_coord(self, x, y):
         return int(x) / self.block_width, int(y) / self.block_height
-                
 
     def get_block(self, x, y):
         i, j = self.get_indices_by_coord(x, y)
@@ -282,4 +293,49 @@ class MoonRabbitGame(Widget):
         # stop timer
         Clock.unschedule(self.update)
         self.context.ui.game_over(win, text)
+        
+    def set_idle(self):
+        self.mode = self.IDLE_MODE
     
+    def set_plant_tree(self):
+        self.mode = self.PLANT_TREE_MODE
+        
+    def switch_to_plant_tree(self, btn=None):
+        if btn and not btn.disabled and self.trees_count:
+            btn.disabled = True
+            self.set_plant_tree()
+            
+    def plant_a_tree(self, touch):
+        can_plant_tree = True
+        body = phy.Body()
+        body.position = (touch.x, touch.y)
+        shape = phy.Poly.create_box(body, BLOCK_SIZE)
+        shape_list = self.space.shape_query(shape)
+        if shape_list:
+            # can't place the tree cause it's close to other objects
+            objs = []
+            for shape in shape_list:
+                if hasattr(shape.body, 'data') and isinstance(shape.body.data, PhysicalObject):
+                    obj = shape.body.data
+                    obj.color_mask.rgba = (1, 0, 0, 1) # color it to red
+                    objs.append(obj)
+                    #import ipdb; ipdb.set_trace()
+            def _rid_color_mask(objs):
+                for obj in objs:
+                    obj.color_mask.rgba = 1, 1, 1, 1
+            Clock.schedule_once(lambda dt: _rid_color_mask(objs), 0.2)
+            can_plant_tree = False
+        block = self.get_block(touch.x, touch.y)
+        if isinstance(block, Water):
+            block.set_color_mask(1, 0, 0, 1)
+            Clock.schedule_once(lambda dt: block.set_color_mask(1, 1, 1, 1), 0.2)
+            can_plant_tree = False
+        
+        if can_plant_tree:
+            Tree(touch.x, touch.y, growing=True)
+            self.trees_count -= 1
+                    
+        if self.context.ui:
+            self.context.ui.toolbar.button_trees.disabled = False
+            self.context.ui.toolbar.number_of_trees.text = 'x%s' % self.trees_count 
+        self.set_idle()

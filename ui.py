@@ -101,16 +101,20 @@ class ToolBar(ScatterPlane):
         boxlayout2 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('146dp', 0))
         button_trees = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/trees.png',
-                             background_down='resources/interface/trees_press.png',
-                             background_color=(1, 1, 1, 1))
+                             background_down='resources/interface/trees.png',
+                             background_disabled_normal='resources/interface/trees_press.png',
+                             background_color=(1, 1, 1, 1),
+                             on_release=GameContext.game.switch_to_plant_tree
+                             )
         number_of_trees = Label(text='x5', font_size="44dp")
         boxlayout2.add_widget(button_trees)
         boxlayout2.add_widget(number_of_trees)
         
+        self.button_trees = button_trees
+        self.number_of_trees = number_of_trees
+        
         anchor_right.add_widget(boxlayout2)
         self.add_widget(anchor_right)
-        
-        
     
     def set_background(self):
         texture = GameContext.resources['textures']['toolbar_bg']

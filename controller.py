@@ -373,6 +373,7 @@ class HareController(BaseCharacterController):
         obj = super(HareController, self).handle_collision(arbiter)
         if hasattr(obj, 'data') and obj.data.__class__.__name__ == 'Tree':
             # if Hare faced tree - saw it
-            Clock.schedule_once(obj.data)
+            Clock.schedule_once(obj.data.destroy, -1)
+            self.switch_to_sawing()
             self.faced = False
             

@@ -17,14 +17,17 @@ class WaterAnimation(AnimationMixin):
         self.texture = GameContext.resources['textures']['water']
         self.set_animation(GameContext.resources['animations']['water'])
         with self.widget.canvas:
-            Color(1, 1, 1, 1)
             Rectangle(pos=(0, 0), size=BLOCK_SIZE, texture=self.texture)
 
 class Landscape(Rectangle):
     velocity_coefficient = 1.0
     
     def __init__(self, *args, **kw):
+        self.color_mask = Color(1, 1, 1, 1)
         super(Landscape, self).__init__(*args, **kw)
+        
+    def set_color_mask(self, *rgba):
+        self.color_mask.rgba = rgba
 
 
 class Grass(Landscape):

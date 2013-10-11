@@ -47,6 +47,8 @@ class PhysicalObject(object):
         self._shapes = []
         self.body = self.body_factory()
         self.widget = self.widget_factory()
+        with self.widget.canvas.before:
+            self.color_mask = Color(1, 1, 1, 1)
         self.define_shape()
         if hasattr(self, 'pos'):
             self.body.position = self.pos
@@ -165,10 +167,9 @@ class Circle(DynamicObject):
         widget.center = self.pos
         with widget.canvas:
             if not self.texture:
-                Color(1, 0, 0, 1)
+                Color(1, 0, 1, 1)
                 Ellipse(pos=(0, 0), size=self.size)
             else:
-                Color(1, 1, 1, 1)
                 Ellipse(pos=(0, 0), texture=self.texture, size=self.size)
         return widget
 

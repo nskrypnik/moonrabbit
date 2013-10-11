@@ -11,10 +11,7 @@ from gamecontext import GameContext
 from controller import HeroRabbitController, HareController
 from settings import BLOCK_SIZE, OBJECT_MASS, CHARACTER_MASS
 from random import choice
-
-class AnimatedCircle(Circle, AnimationMixin):
-    """ It's just for test """
-    pass
+from copy import copy
 
 
 class Rock(Circle):
@@ -327,12 +324,13 @@ class Tree(StaticBox, AnimationMixin):
     def __init__(self, *pos, **kw):
         growing = kw.pop('growing', False)
         texture = GameContext.resources['textures']['tree']
-        self.animations['blow'] = GameContext.resources['animations']['tree_blow']
-        self.animations['grow'] = GameContext.resources['animations']['tree_grow']
+        self.animations['blow'] = copy(GameContext.resources['animations']['tree_blow'])
+        self.animations['grow'] = copy(GameContext.resources['animations']['tree_grow'])
         super(Tree, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
         if growing:
             # rid shape from emulation
             self.space.remove(self.shape)
+            self.start_grow()
             
     def start_grow(self, *largs):
         self.space.add(self.shape)
@@ -342,7 +340,7 @@ class Tree(StaticBox, AnimationMixin):
     def start_grow_deffered(self):
         Clock.schedule_once(self.start_grow, 4)
     
-    def destroy(self):
+    def destroy(self, *largs):
         # first remove shape from emulated space
         self.space.remove(self.shape)
         #then set blow animation
