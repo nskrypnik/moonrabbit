@@ -308,7 +308,6 @@ class MoonRabbitGame(Widget):
         return self.blocks[i][j]
 
     def game_over(self, win=False, text=None):
-        self.context.ui.timer.stop()
         # stop timer
         Clock.unschedule(self.update)
         self.context.ui.game_over(win, text)

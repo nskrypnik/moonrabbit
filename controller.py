@@ -281,12 +281,7 @@ class HeroRabbitController(BaseCharacterController):
         super(HeroRabbitController, self).__init__(*args, **kw)
         self._steps_counter = 0
         self._steps = 0
-    
-    @wait_counter
-    def do_idle(self):
-        self.context.ui.timer.start()
-        self.switch_to_moving()
-        
+            
     def do_moving(self):
         super(HeroRabbitController, self).do_moving()
         self._steps_counter += 1

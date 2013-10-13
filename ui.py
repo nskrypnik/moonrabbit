@@ -150,14 +150,15 @@ class UI(Widget):
         self.greeting_popup = None
         self.context = GameContext
         
-        self.timer = Timer(self.update_time)
-        self.clock = Label(text=self.timer.get_formated_time(),
-                           pos=(0, 0),
-                           font_size = '35dp'
-        )
+        #self.timer = Timer(self.update_time)
+        #self.clock = Label(text=self.timer.get_formated_time(),
+        #                   pos=(0, 0),
+        #                   font_size = '35dp'
+        #)
+        #self.add_widget(self.clock)
         self.toolbar = ToolBar()
         
-        self.add_widget(self.clock)
+        
         self.add_widget(self.toolbar)
         
     def resize(self, w, h):
