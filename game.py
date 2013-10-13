@@ -127,10 +127,6 @@ class MoonRabbitGame(Widget):
     def init_physics(self):
         self.space = init_physics()
 
-    def step(self, dt):
-        self.space.step(dt)
-        self.update_objects()
-
     def create_bounds(self):
         """ Make bounds of the game space """
         # Bounds should be created for
@@ -234,6 +230,25 @@ class MoonRabbitGame(Widget):
             obj.update()
         for obj in self.context.characters:
             obj.controller()
+        self.reindex_graphics()
+    
+    def reindex_graphics(self):
+        for obj in self.context._objs:
+            self.canvas.children.remove(obj.widget.canvas)
+        # fill _objects_z_index
+        _objects_z_index = {}
+        for obj in self.context._objs:
+            y = obj.widget.pos[1]
+            if not y in _objects_z_index:
+                _objects_z_index[y] = []
+            _objects_z_index[y].append(obj)
+        _keys = _objects_z_index.keys()
+        _keys.sort()
+        _keys.reverse()
+        for k in _keys:
+            objs = _objects_z_index[k]
+            for obj in objs:
+                self.canvas.add(obj.widget.canvas)
 
     def on_touch_down(self, touch):
         
@@ -319,7 +334,6 @@ class MoonRabbitGame(Widget):
                     obj = shape.body.data
                     obj.color_mask.rgba = (1, 0, 0, 1) # color it to red
                     objs.append(obj)
-                    #import ipdb; ipdb.set_trace()
             def _rid_color_mask(objs):
                 for obj in objs:
                     obj.color_mask.rgba = 1, 1, 1, 1
