@@ -215,29 +215,33 @@ class MoonRabbitGame(Widget):
                         
         Tree(self.block_width*1.5, self.block_height*3.5)
         
-        with self.canvas.after:
+        with self.canvas:
             for pos in _bushes:
-                Bush(*pos)    
+                Bush(*pos)
             
             for pos, type in _mountains:
                 Mountain(*pos, type=type)
 
         HolyCarrot(13.5*self.block_width, 7.5*self.block_height)
+        # This should be called at the end
+        self.reindex_graphics()
 
     def update(self, dt):
         self.context.space.step(self.spf)
         for obj in self.context.dynamic_objects:
             obj.update()
+        
         for obj in self.context.characters:
             obj.controller()
-        self.reindex_graphics()
     
     def reindex_graphics(self):
-        for obj in self.context._objs:
+        """ Update z-index of all objects on the scene.
+        """
+        for obj in self.context.static_objects:
             self.canvas.children.remove(obj.widget.canvas)
         # fill _objects_z_index
         _objects_z_index = {}
-        for obj in self.context._objs:
+        for obj in self.context.static_objects:
             y = obj.widget.pos[1]
             if not y in _objects_z_index:
                 _objects_z_index[y] = []
@@ -348,6 +352,7 @@ class MoonRabbitGame(Widget):
         if can_plant_tree:
             Tree(touch.x, touch.y, growing=True)
             self.trees_count -= 1
+            self.reindex_graphics()
                     
         if self.context.ui:
             self.context.ui.toolbar.button_trees.disabled = False
