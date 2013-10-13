@@ -3,6 +3,12 @@ from kivy.graphics import VertexInstruction
 from kivy.clock import Clock
 from copy import copy
 
+GLOBAL_PAUSE = False
+
+def set_global_pause(val):
+    global GLOBAL_PAUSE
+    GLOBAL_PAUSE = val
+
 class Animation(object):
     """
     Generic interface. Override __init__ in inherited class
@@ -31,8 +37,8 @@ class Animation(object):
     def reset(self):
         self.current_frame = 0
 
-
-class AnimationMixin(object): 
+class AnimationMixin(object):
+    
     
     def __new__(cls, *args, **kw):
         self = super(AnimationMixin, cls).__new__(cls)
@@ -71,7 +77,13 @@ class AnimationMixin(object):
         self._animate()
     
     def _animate(self, *largs):
+
+        global GLOBAL_PAUSE
         
+        if GLOBAL_PAUSE:
+            Clock.schedule_once(self._animate, 0.1)
+            return
+
         animation = self.current_animation
         if animation.is_first_call():
             # backup texture:

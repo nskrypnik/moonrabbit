@@ -79,10 +79,15 @@ class ToolBar(ScatterPlane):
         button_play = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/pause.png',
                              background_down='resources/interface/pause_press.png',
+                             on_release=GameContext.game.pause,
                              background_color=(1, 1, 1, 1))
         boxlayout1.add_widget(button_menu)
         boxlayout1.add_widget(button_save)
         boxlayout1.add_widget(button_play)
+        
+        self.button_play = button_play
+        self.button_play.set_paused = self.set_paused
+        self.button_play.set_resumed = self.set_resumed
         
         anchor_left.add_widget(boxlayout1)
         
@@ -115,6 +120,15 @@ class ToolBar(ScatterPlane):
         
         anchor_right.add_widget(boxlayout2)
         self.add_widget(anchor_right)
+        
+    def set_paused(self):
+        self.button_play.background_normal='resources/interface/resume.png'
+        self.button_play.background_down='resources/interface/resume_press.png'
+        
+    def set_resumed(self):
+        self.button_play.background_normal='resources/interface/pause.png'
+        self.button_play.background_down='resources/interface/pause_press.png'
+
     
     def set_background(self):
         texture = GameContext.resources['textures']['toolbar_bg']

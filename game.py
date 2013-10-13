@@ -19,6 +19,7 @@ from gameobjects import Rock, Rock2, HeroRabbit, Hare, \
                         Mountain, Wood, Bush, Character, HolyCarrot, Tree
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
 from resources import load_resources, read_map
+from animation import set_global_pause
 
 
 class BodyDragMgr():
@@ -96,6 +97,7 @@ class MoonRabbitGame(Widget):
         
         # set game mode
         self.mode = self.IDLE_MODE
+        self.folding_screen = None
         
     def start_round(self):
         self.context.ui.greeting()
@@ -364,3 +366,26 @@ class MoonRabbitGame(Widget):
             self.context.ui.toolbar.button_trees.disabled = False
             self.context.ui.toolbar.number_of_trees.text = 'x%s' % self.trees_count 
         self.set_idle()
+        
+    def pause(self, btn=None):
+        Clock.unschedule(self.update)
+        set_global_pause(True)
+        if btn:
+            btn.set_paused()
+            btn.bind(on_release=self.resume)
+        if self.folding_screen:
+            color, rect = self.folding_screen
+            color.rgba = 0, 0, 0, .5
+            return
+        with self.canvas.after:
+            self.folding_screen = [Color(0, 0, 0, .5),
+                                   Rectangle(pos=self.pos, size=self.size)]
+    
+    def resume(self, btn=None):
+        Clock.schedule_interval(self.update, self.spf)
+        set_global_pause(False)
+        if btn:
+            btn.set_resumed()
+            btn.bind(on_release=self.pause)
+        color, rect = self.folding_screen
+        color.rgba = 0, 0, 0, 0
