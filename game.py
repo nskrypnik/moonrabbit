@@ -253,6 +253,13 @@ class MoonRabbitGame(Widget):
             objs = _objects_z_index[k]
             for obj in objs:
                 self.canvas.add(obj.widget.canvas)
+    
+    def move_to_bottom(self, obj):
+        canvas = obj.widget.canvas
+        last_block = self.blocks[GAME_AREA_SIZE[0] - 1][GAME_AREA_SIZE[1] - 1]
+        block_index = self.canvas.children.index(last_block)
+        self.canvas.children.remove(canvas)
+        self.canvas.children.insert(block_index + 1, canvas)
 
     def on_touch_down(self, touch):
         
