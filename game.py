@@ -98,6 +98,7 @@ class MoonRabbitGame(Widget):
         # set game mode
         self.mode = self.IDLE_MODE
         self.folding_screen = None
+        self.paused = False
         
     def start_round(self):
         self.context.ui.greeting()
@@ -328,7 +329,7 @@ class MoonRabbitGame(Widget):
         self.mode = self.PLANT_TREE_MODE
         
     def switch_to_plant_tree(self, btn=None):
-        if btn and not btn.disabled and self.trees_count:
+        if not self.paused and btn and not btn.disabled and self.trees_count:
             btn.disabled = True
             self.set_plant_tree()
             
@@ -368,6 +369,7 @@ class MoonRabbitGame(Widget):
         self.set_idle()
         
     def pause(self, btn=None):
+        self.paused = True
         Clock.unschedule(self.update)
         set_global_pause(True)
         if btn:
@@ -382,6 +384,7 @@ class MoonRabbitGame(Widget):
                                    Rectangle(pos=self.pos, size=self.size)]
     
     def resume(self, btn=None):
+        self.paused = False
         Clock.schedule_interval(self.update, self.spf)
         set_global_pause(False)
         if btn:
