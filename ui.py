@@ -70,15 +70,15 @@ class ToolBar(ScatterPlane):
         boxlayout1 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('350dp', 0))
         button_menu = Button(size_hint=(None, None), size=('141dp', '57dp'), border=(0, 0, 0, 0), 
                              background_normal='resources/interface/menu.png',
-                             background_down='resources/interface/menu_press.png',
+                             background_down='resources/interface/menu-pressed.png',
                              background_color=(1, 1, 1, 1))
         button_save = Button(size_hint=(None, None), size=('132dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/save.png',
-                             background_down='resources/interface/save_press.png',
+                             background_down='resources/interface/save-pressed.png',
                              background_color=(1, 1, 1, 1))
         button_play = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/pause.png',
-                             background_down='resources/interface/pause_press.png',
+                             background_down='resources/interface/pause-pressed.png',
                              on_release=GameContext.game.pause,
                              background_color=(1, 1, 1, 1))
         boxlayout1.add_widget(button_menu)
@@ -123,12 +123,11 @@ class ToolBar(ScatterPlane):
         
     def set_paused(self):
         self.button_play.background_normal='resources/interface/resume.png'
-        self.button_play.background_down='resources/interface/resume_press.png'
+        self.button_play.background_down='resources/interface/resume-pressed.png'
         
     def set_resumed(self):
         self.button_play.background_normal='resources/interface/pause.png'
-        self.button_play.background_down='resources/interface/pause_press.png'
-
+        self.button_play.background_down='resources/interface/pause-pressed.png'
     
     def set_background(self):
         texture = GameContext.resources['textures']['toolbar_bg']
