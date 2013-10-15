@@ -12,6 +12,8 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Rectangle, Color
 from kivy.metrics import dp
+from kivy.core.image import Image
+from kivy.properties import ObjectProperty
 from gamecontext import GameContext
 
 
@@ -135,7 +137,7 @@ class ToolBar(ScatterPlane):
         th, tw = dp(th), dp(tw)
         with self.canvas.before:
             Color(1, 1, 1, 1)
-            for i in xrange(20):
+            for i in xrange(50):
                 Rectangle(pos=(i*tw, 0) , size=(tw, th), texture=texture)
     
     def get_real_height(self):
@@ -232,4 +234,91 @@ class UI(Widget):
                       size_hint=(None, None),
                       auto_dismiss=False)
         popup.open()
+
+
+class MenuItem(Label):
+    
+    release = ObjectProperty(None)
+    
+    def __init__(self, *args, **kw):
+        kw.setdefault('font_size', '45dp')
+        kw.setdefault('size_hint', (None, None))
+        kw.setdefault('size', ('300dp', '65dp'))
+        kw.setdefault('bold', True)
+        super(MenuItem, self).__init__(*args, **kw)
+    
+    def on_touch_down(self, touch):
+        super(MenuItem, self).on_touch_down(touch)
+        if self.collide_point(touch.x, touch.y):
+            self.color = 1, 1, 0, 1
+        
+    def on_touch_up(self, touch):
+        super(MenuItem, self).on_touch_up(touch)
+        self.color = 1, 1, 1, 1 # restore color
+        
+        if self.collide_point(touch.x, touch.y) and self.release:
+            self.release()
+            
+            
+def grass_background(widget):
+    return
+    bg_texture = Image('resources/grass/grass-01.png').texture
+    w, h = bg_texture.size
+    # fill all the background
+    with widget.canvas.before:
+        for i in range(50):
+            for e in range(50):
+                Rectangle(pos=(i*w, e*h), size=(w, h), texture=bg_texture)
+
+
+class Menu(Widget):
+    
+    def __init__(self, *args, **kw):
+        kw.setdefault('size', (Window.width, Window.height))
+        super(Menu, self).__init__(*args, **kw)
+        GameContext.menu = self
+        grass_background(self)
+                    
+    def resize(self, w, h):
+        print w, h
+        self.size = w, h
+        self.content.size = w, h
+        
+    def start(self):
+        """ Starts new game """
+        GameContext.app.start_game()
+        
+    def exit(self):
+        """ Exits from the application """
+        GameContext.app.stop()
+
+
+class LoaderAnimation(Widget):
+    pass
+
+
+class Loader(Widget):
+
+    def __init__(self, *args, **kw):
+        kw.setdefault('size', (Window.width, Window.height))
+        super(Loader, self).__init__(*args, **kw)
+        grass_background(self)
+        self.loader_pictures = ['resources/loader/loader-0{}.png'.format(i) for i in xrange(1, 9)]
+    
+    def complete_callback(self, dt):
+        GameContext.app.switch_to_scene()
+        
+    def set_progress(self, percents):
+        
+        loader_pic_index = percents / 13
+        print percents, loader_pic_index
+        self.loader_animation.canvas.children[0].source = self.loader_pictures[loader_pic_index]
+        
+        self.percent_label.text = "%s%%" % percents
+        
+        if percents == 100:
+            Clock.schedule_once(self.complete_callback, 0.2)
+        
+
+         
         

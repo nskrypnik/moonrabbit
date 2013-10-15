@@ -9,6 +9,9 @@ import json
 
 RESOURCES_DIR = 'resources'
 
+def loader_cb(percents):
+    if GameContext.loader:
+        GameContext.loader.set_progress(percents)
 
 def flip_horizontal(tex):
     #x1, x2, x3, x4, x5, x6, x7, x8 = tex.tex_coords
@@ -35,32 +38,38 @@ def load_resources():
     load_texture('water', 'terrain/water-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))
     load_texture('sand', 'terrain/sand-01.png', (0, 0, BLOCK_SIZE[0], BLOCK_SIZE[1]))
     load_texture('rock', 'one-cell-snags/stone-01.png')
+    loader_cb(5)
     load_texture('rock2', 'one-cell-snags/stone-02.png')
     load_texture('wood', 'one-cell-snags/log-01.png')
     load_texture('bush', 'one-cell-snags/bush-01.png')
     load_texture('tree', 'tree/tree-01.png')
+    loader_cb(10)
     load_texture('rabbit_hero', 'hero/hero-idle-side-01.png')
     load_texture('hare', 'hare/hare-idle-side-01.png')
     load_texture('mountain_horizontal_bottom1', 'mountains/mountain-horizontal-bottom-01.png')
     load_texture('mountain_horizontal_bottom2', 'mountains/mountain-horizontal-bottom-02.png')
     load_texture('mountain_horizontal_bottom3', 'mountains/mountain-horizontal-bottom-03.png')
     load_texture('mountain_horizontal_top1', 'mountains/mountain-horizontal-top-01.png')
+    loader_cb(20)
     load_texture('mountain_horizontal_top2', 'mountains/mountain-horizontal-top-02.png')
     load_texture('mountain_horizontal_top3', 'mountains/mountain-horizontal-top-03.png')
     load_texture('mountain_horizontal_left_end_top', 'mountains/mountain-horizontal-left-end-top-01.png')
     load_texture('mountain_horizontal_left_end_bottom', 'mountains/mountain-horizontal-left-end-bottom-01.png')
     load_texture('mountain_horizontal_right_end_top', 'mountains/mountain-horizontal-right-end-top-01.png')
     load_texture('mountain_horizontal_right_end_bottom', 'mountains/mountain-horizontal-right-end-bottom-01.png')
+    loader_cb(30)
     load_texture('mountain_vertical1', 'mountains/mountain-vertical-01.png')
     load_texture('mountain_vertical2', 'mountains/mountain-vertical-02.png')
     load_texture('mountain_vertical_top_start', 'mountains/mountain-vertical-top-start-01.png')
     load_texture('mountain_vertical_top_end', 'mountains/mountain-vertical-top-end-01.png')
     load_texture('mountain_vertical_bottom_start', 'mountains/mountain-vertical-down-start-01.png')
     load_texture('mountain_vertical_bottom_end', 'mountains/mountain-vertical-down-end-01.png')
+    loader_cb(40)
     load_texture('mountain_central', 'mountains/mountain-center-center-01.png')
     load_texture('mountain_central_top', 'mountains/mountain-center-top-01.png')
     load_texture('holy_carrot', 'holy-carrot/holy-carrot-01.png')
     load_texture('toolbar_bg', 'interface/background.png')
+    loader_cb(50)
     
     ##########################################################################
     # All tree animation
@@ -84,6 +93,7 @@ def load_resources():
     frames.append((textures['tree'], frame_time))
     
     animations['tree_grow'] = SimpleAnimation(frames)
+    loader_cb(55)
     
     ##########################################################################
     # Holly carrot animation
@@ -125,6 +135,8 @@ def load_resources():
     frames.append((texture, frame_time))
     animations['hero_run_up'] = SimpleAnimation(frames)
     
+    loader_cb(60)
+    
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 3):
@@ -157,6 +169,7 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['hero_run'] = SimpleAnimation(frames)
     
+    loader_cb(65)
     ##########################################################################
     # Hero swim animations goes here
     ##########################################################################
@@ -191,6 +204,7 @@ def load_resources():
     frames.append((texture, frame_time))
     animations['hero_swim_up'] = SimpleAnimation(frames)
     
+    loader_cb(70)
     # hero swim rotate top
     
     frames = []
@@ -208,6 +222,8 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['hero_swim_rotate_down'] = SimpleAnimation(frames)
     animations['hero_swim_rotate_down_r'] = ReverseAnimation(copy(frames))
+    
+    loader_cb(75)
     
     ##########################################################################
     ##########################################################################
@@ -242,6 +258,7 @@ def load_resources():
     texture = flip_horizontal(texture)
     frames.append((texture, frame_time))
     animations['hare_run_up'] = SimpleAnimation(frames)
+    loader_cb(80)
     
     frames = []
     frame_time = 0.25  # sec
@@ -258,6 +275,8 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['hare_rotate_top'] = SimpleAnimation(frames)
     animations['hare_rotate_top_r'] = ReverseAnimation(copy(frames))
+    
+    loader_cb(85)
 
     frames = []
     frame_time = 0.25  # sec
@@ -275,6 +294,7 @@ def load_resources():
         frames.append((texture, frame_time))
     animations['hare_run'] = SimpleAnimation(frames)
     
+    loader_cb(90)
     ##########################################################################
     # Hare swim animations goes here
     ##########################################################################
@@ -311,6 +331,7 @@ def load_resources():
     
     # hare swim rotate top
     
+    loader_cb(95)
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 3):
@@ -349,6 +370,7 @@ def load_resources():
     texture = flip_horizontal(texture)
     frames.append((texture, frame_time))
     animations['hare_rage_run_up'] = SimpleAnimation(frames)
+    loader_cb(100)
 
 def read_map(fname):
     """

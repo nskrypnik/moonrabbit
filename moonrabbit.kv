@@ -1,8 +1,82 @@
 #:kivy 1.7.2
 
-#<MoonRabbitGame>:
-#    canvas:
-#        Rectangle:
-#            size: 300, 200
 
-            
+<Menu>:
+	content: content
+	AnchorLayout:
+		id: content
+		anchor_x: 'center'
+		anhor_y: 'center'
+		size: root.size
+		
+		GridLayout:
+			cols: 1
+			size_hint: None, 1
+			size: '549dp', 0
+			
+			Widget:
+				size_hint: None, None
+				size: '549dp', '329dp'
+				canvas:
+					Rectangle:
+						source: 'resources/interface/logo.png'
+						pos: self.pos
+						size: self.size
+			
+			MenuItem:
+				text: "START"
+				release: root.start
+			MenuItem:
+				text: "RESUME"
+			MenuItem:
+				text: "HELP"
+			MenuItem:
+				text: "CREDITS"
+			MenuItem:
+				text: "EXIT"
+				release: root.exit
+				
+
+<Loader>:
+	loader_animation: loader_animation
+	percent_label: percent_label
+	
+	AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'center'
+		size: root.size
+		
+		GridLayout:
+			cols: 1
+			size_hint: None, None
+			size: '72dp', '125dp'
+			
+			Widget:
+				size_hint: None, None
+				size: '72dp', '72dp'
+				id: loader_animation
+				canvas:
+					Rectangle:
+						pos: self.pos
+						size: self.size
+						source: 'resources/loader/loader-01.png'
+			Label:
+				id: percent_label
+				text: "0%"
+				font_size: "45dp"
+		
+	AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'bottom'
+		size: root.size
+		
+		Widget:
+			size_hint: None, None
+			size: '179dp', '93dp'
+			canvas:
+				Color:
+					rgba: 1, 1, 1, 1
+				Rectangle:
+					pos: self.pos
+					size: self.size
+					source: 'resources/loader/sunny-logo.png'
