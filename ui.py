@@ -241,9 +241,9 @@ class MenuItem(Label):
     release = ObjectProperty(None)
     
     def __init__(self, *args, **kw):
-        kw.setdefault('font_size', '45dp')
+        kw.setdefault('font_size', '30dp')
         kw.setdefault('size_hint', (None, None))
-        kw.setdefault('size', ('300dp', '65dp'))
+        kw.setdefault('size', ('300dp', '45dp'))
         kw.setdefault('bold', True)
         super(MenuItem, self).__init__(*args, **kw)
     
@@ -261,14 +261,15 @@ class MenuItem(Label):
             
             
 def grass_background(widget):
-    return
-    bg_texture = Image('resources/grass/grass-01.png').texture
-    w, h = bg_texture.size
+    bg_texture = Image('resources/grass/grass-texture.png', nocache=True).texture
+    # get POT texture
+    #bg_texture = bg_texture.get_region(0, 0, 64, 64)
+    #bg_texture.uvpos = (0, 0)
+    bg_texture.uvsize = (35, 35)
+    bg_texture.wrap = 'repeat'
     # fill all the background
     with widget.canvas.before:
-        for i in range(50):
-            for e in range(50):
-                Rectangle(pos=(i*w, e*h), size=(w, h), texture=bg_texture)
+        Rectangle(pos=(0, 0), size=(2560, 2560), texture=bg_texture)
 
 
 class Menu(Widget):
