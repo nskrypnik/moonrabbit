@@ -162,7 +162,7 @@ class UI(Widget):
         if GameContext.ui:
             raise Exception('Creating more than one UI object is not avaliable')
         GameContext.ui = self
-        self.greeting_popup = None
+        self.greeting_msg = None
         self.context = GameContext
         
         #self.timer = Timer(self.update_time)
@@ -190,29 +190,24 @@ class UI(Widget):
 
         def _greeting(dt):
             
-            content = BoxLayout(orientation='vertical')
-            label = Label(text='Help Rabbit to find the Holly Carrot. You cannot directly control the'\
-                          ' Rabbit, but you may move some stones and wood to show the right way for'\
-                          ' Holly Carrot. Keep the Rabbit from the White Hare!', valign="middle", halign="center")
-            content.add_widget(label)
-            content.add_widget(Button(text="Start",
-                                      on_press=self.context.game.start,
-                                      size_hint=(None, None),
-                                      size=(375, 50)))
-            popup = Popup(title='Moon Rabbit',
-                          content=content,
-                          size=(400, 400),
-                          size_hint=(None, None),
-                          auto_dismiss=False)
-            self.greeting_popup = popup
-            popup.open()
-            label.bind(size=label.setter('text_size'))
+            anchor = AnchorLayout(anchor_x='center', anchor_y='center', size=(Window.width, Window.height))
+            label = Label(text='TAP TO START', font_size='50dp', bold=True)
+            anchor.add_widget(label)
+            anchor.bind(on_touch_up=self.close_greeting)
+            self.greeting_msg = anchor
+            self.add_widget(self.greeting_msg)
+            
+            #label.bind(size=label.setter('text_size'))
             
         Clock.schedule_once(_greeting, -1)
     
-    def close_greeting(self):
-        if self.greeting_popup:
-            self.greeting_popup.dismiss()
+    def close_greeting(self, inst, touch):
+        if self.greeting_msg:
+            self.remove_widget(self.greeting_msg)
+            self.greeting_msg = None
+        if self.context.game:
+            self.context.game.start()
+        
             
     def game_over(self, win, text=None):
         
@@ -287,7 +282,8 @@ class Menu(Widget):
         
     def start(self):
         """ Starts new game """
-        GameContext.app.start_game()
+        game_start = GameContext.app.start_game
+        GameContext.app.fade_to_black(game_start)
         
     def exit(self):
         """ Exits from the application """
@@ -319,7 +315,46 @@ class Loader(Widget):
         
         if percents == 100:
             Clock.schedule_once(self.complete_callback, 0.2)
-        
 
-         
+
+
+class BasePicture(Widget):
+    
+    IMG_PATH = ''
+    
+    def __init__(self, *args, **kw):
+        kw.setdefault('size', (Window.width, Window.height))
+        super(BasePicture, self).__init__(*args, **kw)
+        self.picture = Image(self.IMG_PATH).texture
+        grass_background(self)
+        scatter = ScatterPlane(size=self.picture.size,
+                               do_translation=False, do_rotation=False, do_scale=False)
+        with scatter.canvas:
+            Rectangle(size=scatter.size, texture=self.picture)
+        scale = Window.height/float(self.picture.size[1])
+        scatter.scale = scale
+        self.picture_holder = scatter 
+        self.add_widget(scatter)
+        self.picture_holder.center = Window.center
+        
+    
+    def on_touch_up(self, touch):
+        cb = GameContext.app.back_to_menu
+        GameContext.app.fade_to_black(cb)
+    
+    def resize(self, w, h):
+        self.size = Window.width, Window.height
+        scale = Window.height/float(self.picture.size[1])
+        self.picture_holder.scale = scale
+        self.picture_holder.center = Window.center
+
+
+class LosePicture(BasePicture):
+    
+    IMG_PATH = 'resources/sunny--games--rabbit--game-over.png'
+
+
+class WinPicture(BasePicture):
+    
+    IMG_PATH = 'resources/sunny--games--rabbit--win.png'
         

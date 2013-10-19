@@ -99,13 +99,13 @@ class MoonRabbitGame(Widget):
         self.mode = self.IDLE_MODE
         self.folding_screen = None
         self.paused = False
+        self.win = False
         
     def start_round(self):
         self.context.ui.greeting()
     
-    def start(self, btn):
-        
-        self.context.ui.close_greeting()
+    def start(self):
+
         Clock.schedule_interval(self.update, self.spf)
 
     def collision_handler(self, space, arbiter, *args, **kw):
@@ -319,8 +319,11 @@ class MoonRabbitGame(Widget):
 
     def game_over(self, win=False, text=None):
         # stop timer
+        self.win = win
         Clock.unschedule(self.update)
-        self.context.ui.game_over(win, text)
+        cb = self.context.app.finish_round
+        # fade to black screen and do finish round
+        self.context.app.fade_to_black(cb, da=0.03)
         
     def set_idle(self):
         self.mode = self.IDLE_MODE

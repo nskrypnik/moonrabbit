@@ -339,7 +339,8 @@ class Tree(StaticBox, AnimationMixin):
         self._destroyed = False
         self.set_animation('grow', True)
         self.animate()
-        GameContext.game.reindex_graphics()
+        if GameContext.game:
+            GameContext.game.reindex_graphics()
     
     def start_grow_deffered(self):
         Clock.schedule_once(self.start_grow, 4)

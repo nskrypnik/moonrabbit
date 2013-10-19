@@ -14,20 +14,23 @@ class _GameContext(object):
         return cls._instance
     
     def __init__(self):
+        self.app = None
+        self.reset()
+        self.scene_width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
+        self.scene_height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
+        
+    def reset(self):
+        self.space = None
         self.dynamic_objects = []
         self.static_objects = []
         self._objs = []
         self.characters = []
-        self.space = None
-        self.resources = {}
         self.dragged = {}
         self.ui = None
         self.menu = None
-        self.app = None
         self.loader = None
         self.scene = None
-        self.scene_width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
-        self.scene_height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
+        self.resources = {}
     
     def add(self, obj):
         

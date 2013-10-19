@@ -17,12 +17,16 @@ else:
     import cymunk as phy
 
 # init space as global variable 
-space = phy.Space()
-GameContext.space = space
+
+space = None
  
 def init_physics(**kw):
     """ init physics for game here """
     global space
+    
+    space = phy.Space()
+    GameContext.space = space
+
     
     space.iterations = kw.pop('iterations', 30)
     space.gravity = kw.pop('gravity', (0, 0))
