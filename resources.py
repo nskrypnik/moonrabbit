@@ -1,6 +1,6 @@
 
 from kivy.core.image import Image
-from gamecontext import GameContext
+#from gamecontext import GameContext
 from animation import SimpleAnimation, ReverseAnimation, ReturningAnimation
 from os.path import join, dirname
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
@@ -10,8 +10,9 @@ import json
 RESOURCES_DIR = 'resources'
 
 def loader_cb(percents):
-    if GameContext.loader:
-        GameContext.loader.set_progress(percents)
+    pass
+    #if GameContext.loader:
+    #    GameContext.loader.set_progress(percents)
 
 def flip_horizontal(tex):
     #x1, x2, x3, x4, x5, x6, x7, x8 = tex.tex_coords
@@ -20,8 +21,7 @@ def flip_horizontal(tex):
     tex.uvsize = (-tex.uvsize[0], tex.uvsize[1])
     return tex
 
-def load_resources():
-    context = GameContext
+def load_resources(context):
     
     textures = context.resources['textures'] = {}
     animations = context.resources['animations'] = {}

@@ -4,10 +4,18 @@ from kivy.clock import Clock
 from copy import copy
 
 GLOBAL_PAUSE = False
+_ANIMATIONS = []
 
 def set_global_pause(val):
     global GLOBAL_PAUSE
     GLOBAL_PAUSE = val
+    
+    
+def reset_animations():
+    global _ANIMATIONS
+    for a in _ANIMATIONS:
+        a.reset()
+        
 
 class Animation(object):
     """
@@ -17,6 +25,8 @@ class Animation(object):
     """
     
     def __init__(self, *args, **kw):
+        global _ANIMATIONS
+        _ANIMATIONS.append(self)
         self.current_frame = 0
     
     def set_frames(self, frames):
@@ -41,15 +51,15 @@ class AnimationMixin(object):
     
     
     def __new__(cls, *args, **kw):
+        
         self = super(AnimationMixin, cls).__new__(cls)
-
+        
         self.current_animation = None
         self.animations = {}
         self.endless_animation = False
         self.animation_callback = None
         if hasattr(cls, 'restore_original'):
             self.restore_original = cls.restore_original
-        
         return self
         
     

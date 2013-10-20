@@ -112,6 +112,13 @@ class MoonRabbitApp(App):
             Clock.schedule_once(game_scene.fit_to_window, -1)
             
         Clock.schedule_once(_launch_game_round, 0.5)
+        
+        def _emulate_loader(dt=None):
+            loader.set_progress(loader.percents + 20)
+            if loader.percents != 100:
+                Clock.schedule_once(_emulate_loader, 0.1)
+        
+        _emulate_loader()
 
     def on_pause(self):
         return True

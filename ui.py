@@ -1,6 +1,6 @@
 
 import sys
-
+from kivy.lang import Builder
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -14,7 +14,16 @@ from kivy.graphics import Rectangle, Color
 from kivy.metrics import dp
 from kivy.core.image import Image
 from kivy.properties import ObjectProperty
+
 from gamecontext import GameContext
+from msgbox import MsgBox
+
+Builder.load_string('''
+#place kivy notation of app here
+
+<-MsgBox>:
+
+''')
 
 
 class Timer(object):
@@ -63,8 +72,11 @@ class ToolBar(ScatterPlane):
         self.size = (Window.width, self.get_real_height())
         self.on_resize(Window.width, Window.height)
         self.set_background()
-        
         self.set_layout()
+        
+    def disable(self):
+        self.button_menu.disabled = True
+        self.button_play    .disabled = True
     
     def set_layout(self):
         
@@ -73,7 +85,11 @@ class ToolBar(ScatterPlane):
         button_menu = Button(size_hint=(None, None), size=('141dp', '57dp'), border=(0, 0, 0, 0), 
                              background_normal='resources/interface/menu.png',
                              background_down='resources/interface/menu-pressed.png',
-                             background_color=(1, 1, 1, 1))
+                             background_disabled_normal='resources/interface/menu.png',
+                             background_color=(1, 1, 1, 1),
+                             on_release=self.go_to_menu
+                             )
+        self.button_menu = button_menu
         button_save = Button(size_hint=(None, None), size=('132dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/save.png',
                              background_down='resources/interface/save-pressed.png',
@@ -81,6 +97,7 @@ class ToolBar(ScatterPlane):
         button_play = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/pause.png',
                              background_down='resources/interface/pause-pressed.png',
+                             background_disabled_normal='resources/interface/pause.png',
                              on_release=GameContext.game.pause,
                              background_color=(1, 1, 1, 1))
         boxlayout1.add_widget(button_menu)
@@ -122,6 +139,20 @@ class ToolBar(ScatterPlane):
         
         anchor_right.add_widget(boxlayout2)
         self.add_widget(anchor_right)
+    
+    def go_to_menu(self,btn):
+        GameContext.game.pause(self.button_play)
+        def _yes_callback():
+            _cb = GameContext.app.back_to_menu
+            GameContext.app.fade_to_black(_cb)
+        msg = MsgBox(text="You are about to go to main menu.\nAre you sure?",
+                     font_size='40dp', type='question', size_hint=(0.8, 0.8),
+                     buttons_padding='40dp',
+                     no_callback=lambda: GameContext.game.resume(self.button_play),
+                     yes_callback=_yes_callback
+                     )
+        msg.open()
+        
         
     def set_paused(self):
         self.button_play.background_normal='resources/interface/resume.png'
@@ -165,12 +196,6 @@ class UI(Widget):
         self.greeting_msg = None
         self.context = GameContext
         
-        #self.timer = Timer(self.update_time)
-        #self.clock = Label(text=self.timer.get_formated_time(),
-        #                   pos=(0, 0),
-        #                   font_size = '35dp'
-        #)
-        #self.add_widget(self.clock)
         self.toolbar = ToolBar()
         
         
@@ -301,12 +326,14 @@ class Loader(Widget):
         super(Loader, self).__init__(*args, **kw)
         grass_background(self)
         self.loader_pictures = ['resources/loader/loader-0{}.png'.format(i) for i in xrange(1, 9)]
+        self.percents = 0
     
     def complete_callback(self, dt):
         GameContext.app.switch_to_scene()
         
     def set_progress(self, percents):
-        
+        self.percents = percents
+        print percents
         loader_pic_index = percents / 13
         print percents, loader_pic_index
         self.loader_animation.canvas.children[0].source = self.loader_pictures[loader_pic_index]

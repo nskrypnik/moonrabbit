@@ -1,5 +1,7 @@
 
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
+from animation import set_global_pause, reset_animations
+from resources import load_resources
 
 class _GameContext(object):
     """ Should be singletone """
@@ -15,13 +17,29 @@ class _GameContext(object):
     
     def __init__(self):
         self.app = None
+        self.resources = {}
+        load_resources(self)
         self.reset()
         self.scene_width = BLOCK_SIZE[0]*GAME_AREA_SIZE[0]
         self.scene_height = BLOCK_SIZE[1]*GAME_AREA_SIZE[1]
         
     def reset(self):
+        reset_animations()
+        set_global_pause(False)
         self.space = None
+        if hasattr(self, 'dynamic_objects'):
+            _objs = self.dynamic_objects
+            for obj in _objs:
+                if hasattr(obj, 'stop_animation'):
+                    obj.stop_animation()
+                del obj
         self.dynamic_objects = []
+        if hasattr(self, 'static_objects'):
+            _objs = self.static_objects
+            for obj in _objs:
+                if hasattr(obj, 'stop_animation'):
+                    obj.stop_animation()
+                del obj
         self.static_objects = []
         self._objs = []
         self.characters = []
@@ -30,7 +48,6 @@ class _GameContext(object):
         self.menu = None
         self.loader = None
         self.scene = None
-        self.resources = {}
     
     def add(self, obj):
         

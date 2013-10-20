@@ -18,7 +18,7 @@ from gamecontext import GameContext
 from gameobjects import Rock, Rock2, HeroRabbit, Hare, \
                         Mountain, Wood, Bush, Character, HolyCarrot, Tree
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
-from resources import load_resources, read_map
+from resources import read_map
 from animation import set_global_pause
 
 
@@ -89,7 +89,7 @@ class MoonRabbitGame(Widget):
                        for i in xrange(self.num_of_blocks_X)]
 
         self.init_physics()
-        self.load_resources()
+        #self.load_resources()
         self.setup_scene()
         self.create_bounds()
 
@@ -321,6 +321,8 @@ class MoonRabbitGame(Widget):
         # stop timer
         self.win = win
         Clock.unschedule(self.update)
+        if self.context.ui:
+            self.context.ui.toolbar.disable()
         cb = self.context.app.finish_round
         # fade to black screen and do finish round
         self.context.app.fade_to_black(cb, da=0.03)

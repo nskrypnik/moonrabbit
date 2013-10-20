@@ -146,8 +146,7 @@ class HeroRabbit(Character, AnimationMixin):
         self.animations['swim_rotate_top_r'] = GameContext.resources['animations']['hero_swim_rotate_top_r']
         self.animations['swim_rotate_down'] = GameContext.resources['animations']['hero_swim_rotate_down']
         self.animations['swim_rotate_down_r'] = GameContext.resources['animations']['hero_swim_rotate_down_r']
-        
-        
+
         controller = HeroRabbitController(self)
         super(HeroRabbit, self).__init__(inner_pos, controller,
                                         mass=mass, moment=moment,
