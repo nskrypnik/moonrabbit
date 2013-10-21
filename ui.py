@@ -23,6 +23,10 @@ Builder.load_string('''
 
 <-MsgBox>:
 
+<MsgBox_ButtonsBar>:
+    size_hint: 1, None
+    size: 0, '160dp'
+
 ''')
 
 
@@ -146,7 +150,7 @@ class ToolBar(ScatterPlane):
             _cb = GameContext.app.back_to_menu
             GameContext.app.fade_to_black(_cb)
         msg = MsgBox(text="You are about to go to main menu.\nAre you sure?",
-                     font_size='40dp', type='question', size_hint=(0.8, 0.8),
+                     font_size='40dp', type='question', size_hint=(1, 0.8),
                      buttons_padding='40dp',
                      no_callback=lambda: GameContext.game.resume(self.button_play),
                      yes_callback=_yes_callback

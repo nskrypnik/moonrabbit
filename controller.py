@@ -110,6 +110,21 @@ class BaseCharacterController(BaseController):
         self.swim_mode = False
         self._prev_swim_mode = False
         self.vision = VisionVector((-1, 0), 36)
+        
+        self.vision_vectors = {'l': VisionVector((-1, 0), 36),
+                               'lu': VisionVector((-1, 1), 36),
+                               'u': VisionVector((0, 1), 36),
+                               'ur': VisionVector((1, 1), 36),
+                               'r': VisionVector((1, 0), 36),
+                               'rd': VisionVector((1, -1), 36),
+                               'd': VisionVector((0, -1), 36),
+                               'dl': VisionVector((-1, -1), 36),
+                               }
+        self.vision_sectors = {'l': ('lu', 'dl'),
+                               'u': ('lu', 'ur'),
+                               'r': ('rd', 'ur'),
+                               'd': ('rd', 'dl'),
+                               }
 
         super(BaseCharacterController, self).__init__(*args)
         
@@ -184,10 +199,15 @@ class BaseCharacterController(BaseController):
         # check to avoid loop
         if set(self._failed_directions) == set(self._directions):
             self._failed_directions = [_d, self._prev_direction]
-        
-        print self._failed_directions
+            
+        # define possible direction
+        possible = []
+        for d in ('l', 'u', 'r', 'd'):
+            v = self.vision_vectors[d]
+            if not v.look_from(self.obj.body.position):
+                possible.append(d)
 
-        if self._direction in ('l', 'r'):
+        if _d in ('l', 'r'):
             turn_choices = ('u', 'd') if self._steps_from_last_turning > 10 else \
                 [d for d in ('u', 'd') if d not in self._failed_directions]
             if not turn_choices:
@@ -219,7 +239,8 @@ class BaseCharacterController(BaseController):
         self._prev_direction = _d
         
     def meet_something(self):
-        some = self.vision.look_from(self.obj.body.position)
+        vision = self.vision_vectors[self._direction]
+        some = vision.look_from(self.obj.body.position)
         if some or self.faced:
             if self.meet_callback(some):
                 # if returnse true - this function should make some custom logic
