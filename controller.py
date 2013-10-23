@@ -157,6 +157,8 @@ class BaseCharacterController(BaseController):
         self._path = self.get_path_to_goal()
         if not self._path:
             self._counter = 30
+        else:
+            self.switch_to_moving()
         
     @wait_counter
     def do_turning(self):
