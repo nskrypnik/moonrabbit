@@ -180,7 +180,7 @@ class MoonRabbitGame(Widget):
         with self.canvas:
             # draw or hero
             HeroRabbit(self.block_width/2., self.block_height/2.)
-            Hare(self.block_width*3.5, self.block_height*3.5)
+            #Hare(self.block_width*3.5, self.block_height*3.5)
 
         # init statics
         def _is_mountain(i, j):
@@ -306,7 +306,7 @@ class MoonRabbitGame(Widget):
 
     def load_resources(self):
         # see resources module
-        load_resources()
+        pass
 
     def get_indices_by_coord(self, x, y):
         return int(x) / self.block_width, int(y) / self.block_height

@@ -4,6 +4,8 @@ from physics import phy
 from gamecontext import GameContext
 from settings import HERO_SPEED, OBJECT_MASS, CHARACTER_MASS
 from landscape import Grass, Sand, Water
+from settings import BLOCK_SIZE, GAME_AREA_SIZE
+from utils.astar import AStar, SQ_MapHandler, SQ_Location
 
 def wait_counter(func):
     " Wait counter decorator "
@@ -99,6 +101,7 @@ class BaseCharacterController(BaseController):
 
         self.faced = False
         self._state = 'IDLE'
+        self._path = None # path of the character
         self._counter = 30
         self._direction = 'l'
         self._prev_direction = ''
@@ -151,7 +154,9 @@ class BaseCharacterController(BaseController):
     
     @wait_counter
     def do_idle(self):
-        self.switch_to_moving()
+        self._path = self.get_path_to_goal()
+        if not self._path:
+            self._counter = 30
         
     @wait_counter
     def do_turning(self):
@@ -298,6 +303,8 @@ class BaseCharacterController(BaseController):
 
 class HeroRabbitController(BaseCharacterController):
     
+    MAY_GO_THROUGH = ['HolyCarrot', 'HeroRabbit']
+    
     def __init__(self, *args, **kw):
         super(HeroRabbitController, self).__init__(*args, **kw)
         self._steps_counter = 0
@@ -316,7 +323,42 @@ class HeroRabbitController(BaseCharacterController):
             if some.body.data.__class__.__name__ ==  'HolyCarrot':
                 self.context.game.game_over(win=True)
                 return True
+            
+    def get_goal_obj(self):
+        return GameContext.holy_carrot
 
+    def get_path_to_goal(self):
+        body = phy.Body()
+        shape = phy.Poly.create_box(body, (BLOCK_SIZE[0]-1, BLOCK_SIZE[1]-1))
+        game_map = []
+        dx, dy = BLOCK_SIZE[0] / 2., BLOCK_SIZE[1] / 2. 
+        for y in xrange(GAME_AREA_SIZE[1]):
+            for x in xrange(GAME_AREA_SIZE[0]):
+                body.position = x*BLOCK_SIZE[0] + dx, y*BLOCK_SIZE[1] + dy
+                shape_list = GameContext.space.shape_query(shape)
+                if not shape_list: 
+                    game_map.append(1)
+                else:
+                    rigid = 1
+                    for _s in shape_list:
+                        if hasattr(_s.body, 'data') and not isinstance(_s, phy.Segment) and \
+                            _s.body.data.__class__.__name__ not in self.MAY_GO_THROUGH:
+                            rigid = -1
+                            
+                    game_map.append(rigid)
+        # define start position
+        import ipdb; ipdb.set_trace()
+        astar = AStar(SQ_MapHandler(game_map, GAME_AREA_SIZE[0], GAME_AREA_SIZE[1]))
+        start_pos = self.obj.body.position
+        start_x, start_y = int(start_pos.x) / BLOCK_SIZE[0], int(start_pos.y) / BLOCK_SIZE[1]
+        start = SQ_Location(start_x, start_y)
+        # define end position
+        end_pos = self.get_goal_obj().body.position
+        end_x, end_y = int(end_pos.x) / BLOCK_SIZE[0], int(end_pos.y) / BLOCK_SIZE[1]
+        end = SQ_Location(end_x, end_y)
+        return astar.findPath(start,end) 
+                             
+                
 
 class HareController(BaseCharacterController):
     

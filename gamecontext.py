@@ -48,6 +48,8 @@ class _GameContext(object):
         self.menu = None
         self.loader = None
         self.scene = None
+        self.hero = None
+        self.holy_carrot = None
     
     def add(self, obj):
         

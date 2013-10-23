@@ -310,6 +310,8 @@ class HolyCarrot(StaticBox, AnimationMixin):
         self.set_animation(GameContext.resources['animations']['holy_carrot'])
         super(HolyCarrot, self).__init__(pos=pos, size=texture.size, texture=texture, **kw)
         self.animate(True)
+        
+        GameContext.holy_carrot = self
 
 
 class Tree(StaticBox, AnimationMixin):
