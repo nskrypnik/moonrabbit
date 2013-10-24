@@ -1,4 +1,5 @@
 import random
+import math
 from kivy.clock import Clock
 from physics import phy
 from gamecontext import GameContext
@@ -102,11 +103,14 @@ class BaseCharacterController(BaseController):
         self.faced = False
         self._state = 'IDLE'
         self._path = None # path of the character
+        self.check_points = []
+        self.next_point = None
+        self.speed = HERO_SPEED
         self._counter = 30
+        
         self._direction = 'l'
         self._prev_direction = ''
-        self._failed_directions = []
-        self._steps_from_last_turning = 0
+
         self._directions = ['l', 'u', 'r', 'd']
         self._dir_opposites = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
         self._dir_vectors = {'l': (-1, 0), 'u': (0, 1), 'r': (1, 0), 'd': (0, -1)}
@@ -140,13 +144,82 @@ class BaseCharacterController(BaseController):
     
     def __call__(self):
         # check if we are in swim mode
-        pos = self.obj.body.position 
+        pos = self.obj.body.position
         block = self.context.game.get_block(pos.x, pos.y)
         if isinstance(block, Water):
             self.swim_mode = True 
         else:
             self.swim_mode = False
         super(BaseCharacterController, self).__call__()
+    
+    def get_path_to_goal(self):
+        body = phy.Body()
+        shape = phy.Poly.create_box(body, (BLOCK_SIZE[0]-1, BLOCK_SIZE[1]-1))
+        game_map = []
+        dx, dy = BLOCK_SIZE[0] / 2., BLOCK_SIZE[1] / 2. 
+        for y in xrange(GAME_AREA_SIZE[1]):
+            for x in xrange(GAME_AREA_SIZE[0]):
+                body.position = x*BLOCK_SIZE[0] + dx, y*BLOCK_SIZE[1] + dy
+                shape_list = GameContext.space.shape_query(shape)
+                if not shape_list: 
+                    game_map.append(1)
+                else:
+                    rigid = 1
+                    for _s in shape_list:
+                        if hasattr(_s.body, 'data') and not isinstance(_s, (phy.Segment)) and \
+                            _s.body.data.__class__.__name__ not in self.MAY_GO_THROUGH:
+                            rigid = -1
+                            
+                    game_map.append(rigid)
+        # define start position
+        start_pos = self.obj.body.position
+        start_x, start_y = int(start_pos.x) / BLOCK_SIZE[0], int(start_pos.y) / BLOCK_SIZE[1]
+        start = SQ_Location(start_x, start_y)
+        # define end position
+        game_map[GAME_AREA_SIZE[0]*start_y + start_x] = 1
+        end_pos = self.get_goal_obj().body.position
+        end_x, end_y = int(end_pos.x) / BLOCK_SIZE[0], int(end_pos.y) / BLOCK_SIZE[1]
+        end = SQ_Location(end_x, end_y)
+        game_map[GAME_AREA_SIZE[0]*end_y + end_x] = 1
+        astar = AStar(SQ_MapHandler(game_map, GAME_AREA_SIZE[0], GAME_AREA_SIZE[1]))
+        return astar.findPath(start,end)
+    
+    def load_path(self):
+        self.check_points = [] # reset check point
+        self.next_point = None
+        start_pos = self.obj.body.position
+        start_x, start_y = int(start_pos.x) / BLOCK_SIZE[0], int(start_pos.y) / BLOCK_SIZE[1]
+        _prev_point = (start_x, start_y)
+        start_x, start_y = (start_x + 0.5)*BLOCK_SIZE[0], (start_y + 0.5)*BLOCK_SIZE[1]
+        # Adjust way to start point
+        if (math.fabs(start_pos.x - start_x)) > .1 or (math.fabs(start_pos.y != start_y)) > .1:
+            # we should add instructions how to reach start point
+            if (math.fabs(start_pos.x - start_x)) > .1:
+                point = (start_x, start_pos.y)
+                if start_pos.x > start_x:
+                    d = 'l'
+                else:
+                    d = 'r'
+                self.check_points.insert(0, (d, point))
+            if (math.fabs(start_pos.y - start_y)) > .1:
+                point = (start_x, start_y)
+                if start_pos.y > start_y:
+                    d = 'd'
+                else:
+                    d = 'u'
+                self.check_points.insert(0, (d, point))
+        node = self._path.get_next_node()
+        while node:
+            x, y = node.location.x, node.location.y
+            px, py = _prev_point
+            if x == px:
+                d = 'u' if py < y else 'd'
+            if y == py:
+                d = 'r' if px < x else 'l'
+            _prev_point = x, y
+            x, y = (x + 0.5)*BLOCK_SIZE[0], (y + 0.5)*BLOCK_SIZE[1]
+            self.check_points.insert(0, (d, (x, y)))
+            node = self._path.get_next_node()
     
     @property
     def _dir_opposite(self):
@@ -156,30 +229,40 @@ class BaseCharacterController(BaseController):
     def do_idle(self):
         self._path = self.get_path_to_goal()
         if not self._path:
-            self._counter = 30
+            # can't define map stay in this position
+            self._counter = 15
         else:
+            self.load_path()
             self.switch_to_moving()
         
     @wait_counter
     def do_turning(self):
         # check first after turning if current directions is avaliable
-        if self.meet_something():
-            return
+        #if self.meet_something():
+        #    return
         self.switch_to_moving()
         
     def do_moving(self):
-        
-        self._steps_from_last_turning += 1
-        if self._steps_from_last_turning > 10:
-            # clear failled directions
-            self._failed_directions = []
-            self._failed_directions.append(self._dir_opposite)
-        if self._prev_swim_mode != self.swim_mode:
-            self.set_run_animation()
-            self._prev_swim_mode = self.swim_mode
         if self.meet_something():
             return
-        self.obj.body.velocity = self.define_velocity()
+        # update body position
+        pos = self.obj.body.position
+        d, point = self.next_point
+        v = self._dir_vectors[self._direction]
+        self.speed = self.define_velocity()
+        
+        if (self._direction in ('l', 'r') and math.fabs(pos.x - point[0]) < self.speed):
+            self.speed = math.fabs(pos.x - point[0])
+        if (self._direction in ('u', 'd') and math.fabs(pos.y - point[1]) < self.speed):
+            self.speed = math.fabs(pos.y - point[1])
+        
+        self.obj.body.position = pos.x + v[0]*self.speed, pos.y + v[1]*self.speed
+        
+        pos = self.obj.body.position
+        if (math.fabs(pos.x - point[0]) < .1) and (math.fabs(pos.y - point[1]) < .1):
+            # if reached check point
+            self.next_point = None
+            self.switch_to_moving()
     
     def switch_animation(self, animation, endless=False):
         #if self._state == 'SAWING':
@@ -188,8 +271,25 @@ class BaseCharacterController(BaseController):
         self.obj.animate(endless=endless)
     
     def switch_to_moving(self):
-        self.set_run_animation()
-        self.set_state('MOVING')
+        #import ipdb; ipdb.set_trace()
+        if not self.next_point:
+            if self.check_points:
+                self.next_point = self.check_points.pop()
+            else:
+                self.switch_animation('idle', True)
+                self.set_state('IDLE', 15)
+                return
+        
+        d = self.next_point[0]
+        
+        if self._direction != d:
+            self.stop()
+            self.switch_to_turning(d)
+        else:
+            if self._prev_direction != self._direction:
+                self.set_run_animation()
+                self._prev_direction = self._direction
+            self.set_state('MOVING')
     
     def set_run_animation(self):
         animation = 'run' if self._direction in ('l', 'r')\
@@ -199,51 +299,28 @@ class BaseCharacterController(BaseController):
             animation = animation.replace('run', 'swim')
         self.switch_animation(animation, True)
         
-    def switch_to_turning(self):
+    def switch_to_turning(self, d):
         # current dirrection is bad
-        _d = self._direction
-        self._failed_directions.append(_d)
-        # check to avoid loop
-        if set(self._failed_directions) == set(self._directions):
-            self._failed_directions = [_d, self._prev_direction]
+        if d == self._dir_opposite:
+            choices = set(self._directions) - set([d, self._direction])
+            d = random.choice(list(choices))
             
-        # define possible direction
-        possible = []
-        for d in ('l', 'u', 'r', 'd'):
-            v = self.vision_vectors[d]
-            if not v.look_from(self.obj.body.position):
-                possible.append(d)
-
-        if _d in ('l', 'r'):
-            turn_choices = ('u', 'd') if self._steps_from_last_turning > 10 else \
-                [d for d in ('u', 'd') if d not in self._failed_directions]
-            if not turn_choices:
-                self._direction = self._prev_direction
-            else:
-                self._direction = random.choice(turn_choices)
-            animation = {'u': 'rotate_top', 'd': 'rotate_down'}[self._direction]
+        if self._direction in ('l', 'r'):
+            animation = {'u': 'rotate_top', 'd': 'rotate_down'}[d]
         else:
             animation = {'u': 'rotate_top_r', 'd': 'rotate_down_r'}[self._direction]
-            turn_choices = ('l', 'r') if self._steps_from_last_turning > 10 else \
-                [d for d in ('l', 'r') if d not in self._failed_directions]
-            if not turn_choices:
-                self._direction = self._prev_direction
-            else:
-                self._direction = random.choice(turn_choices)
+        
+        self._prev_direction = self._direction
+        self._direction = d
         
         if self._direction == 'r' and not self.obj.h_flipped \
                 or self._direction == 'l' and self.obj.h_flipped:
             self.obj.flip_h()
         
-        self.vision.set_direction(self._dir_vectors[self._direction])
-        
         if self.swim_mode:
             animation = "swim_%s" % animation
         self.switch_animation(animation)
         self.set_state('TURNING', 15)
-
-        self._steps_from_last_turning = 0
-        self._prev_direction = _d
         
     def meet_something(self):
         vision = self.vision_vectors[self._direction]
@@ -254,7 +331,9 @@ class BaseCharacterController(BaseController):
                 return True
             self.stop()
             self.faced = False
-            self.switch_to_turning()
+            #self.switch_to_moving()
+            self.set_state('IDLE', 10)
+            self.switch_animation('idle', True)
             return True
         return False
     
@@ -266,12 +345,11 @@ class BaseCharacterController(BaseController):
         SPEED = HERO_SPEED
         
         # define landscape type where we are
-        pos = self.obj.body.position 
+        pos = self.obj.body.position
         block = self.context.game.get_block(pos.x, pos.y)
         SPEED *= block.velocity_coefficient
         
-        v = self._dir_vectors[self._direction]
-        return v[0]*SPEED, v[1]*SPEED
+        return SPEED
     
     def handle_collision(self, arbiter):
         """ Implement handle of object collision here """
@@ -293,7 +371,6 @@ class BaseCharacterController(BaseController):
             if y:
                 if self.obj.body.position.y*y > other.position.y*y:
                     return
-
         if arbiter.total_ke > OBJECT_MASS:
             self.faced = True
         
@@ -328,38 +405,6 @@ class HeroRabbitController(BaseCharacterController):
             
     def get_goal_obj(self):
         return GameContext.holy_carrot
-
-    def get_path_to_goal(self):
-        body = phy.Body()
-        shape = phy.Poly.create_box(body, (BLOCK_SIZE[0]-1, BLOCK_SIZE[1]-1))
-        game_map = []
-        dx, dy = BLOCK_SIZE[0] / 2., BLOCK_SIZE[1] / 2. 
-        for y in xrange(GAME_AREA_SIZE[1]):
-            for x in xrange(GAME_AREA_SIZE[0]):
-                body.position = x*BLOCK_SIZE[0] + dx, y*BLOCK_SIZE[1] + dy
-                shape_list = GameContext.space.shape_query(shape)
-                if not shape_list: 
-                    game_map.append(1)
-                else:
-                    rigid = 1
-                    for _s in shape_list:
-                        if hasattr(_s.body, 'data') and not isinstance(_s, phy.Segment) and \
-                            _s.body.data.__class__.__name__ not in self.MAY_GO_THROUGH:
-                            rigid = -1
-                            
-                    game_map.append(rigid)
-        # define start position
-        import ipdb; ipdb.set_trace()
-        astar = AStar(SQ_MapHandler(game_map, GAME_AREA_SIZE[0], GAME_AREA_SIZE[1]))
-        start_pos = self.obj.body.position
-        start_x, start_y = int(start_pos.x) / BLOCK_SIZE[0], int(start_pos.y) / BLOCK_SIZE[1]
-        start = SQ_Location(start_x, start_y)
-        # define end position
-        end_pos = self.get_goal_obj().body.position
-        end_x, end_y = int(end_pos.x) / BLOCK_SIZE[0], int(end_pos.y) / BLOCK_SIZE[1]
-        end = SQ_Location(end_x, end_y)
-        return astar.findPath(start,end) 
-                             
                 
 
 class HareController(BaseCharacterController):
@@ -426,8 +471,7 @@ class HareController(BaseCharacterController):
         else:
             SPEED *= block.velocity_coefficient
         
-        v = self._dir_vectors[self._direction]
-        return v[0]*SPEED, v[1]*SPEED
+        return SPEED
     
     def handle_collision(self, arbiter):
         obj = super(HareController, self).handle_collision(arbiter)

@@ -272,7 +272,7 @@ class MoonRabbitGame(Widget):
         
         self._touches.append(touch)
         shape = self.context.space.point_query_first(phy.Vec2d(touch.x, touch.y))
-        print shape
+        print shape, int(touch.x) / 72, int(touch.y) / 72  
         
         # drag logic here
         if shape and shape.body.data.draggable:
