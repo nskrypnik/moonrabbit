@@ -108,7 +108,7 @@ class BaseCharacterController(BaseController):
         self.check_points = []
         self.next_point = None
         self.speed = HERO_SPEED
-        self._counter = 30
+        self._counter = 40 # delay on the begin of round
         
         self._direction = 'l'
         self._prev_direction = ''
@@ -393,7 +393,7 @@ class HeroRabbitController(BaseCharacterController):
 class HareController(BaseCharacterController):
     
     MAY_GO_THROUGH = ['Tree', 'Hare']
-    IDLE_TIME = 5
+    IDLE_TIME = 0
     
     _sawing_steps = 0
     
