@@ -216,8 +216,8 @@ class MoonRabbitGame(Widget):
                         _mountains.append((pos, _get_mountain_type(i, j)))
                         #Mountain(*pos, type=_get_mountain_type(i, j))
                         
-        Tree(self.block_width*1.5, self.block_height*3.5)
-        Tree(self.block_width*3.5, self.block_height*2.5)
+        Tree(self.block_width*1.5, self.block_height*1.5)
+        #Tree(self.block_width*3.5, self.block_height*2.5)
         
         with self.canvas:
             for pos in _bushes:

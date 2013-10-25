@@ -120,10 +120,10 @@ class BaseCharacterController(BaseController):
         self._prev_swim_mode = False
         self.vision = VisionVector((-1, 0), 36)
         
-        self.vision_vectors = {'l': VisionVector((-1, 0), 36),
-                               'u': VisionVector((0, 1), 36),
-                               'r': VisionVector((1, 0), 36),
-                               'd': VisionVector((0, -1), 36),
+        self.vision_vectors = {'l': VisionVector((-1, 0), BLOCK_SIZE[0]),
+                               'u': VisionVector((0, 1), BLOCK_SIZE[1]),
+                               'r': VisionVector((1, 0), BLOCK_SIZE[0]),
+                               'd': VisionVector((0, -1), BLOCK_SIZE[1]),
                                }
 
         super(BaseCharacterController, self).__init__(*args)
@@ -397,6 +397,15 @@ class HareController(BaseCharacterController):
     
     _sawing_steps = 0
     
+    def __call__(self):
+        hero_pos = GameContext.hero.body.position
+        pos = self.obj.body.position
+        if (math.fabs(pos.x - hero_pos.x) < 1. and  math.fabs(pos.y - hero_pos.y) <= BLOCK_SIZE[1] + 1.) or \
+             (math.fabs(pos.y - hero_pos.y) < 1. and  math.fabs(pos.x - hero_pos.x) <= BLOCK_SIZE[0] + 1.):
+            self.kill_rabbit() 
+            return
+        super(HareController, self).__call__()
+    
     def get_goal_obj(self):
         return GameContext.hero
     
@@ -411,6 +420,31 @@ class HareController(BaseCharacterController):
                 self.saw_the_tree(some.body.data)
                 return True
             
+    def kill_rabbit(self):
+        hero_pos = GameContext.hero.body.position
+        pos = self.obj.body.position
+        d = ''
+        if (math.fabs(pos.x - hero_pos.x) < 1. and  math.fabs(pos.y - hero_pos.y) <= BLOCK_SIZE[1] + 1.):
+            # left or right
+            if pos.y > hero_pos.y:
+                d = 'd'
+            else:
+                d = 'u'
+        if (math.fabs(pos.y - hero_pos.y) < 1. and  math.fabs(pos.x - hero_pos.x) <= BLOCK_SIZE[0] + 1.):
+            if pos.x > hero_pos.x:
+                d = 'l'
+            else:
+                d = 'r'
+        animation = 'rage_run' if d in ('l', 'r')\
+                        else 'rage_run_up' if d == 'u'\
+                        else 'rage_run_down'
+        if d == 'r' and not self.obj.h_flipped \
+                or d == 'l' and self.obj.h_flipped:
+            self.obj.flip_h()
+        self.switch_animation(animation, True)
+        
+        GameContext.game.game_over(win=False)
+        
     def switch_to_sawing(self, d=None):
         if not d:
             d = self._direction
@@ -443,19 +477,6 @@ class HareController(BaseCharacterController):
             if d == self._direction and self.meet_something():
                 return
         self.switch_to_moving()
-    
-    def meet_something(self):
-        viewed = []
-        for d, v in self.vision_vectors.iteritems():
-            some = v.look_from(self.obj.body.position)
-            if some:
-                viewed.append((d, some))
-        for d, some in viewed:
-            if some.body.data.__class__.__name__ ==  'HeroRabbit':
-                self.switch_to_sawing(d)
-                self.context.game.game_over(win=False, text="Rabbit was sawn by Hare")
-                return True
-        return super(HareController, self).meet_something()
     
     def saw_the_tree(self, tree):
         #tree.destroy()
