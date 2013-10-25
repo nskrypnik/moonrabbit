@@ -1,6 +1,6 @@
 
 """ Here should be Game objects, based on Physical objects """
-
+import math
 from kivy.graphics import VertexInstruction, Rectangle, Color
 from kivy.uix.scatter import ScatterPlane
 from kivy.graphics import Rectangle, Color, Ellipse
@@ -357,6 +357,10 @@ class Tree(StaticBox, AnimationMixin):
             self.animation_callback = self.start_grow_deffered()
             self.animate()
             GameContext.game.move_to_bottom(self)
-            
     
-    
+    def widget_factory(self):
+        t_pos = self.pos
+        self.pos = self.pos[0], self.pos[1] + 18
+        widget = super(Tree, self).widget_factory()
+        self.pos = t_pos
+        return widget

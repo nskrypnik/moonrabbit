@@ -216,8 +216,7 @@ class MoonRabbitGame(Widget):
                         _mountains.append((pos, _get_mountain_type(i, j)))
                         #Mountain(*pos, type=_get_mountain_type(i, j))
                         
-        Tree(self.block_width*1.5, self.block_height*1.5)
-        #Tree(self.block_width*3.5, self.block_height*2.5)
+        Tree(self.block_width*2.5, self.block_height*1.5)
         
         with self.canvas:
             for pos in _bushes:
@@ -342,8 +341,10 @@ class MoonRabbitGame(Widget):
     def plant_a_tree(self, touch):
         can_plant_tree = True
         body = phy.Body()
-        body.position = (touch.x, touch.y)
-        shape = phy.Poly.create_box(body, BLOCK_SIZE)
+        game_pos = int(touch.x) / BLOCK_SIZE[0], int(touch.y) / BLOCK_SIZE[1]
+        x, y = (game_pos[0] + 0.5)*BLOCK_SIZE[0], (game_pos[1] + 0.5)*BLOCK_SIZE[1]
+        body.position = (x, y)
+        shape = phy.Poly.create_box(body, (BLOCK_SIZE[0] - 1., BLOCK_SIZE[1] - 1.))
         shape_list = self.space.shape_query(shape)
         if shape_list:
             # can't place the tree cause it's close to other objects
@@ -365,7 +366,7 @@ class MoonRabbitGame(Widget):
             can_plant_tree = False
         
         if can_plant_tree:
-            Tree(touch.x, touch.y, growing=True)
+            Tree(x, y, growing=True)
             self.trees_count -= 1
             self.reindex_graphics()
                     
