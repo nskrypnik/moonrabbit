@@ -180,7 +180,7 @@ class MoonRabbitGame(Widget):
         with self.canvas:
             # draw or hero
             HeroRabbit(self.block_width/2., self.block_height/2.)
-            #Hare(self.block_width*3.5, self.block_height*3.5)
+            Hare(self.block_width*3.5, self.block_height*3.5)
 
         # init statics
         def _is_mountain(i, j):
@@ -217,6 +217,7 @@ class MoonRabbitGame(Widget):
                         #Mountain(*pos, type=_get_mountain_type(i, j))
                         
         Tree(self.block_width*1.5, self.block_height*3.5)
+        Tree(self.block_width*3.5, self.block_height*2.5)
         
         with self.canvas:
             for pos in _bushes:

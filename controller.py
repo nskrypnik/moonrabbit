@@ -99,6 +99,8 @@ class BaseCharacterController(BaseController):
     """ This is the controller for main Rabbit character """
         
     def __init__(self, *args):
+        
+        IDLE_TIME = 15
 
         self.faced = False
         self._state = 'IDLE'
@@ -119,18 +121,9 @@ class BaseCharacterController(BaseController):
         self.vision = VisionVector((-1, 0), 36)
         
         self.vision_vectors = {'l': VisionVector((-1, 0), 36),
-                               'lu': VisionVector((-1, 1), 36),
                                'u': VisionVector((0, 1), 36),
-                               'ur': VisionVector((1, 1), 36),
                                'r': VisionVector((1, 0), 36),
-                               'rd': VisionVector((1, -1), 36),
                                'd': VisionVector((0, -1), 36),
-                               'dl': VisionVector((-1, -1), 36),
-                               }
-        self.vision_sectors = {'l': ('lu', 'dl'),
-                               'u': ('lu', 'ur'),
-                               'r': ('rd', 'ur'),
-                               'd': ('rd', 'dl'),
                                }
 
         super(BaseCharacterController, self).__init__(*args)
@@ -146,8 +139,9 @@ class BaseCharacterController(BaseController):
         # check if we are in swim mode
         pos = self.obj.body.position
         block = self.context.game.get_block(pos.x, pos.y)
+        self._prev_swim_mode = self.swim_mode
         if isinstance(block, Water):
-            self.swim_mode = True 
+            self.swim_mode = True
         else:
             self.swim_mode = False
         super(BaseCharacterController, self).__call__()
@@ -190,27 +184,9 @@ class BaseCharacterController(BaseController):
         start_pos = self.obj.body.position
         start_x, start_y = int(start_pos.x) / BLOCK_SIZE[0], int(start_pos.y) / BLOCK_SIZE[1]
         _prev_point = (start_x, start_y)
-        start_x, start_y = (start_x + 0.5)*BLOCK_SIZE[0], (start_y + 0.5)*BLOCK_SIZE[1]
-        # Adjust way to start point
-        if (math.fabs(start_pos.x - start_x)) > .1 or (math.fabs(start_pos.y != start_y)) > .1:
-            # we should add instructions how to reach start point
-            if (math.fabs(start_pos.x - start_x)) > .1:
-                point = (start_x, start_pos.y)
-                if start_pos.x > start_x:
-                    d = 'l'
-                else:
-                    d = 'r'
-                self.check_points.insert(0, (d, point))
-            if (math.fabs(start_pos.y - start_y)) > .1:
-                point = (start_x, start_y)
-                if start_pos.y > start_y:
-                    d = 'd'
-                else:
-                    d = 'u'
-                self.check_points.insert(0, (d, point))
         node = self._path.get_next_node()
         while node:
-            x, y = node.location.x, node.location.y
+            x, y = node.location.x, node    .location.y
             px, py = _prev_point
             if x == px:
                 d = 'u' if py < y else 'd'
@@ -243,8 +219,6 @@ class BaseCharacterController(BaseController):
         self.switch_to_moving()
         
     def do_moving(self):
-        if self.meet_something():
-            return
         # update body position
         pos = self.obj.body.position
         d, point = self.next_point
@@ -258,9 +232,14 @@ class BaseCharacterController(BaseController):
         
         self.obj.body.position = pos.x + v[0]*self.speed, pos.y + v[1]*self.speed
         
+        if self._prev_swim_mode != self.swim_mode:
+            self.set_run_animation()
+        
         pos = self.obj.body.position
         if (math.fabs(pos.x - point[0]) < .1) and (math.fabs(pos.y - point[1]) < .1):
             # if reached check point
+            if self.meet_something():
+                return
             self.next_point = None
             self.switch_to_moving()
     
@@ -271,7 +250,6 @@ class BaseCharacterController(BaseController):
         self.obj.animate(endless=endless)
     
     def switch_to_moving(self):
-        #import ipdb; ipdb.set_trace()
         if not self.next_point:
             if self.check_points:
                 self.next_point = self.check_points.pop()
@@ -286,9 +264,7 @@ class BaseCharacterController(BaseController):
             self.stop()
             self.switch_to_turning(d)
         else:
-            if self._prev_direction != self._direction:
-                self.set_run_animation()
-                self._prev_direction = self._direction
+            self.set_run_animation()
             self.set_state('MOVING')
     
     def set_run_animation(self):
@@ -297,7 +273,8 @@ class BaseCharacterController(BaseController):
                         else 'run_down'
         if self.swim_mode:
             animation = animation.replace('run', 'swim')
-        self.switch_animation(animation, True)
+        if self.obj.animations[animation] != self.obj.current_animation:
+            self.switch_animation(animation, True)
         
     def switch_to_turning(self, d):
         # current dirrection is bad
@@ -321,7 +298,7 @@ class BaseCharacterController(BaseController):
             animation = "swim_%s" % animation
         self.switch_animation(animation)
         self.set_state('TURNING', 15)
-        
+
     def meet_something(self):
         vision = self.vision_vectors[self._direction]
         some = vision.look_from(self.obj.body.position)
@@ -332,8 +309,12 @@ class BaseCharacterController(BaseController):
             self.stop()
             self.faced = False
             #self.switch_to_moving()
-            self.set_state('IDLE', 10)
-            self.switch_animation('idle', True)
+            self.set_state('IDLE', self.IDLE_TIME)
+            if self.swim_mode:
+                animation = 'swim_idle'
+            else:
+                animation = 'idle'
+            self.switch_animation(animation, True)
             return True
         return False
     
@@ -382,6 +363,8 @@ class BaseCharacterController(BaseController):
 
 class HeroRabbitController(BaseCharacterController):
     
+    IDLE_TIME = 15
+    
     MAY_GO_THROUGH = ['HolyCarrot', 'HeroRabbit']
     
     def __init__(self, *args, **kw):
@@ -409,54 +392,74 @@ class HeroRabbitController(BaseCharacterController):
 
 class HareController(BaseCharacterController):
     
+    MAY_GO_THROUGH = ['Tree', 'Hare']
+    IDLE_TIME = 5
+    
     _sawing_steps = 0
+    
+    def get_goal_obj(self):
+        return GameContext.hero
     
     def __init__(self, *args, **kw):
         super(HareController, self).__init__(*args, **kw)
         self._state_handlers['SAWING'] = self.do_sawing
-        self.tree_vision = VisionVector((-1, 0), 54)
-        
+        self._sawn_tree = None
     
     def meet_callback(self, some):
         if hasattr(some, 'body'):
-            if some.body.data.__class__.__name__ ==  'HeroRabbit':
-                self.switch_to_sawing()
-                self.context.game.game_over(win=False, text="Rabbit was sawn by Hare")
+            if some.body.data.__class__.__name__ ==  'Tree':
+                self.saw_the_tree(some.body.data)
                 return True
             
-    def switch_to_sawing(self):
+    def switch_to_sawing(self, d=None):
+        if not d:
+            d = self._direction
         self._sawing_steps = 0
-        animation = 'rage_run' if self._direction in ('l', 'r')\
-                        else 'rage_run_up' if self._direction == 'u'\
+        animation = 'rage_run' if d in ('l', 'r')\
+                        else 'rage_run_up' if d == 'u'\
                         else 'rage_run_down'
         self.switch_animation(animation, True)
-        self.set_state('SAWING')
+        self.set_state('SAWING', 15)
+        pos = self._sawn_tree.body.position
+        self.next_point = self._direction, (pos.x, pos.y)
+        self.check_points = []
         
-    def switch_to_turning(self):
-        super(HareController, self).switch_to_turning()
-        self.tree_vision.set_direction(self._dir_vectors[self._direction])
-    
+    @wait_counter
     def do_sawing(self):
         # almost same as do moving
-        if self._sawing_steps > 45:
-            self.switch_to_moving()
-        if self.meet_something():
-            return
-        v = self._dir_vectors[self._direction]
-        speed = HERO_SPEED * 0.5
-        self.obj.body.velocity = v[0]*speed, v[1]*speed
-        self._sawing_steps += 1
+        # move to tree position
+        
+        self._sawn_tree.destroy()
+        self.do_moving()
+        if self._state != 'SAWING':
+            # state was changed during moving
+            self._sawn_tree = None
+            
+    @wait_counter
+    def do_turning(self):
+        # check first after turning if current directions is avaliable
+        if self.next_point:
+            d, p = self.next_point
+            if d == self._direction and self.meet_something():
+                return
+        self.switch_to_moving()
     
     def meet_something(self):
-        some = self.tree_vision.look_from(self.obj.body.position)
-        if some:
-            if hasattr(some, 'body') and some.body.data.__class__.__name__ ==  'Tree':
-                self.saw_the_tree(some.body.data)
+        viewed = []
+        for d, v in self.vision_vectors.iteritems():
+            some = v.look_from(self.obj.body.position)
+            if some:
+                viewed.append((d, some))
+        for d, some in viewed:
+            if some.body.data.__class__.__name__ ==  'HeroRabbit':
+                self.switch_to_sawing(d)
+                self.context.game.game_over(win=False, text="Rabbit was sawn by Hare")
                 return True
         return super(HareController, self).meet_something()
     
     def saw_the_tree(self, tree):
-        tree.destroy()
+        #tree.destroy()
+        self._sawn_tree = tree
         self.switch_to_sawing()
 
     def define_velocity(self):
@@ -475,9 +478,23 @@ class HareController(BaseCharacterController):
     
     def handle_collision(self, arbiter):
         obj = super(HareController, self).handle_collision(arbiter)
+        return
         if hasattr(obj, 'data') and obj.data.__class__.__name__ == 'Tree':
             # if Hare faced tree - saw it
             Clock.schedule_once(obj.data.destroy, -1)
             self.switch_to_sawing()
             self.faced = False
+    
+    def switch_to_moving(self):
+        self._path = self.get_path_to_goal()
+        if not self._path:
+            self.set_state('IDLE', self.IDLE_TIME)
+            if self.swim_mode:
+                animation = 'swim_idle'
+            else:
+                animation = 'idle'
+            self.switch_animation(animation, True)
+            return
+        self.load_path()
+        super(HareController, self).switch_to_moving()
             

@@ -178,6 +178,14 @@ def load_resources(context):
     frames = []
     frame_time = 0.25  # sec
     for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-idle-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hero_swim_idle'] = SimpleAnimation(frames)
+    
+    # hero swim run side
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
         texture = Image(join(RESOURCES_DIR, 'hero/hero-swim-run-side-0{}.png'.format(i))).texture
         frames.append((texture, frame_time))
     animations['hero_swim'] = SimpleAnimation(frames)
@@ -298,7 +306,15 @@ def load_resources(context):
     ##########################################################################
     # Hare swim animations goes here
     ##########################################################################
-    
+
+    # hero swim run side
+    frames = []
+    frame_time = 0.25  # sec
+    for i in xrange(1, 3):
+        texture = Image(join(RESOURCES_DIR, 'hare/hare-swim-idle-side-0{}.png'.format(i))).texture
+        frames.append((texture, frame_time))
+    animations['hare_swim_idle'] = SimpleAnimation(frames)
+
     # hare swim run side
     frames = []
     frame_time = 0.25  # sec

@@ -139,6 +139,7 @@ class HeroRabbit(Character, AnimationMixin):
         self.animations['rotate_down_r'] = GameContext.resources['animations']['hero_rotate_down_r']
         
         # hero swim animations
+        self.animations['swim_idle'] = GameContext.resources['animations']['hero_swim_idle']
         self.animations['swim'] = GameContext.resources['animations']['hero_swim']
         self.animations['swim_down'] = GameContext.resources['animations']['hero_swim_down']
         self.animations['swim_up'] = GameContext.resources['animations']['hero_swim_up']
@@ -187,6 +188,7 @@ class Hare(Character, AnimationMixin):
         self.animations['rotate_down_r'] = GameContext.resources['animations']['hare_rotate_down_r']
         
         # hare swim animations
+        self.animations['swim_idle'] = GameContext.resources['animations']['hare_swim_idle']
         self.animations['swim'] = GameContext.resources['animations']['hare_swim']
         self.animations['swim_down'] = GameContext.resources['animations']['hare_swim_down']
         self.animations['swim_up'] = GameContext.resources['animations']['hare_swim_up']
@@ -319,8 +321,7 @@ class Tree(StaticBox, AnimationMixin):
     restore_original = False
     
     def define_shape(self):
-        vertices = [(0, 0), (0, 50), (50, 50), (50, 0)]
-        self.shape = phy.Poly(self.body, vertices, offset=(-35, -50))
+        self.shape = phy.Poly.create_box(self.body, BLOCK_SIZE)
     
     def __init__(self, *pos, **kw):
         growing = kw.pop('growing', False)
