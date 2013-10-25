@@ -108,7 +108,8 @@ class BaseCharacterController(BaseController):
         self.check_points = []
         self.next_point = None
         self.speed = HERO_SPEED
-        self._counter = 40 # delay on the begin of round
+        # TODO: delay on inner state may be generic
+        self._counter = 50 # delay on the begin of round
         
         self._direction = 'l'
         self._prev_direction = ''
@@ -484,14 +485,14 @@ class HareController(BaseCharacterController):
         self.switch_to_sawing()
 
     def define_velocity(self):
-        SPEED = HERO_SPEED
+        SPEED = HERO_SPEED*1.5
         
         # define landscape type where we are
         pos = self.obj.body.position 
         block = self.context.game.get_block(pos.x, pos.y)
         if isinstance(block, Water):
             # hardcoded value for speed on water for Hare
-            SPEED = HERO_SPEED*0.5
+            SPEED *= 0.5
         else:
             SPEED *= block.velocity_coefficient
         
