@@ -251,6 +251,17 @@ class BaseCharacterController(BaseController):
         self.obj.animate(endless=endless)
     
     def switch_to_moving(self):
+        self._path = self.get_path_to_goal()
+        if not self._path:
+            self.set_state('IDLE', self.IDLE_TIME)
+            if self.swim_mode:
+                animation = 'swim_idle'
+            else:
+                animation = 'idle'
+            self.switch_animation(animation, True)
+            return
+        self.load_path()
+        
         if not self.next_point:
             if self.check_points:
                 self.next_point = self.check_points.pop()
@@ -454,7 +465,7 @@ class HareController(BaseCharacterController):
                         else 'rage_run_up' if d == 'u'\
                         else 'rage_run_down'
         self.switch_animation(animation, True)
-        self.set_state('SAWING', 15)
+        self.set_state('SAWING', 20)
         pos = self._sawn_tree.body.position
         self.next_point = self._direction, (pos.x, pos.y)
         self.check_points = []
@@ -506,17 +517,7 @@ class HareController(BaseCharacterController):
             Clock.schedule_once(obj.data.destroy, -1)
             self.switch_to_sawing()
             self.faced = False
-    
+            
     def switch_to_moving(self):
-        self._path = self.get_path_to_goal()
-        if not self._path:
-            self.set_state('IDLE', self.IDLE_TIME)
-            if self.swim_mode:
-                animation = 'swim_idle'
-            else:
-                animation = 'idle'
-            self.switch_animation(animation, True)
-            return
-        self.load_path()
         super(HareController, self).switch_to_moving()
             

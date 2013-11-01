@@ -337,6 +337,8 @@ class Tree(StaticBox, AnimationMixin):
             
     def start_grow(self, *largs):
         
+        # first check if there's no something upen the root
+        # TODO: make checking and other stuff
         self.space.add(self.shape)
         self._destroyed = False
         self.set_animation('grow', True)

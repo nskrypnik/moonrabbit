@@ -118,7 +118,7 @@ class ToolBar(ScatterPlane):
         
         anchor_center = AnchorLayout(anchor_x='center', anchor_y="bottom", size_hint=(None, None),
                                      size=(Window.width, '%sdp' % self._height))
-        steps = Label(text="STEPS:0", font_size="44dp") #, font_name="resources/Intro.otf")
+        steps = Label(text="STEPS:0", font_size="34dp", font_name='resources/Intro.ttf') #, font_name="resources/Intro.ttf")
         self.steps = steps
         anchor_center.add_widget(steps)
         
@@ -266,6 +266,7 @@ class MenuItem(Label):
     
     def __init__(self, *args, **kw):
         kw.setdefault('font_size', '30dp')
+        kw.setdefault('font_name', 'resources/Intro.ttf')
         kw.setdefault('size_hint', (None, None))
         kw.setdefault('size', ('300dp', '45dp'))
         kw.setdefault('bold', True)
@@ -304,10 +305,9 @@ class Menu(Widget):
         GameContext.menu = self
         grass_background(self)
                     
-    def resize(self, w, h):
-        print w, h
-        self.size = w, h
-        self.content.size = w, h
+    def resize(self, *largs):
+        self.size = Window.width, Window.height
+        self.content.size = Window.width, Window.height
         
     def start(self):
         """ Starts new game """

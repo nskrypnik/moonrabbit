@@ -37,6 +37,7 @@ class MoonRabbitApp(App):
         self.context.menu = menu
         Window.bind(on_resize=self.resize)
         self.root = root
+        Clock.schedule_once(menu.resize, -1)
         return root
     
     def fade_to_black(self, callback, da=0.2):
@@ -89,7 +90,7 @@ class MoonRabbitApp(App):
         if GameContext.ui:
             GameContext.ui.resize(w, h)
         if GameContext.menu:
-            GameContext.menu.resize(w, h)
+            GameContext.menu.resize()
             
     def switch_to_scene(self):
         self.root.add_widget(self.context.scene)
