@@ -381,6 +381,7 @@ class MoonRabbitGame(Widget):
         set_global_pause(True)
         if btn:
             btn.set_paused()
+            btn.unbind(on_release=self.pause)
             btn.bind(on_release=self.resume)
         if self.folding_screen:
             color, rect = self.folding_screen
@@ -396,6 +397,7 @@ class MoonRabbitGame(Widget):
         set_global_pause(False)
         if btn:
             btn.set_resumed()
+            btn.unbind(on_release=self.resume)
             btn.bind(on_release=self.pause)
         color, rect = self.folding_screen
         color.rgba = 0, 0, 0, 0

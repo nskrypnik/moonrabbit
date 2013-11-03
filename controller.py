@@ -149,7 +149,7 @@ class BaseCharacterController(BaseController):
     
     def get_path_to_goal(self):
         body = phy.Body()
-        shape = phy.Poly.create_box(body, (BLOCK_SIZE[0]-1, BLOCK_SIZE[1]-1))
+        shape = phy.Poly.create_box(body, (BLOCK_SIZE[0] / 2, BLOCK_SIZE[1] / 2))
         game_map = []
         dx, dy = BLOCK_SIZE[0] / 2., BLOCK_SIZE[1] / 2. 
         for y in xrange(GAME_AREA_SIZE[1]):
