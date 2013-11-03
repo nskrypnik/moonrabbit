@@ -336,9 +336,16 @@ class Tree(StaticBox, AnimationMixin):
         self._destroyed = False
             
     def start_grow(self, *largs):
+        dummy = phy.Body()
+        dummy.position = self.pos[0], self.pos[1]
+        shape = phy.Poly.create_box(dummy, (BLOCK_SIZE[0] - 1., BLOCK_SIZE[1] - 1.))
+        shapes = self.space.shape_query(shape)
+        if shapes:
+            for shape in shapes:
+                if not isinstance(shape, phy.Segment):
+                    self.start_grow_deffered(2)
+                    return
         
-        # first check if there's no something upen the root
-        # TODO: make checking and other stuff
         self.space.add(self.shape)
         self._destroyed = False
         self.set_animation('grow', True)
@@ -346,8 +353,8 @@ class Tree(StaticBox, AnimationMixin):
         if GameContext.game:
             GameContext.game.reindex_graphics()
     
-    def start_grow_deffered(self):
-        Clock.schedule_once(self.start_grow, 4)
+    def start_grow_deffered(self, dt=4):
+        Clock.schedule_once(self.start_grow, dt)
     
     def destroy(self, *largs):
         # first remove shape from emulated space

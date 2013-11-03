@@ -207,7 +207,7 @@ class BaseCharacterController(BaseController):
         self._path = self.get_path_to_goal()
         if not self._path:
             # can't define map stay in this position
-            self._counter = 15
+            self._counter = self.IDLE_TIME
         else:
             self.load_path()
             self.switch_to_moving()
@@ -404,7 +404,7 @@ class HeroRabbitController(BaseCharacterController):
 
 class HareController(BaseCharacterController):
     
-    MAY_GO_THROUGH = ['Tree', 'Hare']
+    MAY_GO_THROUGH = ['Tree', 'Hare',]
     IDLE_TIME = 0
     
     _sawing_steps = 0
