@@ -5,11 +5,15 @@ from kivy.graphics import Rectangle
 from kivy.uix.widget import Widget
 from kivy.uix.modalview import ModalView
 from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout 
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.scatter import ScatterPlane 
 from kivy.core.window import Window
+from kivy.core.image import Image
 from kivy.properties import ListProperty, NumericProperty, StringProperty,\
                             ObjectProperty, BooleanProperty
 from kivy.uix.button import Button
+
 
 Builder.load_string('''
 #place kivy notation of app here
@@ -29,9 +33,11 @@ Builder.load_string('''
             
 <MsgBox_Text>:
     size_hint: 1, 1
+    font_name: 'resources/Intro.ttf'
     
 <MsgBox_ButtonsBar>:
-    size_hint: 1, 0.5
+    size_hint: 1, None
+    size: 0, '60dp'
 ''')
 
 
@@ -84,14 +90,36 @@ class MsgBox(ModalView):
                       'yes': kw.pop('yes_callback', None),
                       'no': kw.pop('no_callback', None)}
         
-        kw.setdefault('size_hint', (0.5, 0.5))
-        kw.setdefault('autodismiss', False)
+        kw.setdefault('do_translation', False)
+        kw.setdefault('do_rotation', False)
+        kw.setdefault('do_scale', False)
+        #kw.setdefault('size_hint', (0.5, 0.5))
+        #kw.setdefault('autodismiss', False)
         super(MsgBox, self).__init__(*args, **kw)
+        self.canvas.clear()
         self.build_layout()
         
         #self.center = Window.center
         
+    def open(self):
+        super(MsgBox, self).open()
+        self.set_background()
+    
+    def set_background(self):
+        texture = Image('resources/interface/modal-background.png').texture
+        texture.wrap = 'repeat'
+        texture.uvsize = (1, 1)
+        with self.canvas.before:
+            Rectangle(texture=texture, size=self.size, pos=self.pos)
+    
+        
     def build_layout(self):
+        
+        def _wrap_anchor(w, anchor_x='center', anchor_y='center'):
+            anchor = AnchorLayout(anchor_x=anchor_x, anchor_y=anchor_y)
+            anchor.add_widget(w)
+            return anchor
+        
         self.content = BoxLayout(orientation='vertical',
                                  padding=self.content_padding)
         # build the title
@@ -113,10 +141,21 @@ class MsgBox(ModalView):
             self.button_bar.add_widget(self.ok_button)
             self.ok_button.bind(on_release=self.btn_release)
         if self.type == 'question':
-            self.yes_button = self.MsgBox_Button(text="Yes", font_size=self.font_size, type='yes')
-            self.no_button = self.MsgBox_Button(text="No", font_size=self.font_size, type='no')
-            self.button_bar.add_widget(self.yes_button)
-            self.button_bar.add_widget(self.no_button)
+            # Yes button
+            self.yes_button = self.MsgBox_Button(font_size=self.font_size, type='yes',
+                                                 size_hint=(None, None), size=('135dp', '51dp'),
+                                                 border=(0, 0, 0, 0),
+                                                 background_normal='resources/interface/yep.png',
+                                                 background_down='resources/interface/yep-pressed.png',
+                                                 )
+            self.no_button = self.MsgBox_Button(font_size=self.font_size, type='no',
+                                                 size_hint=(None, None), size=('135dp', '51dp'),
+                                                 border=(0, 0, 0, 0),
+                                                 background_normal='resources/interface/nah.png',
+                                                 background_down='resources/interface/nah-pressed.png',)
+            
+            self.button_bar.add_widget(_wrap_anchor(self.yes_button))
+            self.button_bar.add_widget(_wrap_anchor(self.no_button))
             self.yes_button.bind(on_release=self.btn_release)
             self.no_button.bind(on_release=self.btn_release)
         
@@ -125,6 +164,9 @@ class MsgBox(ModalView):
         self.add_widget(self.content)
         
     def btn_release(self, btn):
+        # clear here canvas to avoid effect of ghost widget
+        self.canvas.clear()
+        self.canvas.before.clear()
         self.dismiss()
         callback = self._callbacks.get(btn.type)
         if callback:
