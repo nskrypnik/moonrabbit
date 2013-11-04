@@ -29,6 +29,8 @@ Builder.load_string('''
 
 ''')
 
+FONT_NAME = 'resources/Intro.ttf'
+
 
 class Timer(object):
     def __init__(self, callback, time=70, **kw):
@@ -65,7 +67,7 @@ class Timer(object):
 
 class ToolBar(ScatterPlane):
     
-    _height = 60
+    _height = 55
     
     def __init__(self, *args, **kw):
         kw.setdefault('do_scale', False)
@@ -80,13 +82,13 @@ class ToolBar(ScatterPlane):
         
     def disable(self):
         self.button_menu.disabled = True
-        self.button_play    .disabled = True
+        self.button_play.disabled = True
     
     def set_layout(self):
         
-        anchor_left = AnchorLayout(anchor_x='left', anchor_y='bottom')
-        boxlayout1 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('350dp', 0))
-        button_menu = Button(size_hint=(None, None), size=('141dp', '57dp'), border=(0, 0, 0, 0), 
+        #anchor_left = AnchorLayout(anchor_x='left', anchor_y='bottom')
+        boxlayout1 = BoxLayout(orientation='horizontal', size_hint=(None, None), size=(Window.width, '%sdp' % self._height)) #, size=('350dp', 0))
+        button_menu = Button(size_hint=(None, None), size=('127dp', '51dp'), border=(0, 0, 0, 0), 
                              background_normal='resources/interface/menu.png',
                              background_down='resources/interface/menu-pressed.png',
                              background_disabled_normal='resources/interface/menu.png',
@@ -94,55 +96,54 @@ class ToolBar(ScatterPlane):
                              on_release=self.go_to_menu
                              )
         self.button_menu = button_menu
-        button_save = Button(size_hint=(None, None), size=('132dp', '57dp'), border=(0, 0, 0, 0),
-                             background_normal='resources/interface/save.png',
-                             background_down='resources/interface/save-pressed.png',
-                             background_color=(1, 1, 1, 1))
-        button_play = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
+        #button_save = Button(size_hint=(None, None), size=('132dp', '57dp'), border=(0, 0, 0, 0),
+        #                     background_normal='resources/interface/save.png',
+        #                     background_down='resources/interface/save-pressed.png',
+        #                     background_color=(1, 1, 1, 1))
+        button_play = Button(size_hint=(None, None), size=('68dp', '51dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/pause.png',
                              background_down='resources/interface/pause-pressed.png',
                              background_disabled_normal='resources/interface/pause.png',
                              on_release=GameContext.game.pause,
                              background_color=(1, 1, 1, 1))
         boxlayout1.add_widget(button_menu)
-        boxlayout1.add_widget(button_save)
+        #boxlayout1.add_widget(button_save)
         boxlayout1.add_widget(button_play)
         
         self.button_play = button_play
         self.button_play.set_paused = self.set_paused
         self.button_play.set_resumed = self.set_resumed
         
-        anchor_left.add_widget(boxlayout1)
+        #anchor_left.add_widget(boxlayout1)
         
-        self.add_widget(anchor_left)
-        
-        anchor_center = AnchorLayout(anchor_x='center', anchor_y="bottom", size_hint=(None, None),
-                                     size=(Window.width, '%sdp' % self._height))
-        steps = Label(text="STEPS:0", font_size="34dp", font_name='resources/Intro.ttf') #, font_name="resources/Intro.ttf")
+        anchor_center = AnchorLayout(anchor_x='center', anchor_y="bottom", size_hint=(1, 1))
+        #size=(Window.width, '%sdp' % self._height))
+        steps = Label(text="STEPS:0", font_size="31dp", font_name=FONT_NAME) #, font_name="resources/Intro.ttf")
         self.steps = steps
         anchor_center.add_widget(steps)
         
-        self.add_widget(anchor_center)
+        boxlayout1.add_widget(anchor_center)
         
-        anchor_right = AnchorLayout(anchor_x='right', anchor_y="bottom", size_hint=(None, None),
-                                     size=(Window.width, '%sdp' % self._height))
-        boxlayout2 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('146dp', 0))
-        button_trees = Button(size_hint=(None, None), size=('75dp', '57dp'), border=(0, 0, 0, 0),
+        #anchor_right = AnchorLayout(anchor_x='right', anchor_y="bottom", size_hint=(None, None),
+        #                             size=(Window.width, '%sdp' % self._height))
+        boxlayout2 = BoxLayout(orientation='horizontal', size_hint=(None, 1), size=('120dp', 0))
+        button_trees = Button(size_hint=(None, None), size=('68dp', '57dp'), border=(0, 0, 0, 0),
                              background_normal='resources/interface/trees.png',
                              background_down='resources/interface/trees.png',
                              background_disabled_normal='resources/interface/trees_press.png',
                              background_color=(1, 1, 1, 1),
                              on_release=GameContext.game.switch_to_plant_tree
                              )
-        number_of_trees = Label(text='x5', font_size="44dp")
+        number_of_trees = Label(text='x5', font_size="31dp", font_name=FONT_NAME)
         boxlayout2.add_widget(button_trees)
         boxlayout2.add_widget(number_of_trees)
         
         self.button_trees = button_trees
         self.number_of_trees = number_of_trees
         
-        anchor_right.add_widget(boxlayout2)
-        self.add_widget(anchor_right)
+        boxlayout1.add_widget(boxlayout2)
+        self.add_widget(boxlayout1)
+        #self.add_widget(anchor_right)
     
     def go_to_menu(self,btn):
         GameContext.game.pause(self.button_play)
@@ -220,7 +221,7 @@ class UI(Widget):
         def _greeting(dt):
             
             anchor = AnchorLayout(anchor_x='center', anchor_y='center', size=(Window.width, Window.height))
-            label = Label(text='TAP TO START', font_size='50dp', bold=True)
+            label = Label(text='TAP TO START', font_size='50dp', bold=True, font_name=FONT_NAME)
             anchor.add_widget(label)
             anchor.bind(on_touch_up=self.close_greeting)
             self.greeting_msg = anchor
@@ -265,10 +266,10 @@ class MenuItem(Label):
     release = ObjectProperty(None)
     
     def __init__(self, *args, **kw):
-        kw.setdefault('font_size', '30dp')
+        kw.setdefault('font_size', 30)
         kw.setdefault('font_name', 'resources/Intro.ttf')
         kw.setdefault('size_hint', (None, None))
-        kw.setdefault('size', ('300dp', '45dp'))
+        kw.setdefault('size', (300, 45))
         kw.setdefault('bold', True)
         super(MenuItem, self).__init__(*args, **kw)
     
@@ -304,10 +305,17 @@ class Menu(Widget):
         super(Menu, self).__init__(*args, **kw)
         GameContext.menu = self
         grass_background(self)
+        self.scale_content()
+        
+    def scale_content(self):
+        scale = Window.height/float(self.content.size[1])
+        self.content.scale = scale
+        self.content.center = Window.width / 2, Window.height / 2
                     
     def resize(self, *largs):
         self.size = Window.width, Window.height
-        self.content.size = Window.width, Window.height
+        #self.content.size = Window.width, Window.height
+        self.scale_content()
         
     def start(self):
         """ Starts new game """

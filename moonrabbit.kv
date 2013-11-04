@@ -4,36 +4,43 @@
 
 <Menu>:
 	content: content
-	AnchorLayout:
+
+	ScatterPlane:
 		id: content
-		anchor_x: 'center'
-		anhor_y: 'center'
-		size: window.width, window.height
-		
-		GridLayout:
-			cols: 1
-			size_hint: None, 1
-			size: 549, 0
-			
-			Widget:
-				size_hint: None, None
-				size: 549, 329
-				canvas:
-					Rectangle:
-						source: 'resources/interface/logo.png'
-						pos: self.pos
-						size: self.size
-			
-			MenuItem:
-				text: "START"
-				release: root.start
-			MenuItem:
-				text: "HELP"
-			MenuItem:
-				text: "CREDITS"
-			MenuItem:
-				text: "EXIT"
-				release: root.exit
+		size: 549, 576
+		do_translation: False
+		do_rotation: False
+		do_scale: False
+
+		AnchorLayout:
+			anchor_x: 'center'
+			anhor_y: 'center'
+			size: 549, 576
+	
+			GridLayout:
+				cols: 1
+				size_hint: None, 1
+				size: 549, 0
+				
+				Widget:
+					size_hint: None, None
+					size: 549, 329
+					canvas:
+						Rectangle:
+							source: 'resources/interface/logo.png'
+							pos: self.pos
+							size: self.size
+				
+				MenuItem:
+					text: "START"
+					release: root.start
+				MenuItem:
+					text: "HELP"
+				MenuItem:
+					text: "CREDITS"
+				MenuItem:
+					text: "EXIT"
+					release: root.exit
 				
 
 <Loader>:
@@ -62,7 +69,8 @@
 			Label:
 				id: percent_label
 				text: "0%"
-				font_size: "45dp"
+				font_size: "35dp"
+				font_name: 'resources/Intro.ttf'
 		
 	AnchorLayout:
 		anchor_x: 'center'
