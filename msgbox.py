@@ -104,7 +104,7 @@ class MsgBox(ModalView):
     def set_background(self):
         texture = Image('resources/interface/modal-background.png').texture
         texture.wrap = 'repeat'
-        texture.uvsize = (1, 1)
+        texture.uvsize = (2, 1)
         with self.canvas.before:
             Rectangle(texture=texture, size=self.size, pos=self.pos)
     

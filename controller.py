@@ -101,6 +101,7 @@ class BaseCharacterController(BaseController):
     def __init__(self, *args):
         
         IDLE_TIME = 15
+        _fail_to_find_path = 0
 
         self.faced = False
         self._state = 'IDLE'
@@ -207,8 +208,12 @@ class BaseCharacterController(BaseController):
         self._path = self.get_path_to_goal()
         if not self._path:
             # can't define map stay in this position
+            self._fail_to_find_path += 1
             self._counter = self.IDLE_TIME
+            if self._fail_to_find_path > 3:
+                self._counter += 20
         else:
+            self._fail_to_find_path = 0
             self.load_path()
             self.switch_to_moving()
         
