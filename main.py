@@ -19,6 +19,7 @@ from game import MoonRabbitGame
 from gamecontext import GameContext
 from ui import UI, Menu, Loader, WinPicture, LosePicture 
 from settings import BLOCK_SIZE, GAME_AREA_SIZE
+from msgbox import MsgBox
 
 
 class MoonRabbitApp(App):
@@ -71,7 +72,6 @@ class MoonRabbitApp(App):
         menu = Menu()
         self.root.add_widget(menu)
         self.context.menu = menu
-        
         
     def finish_round(self):
         game = self.context.game

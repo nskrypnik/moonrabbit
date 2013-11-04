@@ -295,6 +295,25 @@ class Menu(Widget):
         GameContext.menu = self
         grass_background(self)
         self.scale_content()
+    
+    def show_credits(self):
+        msg = MsgBox(text="This game is created by software engineer Niko Skrypnik and "\
+                     "designers from Sunny Studio and powered with Kivy - open source"\
+                     "framework for creating cross-platform applications on Python",
+                     font_size='23dp', type='info', size_hint=(0.95, 0.95),
+                     buttons_padding='5dp',
+                    )
+        msg.open()
+    
+    def show_help(self):
+        msg = MsgBox(text="Path of the Rabbit game is the simple game"\
+                     " with indirect control where you should help the main hero(Rabbit)"\
+                     " to achieve the Holly Carrot. You should help him to avoid meet with"\
+                     " cruel and dangerous Hare which wants to kill our hero.",
+                     font_size='23dp', type='info', size_hint=(0.95, 0.95),
+                     buttons_padding='5dp',
+                    )
+        msg.open()
         
     def scale_content(self):
         scale = Window.height/float(self.content.size[1])

@@ -90,16 +90,12 @@ class MsgBox(ModalView):
                       'yes': kw.pop('yes_callback', None),
                       'no': kw.pop('no_callback', None)}
         
-        kw.setdefault('do_translation', False)
-        kw.setdefault('do_rotation', False)
-        kw.setdefault('do_scale', False)
-        #kw.setdefault('size_hint', (0.5, 0.5))
-        #kw.setdefault('autodismiss', False)
+
+        kw.setdefault('size_hint', (0.5, 0.5))
+        kw.setdefault('autodismiss', False)
         super(MsgBox, self).__init__(*args, **kw)
         self.canvas.clear()
         self.build_layout()
-        
-        #self.center = Window.center
         
     def open(self):
         super(MsgBox, self).open()
@@ -137,8 +133,10 @@ class MsgBox(ModalView):
                                     spacing=self.buttons_padding)
         # create buttons according to type of message box
         if self.type == 'info':
-            self.ok_button = self.MsgBox_Button(text="OK", font_size=self.font_size, type='ok')
-            self.button_bar.add_widget(self.ok_button)
+            self.ok_button = self.MsgBox_Button(text="OK", font_size=self.font_size, type='ok',
+                                                font_name='resources/Intro.ttf',
+                                                size_hint=(None, None), size=('70dp', '50dp'))
+            self.button_bar.add_widget(_wrap_anchor(self.ok_button))
             self.ok_button.bind(on_release=self.btn_release)
         if self.type == 'question':
             # Yes button
