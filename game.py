@@ -152,7 +152,7 @@ class MoonRabbitGame(Widget):
         """ Create here and add to scene all game objects """
 
         # read map
-        options, landscapes, statics, dynamics = read_map('test.map')
+        options, landscapes, statics, dynamics, trees, hero, hare = read_map('test.map')
         self.num_of_blocks_X, self.num_of_blocks_Y = options['size']
         with self.canvas:
             # init landscapes
@@ -179,8 +179,8 @@ class MoonRabbitGame(Widget):
         
         with self.canvas:
             # draw or hero
-            HeroRabbit(self.block_width/2., self.block_height/2.)
-            Hare(self.block_width*3.5, self.block_height*3.5)
+            HeroRabbit(BLOCK_SIZE[0]*(hero[0] + 0.5), BLOCK_SIZE[1]*(hero[1] + 0.5))
+            Hare(BLOCK_SIZE[0]*(hare[0] + 0.5), BLOCK_SIZE[1]*(hare[1] + 0.5))
 
         # init statics
         def _is_mountain(i, j):
@@ -215,8 +215,9 @@ class MoonRabbitGame(Widget):
                     elif class_name == 'mountain':
                         _mountains.append((pos, _get_mountain_type(i, j)))
                         #Mountain(*pos, type=_get_mountain_type(i, j))
-                        
-        Tree(self.block_width*2.5, self.block_height*1.5)
+        
+        for tree_pos in trees:
+            Tree(BLOCK_SIZE[0]*(tree_pos[0] + 0.5), BLOCK_SIZE[1]*(tree_pos[1] + 0.5))
         
         with self.canvas:
             for pos in _bushes:

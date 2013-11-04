@@ -17,6 +17,14 @@
 	[8, 3, "mountain"], [8, 4, "mountain"], [8, 5, "mountain"], [7, 2, "mountain"], [8, 2, "mountain"], [9, 2, "mountain"],
 	[10, 2, "mountain"], [11, 2, "mountain"], [12, 2, "mountain"], [8, 1, "mountain"], [12, 1, "mountain"]
 	],
+	
+	"hero": [0, 0],
+	"hare": [3, 3],
+	
+	"trees": [
+		[1, 1]
+	],
+
 
 	"options": {"size": [14, 10], "dynamics_as_blocks": true}
 }

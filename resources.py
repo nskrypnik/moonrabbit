@@ -398,6 +398,9 @@ def read_map(fname):
         landscapes: [(i,j,type), ...], where type is in ['grass', 'water', 'sand', 'hole', 'carrot']
         statics: [(i,j,type), ...], where type is in ['mountain', 'bush']
         dynamics: [(x,y,type), ...], where type is in ['wood', 'rock', 'rock2']
+        trees: [(x, y), ... ]
+        hero: [x, y]
+        hare: [x, y]
     """
 
     required_fields = {'landscapes', 'statics', 'dynamics', 'options'}
@@ -405,7 +408,6 @@ def read_map(fname):
         with open(fname, 'r') as ifile:
             data = ifile.read()
             map = json.loads(data)
-            print 10000
             # check that all required fields are presented
             assert len(required_fields - set(map.keys())) == 0
     except:
@@ -424,4 +426,4 @@ def read_map(fname):
     statics = list_to_2d_array(num_X, num_Y, map['statics'])
     dynamics = map['dynamics']
 
-    return map['options'], landscapes, statics, dynamics
+    return map['options'], landscapes, statics, dynamics, map['trees'], map['hero'], map['hare']
