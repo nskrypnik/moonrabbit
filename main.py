@@ -123,6 +123,10 @@ class MoonRabbitApp(App):
 
     def on_pause(self):
         return True
+    
+    def on_resume(self):
+        cb = lambda dt: self.resize(None, Window.width, Window.height)
+        Clock.schedule_once(cb, -1)
 
 
 if __name__ == '__main__':

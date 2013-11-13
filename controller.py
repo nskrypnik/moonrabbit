@@ -97,11 +97,11 @@ class BaseController(object):
 class BaseCharacterController(BaseController):
     
     """ This is the controller for main Rabbit character """
+    
+    IDLE_TIME = 15
+    _fail_to_find_path = 0
         
     def __init__(self, *args):
-        
-        IDLE_TIME = 15
-        _fail_to_find_path = 0
 
         self.faced = False
         self._state = 'IDLE'
